@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.openstreetmap.josm.gui.MainApplication;
+import org.openstreetmap.josm.gui.MainMenu;
 import org.openstreetmap.josm.gui.MapFrame;
 import org.openstreetmap.josm.gui.autofilter.AutoFilter;
 import org.openstreetmap.josm.gui.autofilter.AutoFilterManager;
@@ -21,6 +22,8 @@ import org.openstreetmap.josm.plugins.PluginInformation;
 import org.openstreetmap.josm.spi.preferences.Config;
 
 import controller.IndoorHelperController;
+import controller.io.ImportDataController;
+import views.io.ImportBIMDataAction;
 
 /**
  * This is the main class for the indoorhelper plug-in.
@@ -30,7 +33,10 @@ import controller.IndoorHelperController;
  */
 public class IndoorHelperPlugin extends Plugin implements PaintableInvalidationListener, ActiveLayerChangeListener {
 
-    private IndoorHelperController controller;
+    private IndoorHelperController indoorController;	// controller for indoor helper panel
+	private ImportDataController importController;		// controller for import function
+	private ImportBIMDataAction importBIMAction = new ImportBIMDataAction();
+
     String sep = System.getProperty("file.separator");
 
     /**
@@ -56,8 +62,12 @@ public class IndoorHelperPlugin extends Plugin implements PaintableInvalidationL
 
         if (oldFrame == null && newFrame != null) {
             // Secures that the plug-in is only loaded, if a new MapFrame is created.
-            controller = new IndoorHelperController();
+            indoorController = new IndoorHelperController();
+            importController = new ImportDataController();
         }
+
+        // add menu entry for BIM import
+        MainMenu.add(MainApplication.getMenu().fileMenu, importBIMAction);
     }
 
     /**
@@ -101,16 +111,17 @@ public class IndoorHelperPlugin extends Plugin implements PaintableInvalidationL
         AutoFilter currentAutoFilter = AutoFilterManager.getInstance().getCurrentAutoFilter();
 
         if (currentAutoFilter != null) {
-            if (controller != null) {
+            if (indoorController != null) {
                 String currentFilterValue = currentAutoFilter.getLabel();
 
-                controller.setIndoorLevel(currentFilterValue);
-                controller.getIndoorLevel(currentFilterValue);
-                controller.unsetSpecificKeyFilter("repeat_on");
+                indoorController.setIndoorLevel(currentFilterValue);
+                indoorController.getIndoorLevel(currentFilterValue);
+                indoorController.unsetSpecificKeyFilter("repeat_on");
             }
-        } else if (controller != null) {
-            controller.setIndoorLevel("");
-            controller.getIndoorLevel("");
+        } else if (indoorController != null) {
+            indoorController.setIndoorLevel("");
+            indoorController.getIndoorLevel("");
         }
     }
+
 }
