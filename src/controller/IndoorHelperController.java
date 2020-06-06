@@ -41,7 +41,7 @@ import views.ToolBoxView;
 
 /**
  *
- * Class for the Controller which provides the communication between the
+ * IndoorHelper controller class which provides the communication between the
  * IndoorHelperModel and the different views.
  *
  * @author egru
