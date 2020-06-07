@@ -8,7 +8,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.openstreetmap.josm.gui.MainApplication;
-import org.openstreetmap.josm.gui.MainMenu;
 import org.openstreetmap.josm.gui.MapFrame;
 import org.openstreetmap.josm.gui.autofilter.AutoFilter;
 import org.openstreetmap.josm.gui.autofilter.AutoFilterManager;
@@ -23,7 +22,6 @@ import org.openstreetmap.josm.spi.preferences.Config;
 
 import controller.IndoorHelperController;
 import controller.io.ImportDataController;
-import views.io.ImportBIMDataAction;
 
 /**
  * This is the main class for the indoorhelper plug-in.
@@ -35,7 +33,6 @@ public class IndoorHelperPlugin extends Plugin implements PaintableInvalidationL
 
     private IndoorHelperController indoorController;	// controller for indoor helper panel
 	private ImportDataController importController;		// controller for import function
-	private ImportBIMDataAction importBIMAction = new ImportBIMDataAction();
 
     String sep = System.getProperty("file.separator");
 
@@ -65,9 +62,6 @@ public class IndoorHelperPlugin extends Plugin implements PaintableInvalidationL
             indoorController = new IndoorHelperController();
             importController = new ImportDataController();
         }
-
-        // add menu entry for BIM import
-        MainMenu.add(MainApplication.getMenu().fileMenu, importBIMAction);
     }
 
     /**
