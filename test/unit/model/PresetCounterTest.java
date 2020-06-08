@@ -1,5 +1,5 @@
 // License: GPL. For details, see LICENSE file.
-package model;
+package unit.model;
 
 import static org.junit.Assert.assertEquals;
 
@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.junit.Test;
 
+import model.PresetCounter;
 import model.TagCatalog.IndoorObject;
 
 /**

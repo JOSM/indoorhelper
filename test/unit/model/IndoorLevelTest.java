@@ -1,10 +1,12 @@
 // License: GPL. For details, see LICENSE file.
-package model;
+package unit.model;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
+
+import model.IndoorLevel;
 
 /**
  * Unit tests of {@link IndoorLevel} class.
