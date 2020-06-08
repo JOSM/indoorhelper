@@ -1,0 +1,55 @@
+ISO-10303-21;
+HEADER;
+FILE_DESCRIPTION (('hello pipe'), '2;1');
+FILE_NAME ('', '2019-05-06T22:49:28', ('Bock'), (''), 'C#2Ifc2html', '', '');
+FILE_SCHEMA (('IFC4'));
+ENDSEC;
+DATA;
+/* local coords:                                                              */
+#101=IFCCARTESIANPOINT((0.000,0.000,0.000));/* origin */
+#102=IFCDIRECTION((1.000,0.000,0.000));/* X-axis */
+#103=IFCDIRECTION((0.000,1.000,0.000));/* Y-axis */
+#104=IFCDIRECTION((0.000,0.000,1.000));/* Z-axis */
+#105=IFCAXIS2PLACEMENT3D(#101,#104,#102);/* cartesian coordinate system */
+/* unit-declaration:                                                          */
+#121=IFCSIUNIT($,.LENGTHUNIT.,$,.METRE.);/* e.g. cartesian point coordinates */
+#122=IFCSIUNIT($,.PLANEANGLEUNIT.,$,.RADIAN.);/* rotation angles */
+#123=IFCUNITASSIGNMENT((#121,#122));
+/* ways to display:                                                           */
+#142=IFCGEOMETRICREPRESENTATIONCONTEXT('3D body','3D-Models VR',3,$,#105,$);
+#145=IFCGEOMETRICREPRESENTATIONSUBCONTEXT('body300','LOD300',$,$,$,$,#142,$,.MODEL_VIEW.,$);
+/* assign global coords to 3D representation context:                         */
+#161=IFCPROJECTEDCRS('EPSG:25832','UTM in band 32','ETRS89','DHHN92','UTM','UTM32',#121);
+#162=IFCMAPCONVERSION(#142,#161,439949.000,5466152.000,130.000,1.000,0.000,1.000);/* base of local coords */
+/* assign contexts, units to project:                                         */
+#181=IFCPROJECT('2Dx3oA_r5F69i0DCABvXDv',$,'hello pipe project',$,$,$,$,(#145),#123);
+/* 3D-body-context LOD 300:                                                   */
+#201=IFCCARTESIANPOINT((0.000,0.200));/*  (1): x=0              , y=ri  */
+#202=IFCCARTESIANPOINT((0.000,0.263));/*  (2): x=0              , y=rsp */
+#203=IFCCARTESIANPOINT((0.100,0.263));/*  (3): x=lso            , y=rsp */
+#204=IFCCARTESIANPOINT((0.100,0.275));/*  (4): x=lso            , y=ra  */
+#205=IFCCARTESIANPOINT((2.784,0.275));/*  (5): x=l-3*(rg-ra)    , y=ra  */
+#206=IFCCARTESIANPOINT((3.000,0.347));/*  (6): x=l              , y=rg  */
+#207=IFCCARTESIANPOINT((3.100,0.347));/*  (7): x=l+lso          , y=rg  */
+#208=IFCCARTESIANPOINT((3.100,0.272));/*  (8): x=l+lso          , y=rso */
+#209=IFCCARTESIANPOINT((3.000,0.272));/*  (9): x=l              , y=rso */
+#210=IFCCARTESIANPOINT((3.000,0.200));/* (10): x=l              , y=ri  */
+#211=IFCCARTESIANPOINT((0.000,0.200));/* (11)=(1)                       */
+#212=IFCPOLYLINE((#201,#202,#203,#204,#205,#206,#207,#208,#209,#210,#211));
+#213=IFCARBITRARYCLOSEDPROFILEDEF(.AREA.,$,#212);/* declare poly as area */
+#214=IFCAXIS2PLACEMENT3D(#101,#104,#102);/* revolve-plane */
+#215=IFCAXIS1PLACEMENT(#101,#102);/* rotation axis */
+#216=IFCREVOLVEDAREASOLID(#213,#214,#215,6.283);/* how */
+#217=IFCSHAPEREPRESENTATION(#145,'body300',$,(#216));/* as */
+/* product shape definition, placement and instancing:                        */
+#501=IFCPRODUCTDEFINITIONSHAPE($,$,(#217));/* with */
+#502=IFCLOCALPLACEMENT($,#105);/* where */
+#503=IFCFLOWSEGMENT('3poERwXYL9lgTG8ACKJuNz',$,'pipe',$,$,#502,#501,$);/* what */
+/* assign properties to pipe:                                                 */
+#701=IFCPROPERTYSINGLEVALUE('DN',$,IFCREAL(400),$);
+#702=IFCPROPERTYSET('1FGilBX2j3hgY6Jx3rLKfz',$,'pipe-properties',$,(#701));
+#703=IFCRELDEFINESBYPROPERTIES('3GIJzeSVL6_x3rDzCQWlth',$,$,$,(#503),#702);
+/* assign elements to project:                                                */
+#901=IFCRELAGGREGATES('1l4J2aaDD0b9lNurr4uB78',$,$,$,#181,(#503));
+ENDSEC;
+END-ISO-10303-21;

@@ -10,64 +10,97 @@ import java.nio.file.Paths;
 import java.util.Scanner;
 
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.tools.Logging;
 
+import controller.io.ImportEventListener;
 import nl.tue.buildingsmart.express.population.ModelPopulation;
 
 /**
- * Parser for BIM data. Extracts major BIM elements and transforms coordinates into OSM convenient format.
+ * Parser for BIM data. Extracts major BIM elements and transforms coordinates into OSM convenient format
  *
  * @author rebsc
  *
  */
 public class BIMtoOSMParser {
 
-	private final String IFC2X3_TC1 = "IFC2X3_TC1";
-	private final String IFC2X3 = "IFC2X3";
-	private final String IFC4 = "IFC4";
+	private final String FLAG_IFC2X3_TC1 = "FILE_SCHEMA(('IFC2X3_TC1'))";
+	private final String FLAG_IFC2X3 = "FILE_SCHEMA(('IFC2X3'))";
+	private final String FLAG_IFC4 = "FILE_SCHEMA(('IFC4'))";
 	private final String resourcePathDir = System.getProperty("user.dir") + File.separator + "resources" + File.separator;
 	private String ifcSchemaFilePath = resourcePathDir + "IFC2X3_TC1.exp"; // default
 
-	ModelPopulation ifcModel;
+	private ImportEventListener importListener;
+	private FileInputStream inputfs = null;
+	private ModelPopulation ifcModel;
+	private DataSet osmData;
 
-	public DataSet parse(String filepath) {
-		FileInputStream fs = null;
-		ModelPopulation ifcModel;
-		DataSet osmData = new DataSet();
+	public BIMtoOSMParser(ImportEventListener listener) {
+		importListener = listener;
+		osmData = new DataSet();
+	}
 
+	/**
+	 * Method parses data from ifc file into osm data
+	 * @param filepath of ifc file
+	 */
+	public void parse(String filepath) {
+		// load data into ifc model
 		try {
-
 			// find used ifc schema
 			String usedIfcSchema = chooseSchemaFile(filepath);
-			if(usedIfcSchema.equals(IFC4)) {
-				ifcSchemaFilePath = resourcePathDir + "IFC4.exp";
+
+			if(usedIfcSchema.isEmpty()) {
+				showsLoadingErrorView(filepath, "Could not load IFC file.\n"+"IFC schema is no supported.");
+				return;
 			}
-			if(usedIfcSchema == "") {
-				showErrorView("Could not load IFC file.\n"+"IFC schema is no supported.");
-				return osmData;
+			if(usedIfcSchema.equals(FLAG_IFC4)) {
+				ifcSchemaFilePath = resourcePathDir + "IFC4.exp";
 			}
 
 			// load ifc file
-			fs = new FileInputStream(filepath);
-
+			inputfs = new FileInputStream(filepath);
 			// load ifc file data into model
-			ifcModel = new ModelPopulation(fs);
+			ifcModel = new ModelPopulation(inputfs);
 			ifcModel.setSchemaFile(Paths.get(ifcSchemaFilePath));
-			// TODO Add progress bar because loading large files needs some time
 			ifcModel.load();
 
+			// if loading throws ParseException check if ifcModel is empty to recognize something went wrong
+			if(ifcModel.getInstances() == null) {
+				showsLoadingErrorView(filepath, "Could not load IFC file.");
+				return;
+			}
 		} catch (FileNotFoundException e) {
 			Logging.error(e.getMessage());
 		}
 		finally {
-			if ( fs != null ){
-				try { fs.close(); } catch ( IOException e ) { }
+			if ( inputfs != null ){
+				try { inputfs.close(); } catch ( IOException e ) { }
 			}
 		}
+		Logging.info(this.getClass().getName() + ": " + filepath + " loaded successfully");
 
+		// extract important data and put them into internal data structure
+		FilteredBIMData filteredBIMdata = extractMajorBIMData();
+
+		// TODO transform coordinates
+		// TODO parse FilteredBIMData into osm DataSet
+
+		// send parsed data to controller
+		importListener.onDataParsed(osmData);
+		Logging.info(this.getClass().getName() + ": " + filepath + " parsed successfully");
+	}
+
+
+	/**
+	 * Filters important osm data into internal data structure
+	 * @return FilteredBIMData including BIM objects of ways, rooms, etc.
+	 */
+	private FilteredBIMData extractMajorBIMData() {
+		// TODO extract
 		return null;
 	}
 
@@ -81,16 +114,24 @@ public class BIMtoOSMParser {
 		try {
 		      File file = new File(filepath);
 		      Scanner reader = new Scanner(file, StandardCharsets.UTF_8.name());
+
 		      while (reader.hasNextLine()) {
 		        String data = reader.nextLine();
-		        if(data.contains(IFC2X3_TC1) || data.contains(IFC2X3) ) {
-		        	schema = IFC2X3_TC1;
+		        data = data.replaceAll("\\s+","");
+
+		        // schema must be defined before this flag
+		        if(data.contains("DATA;"))	break;
+		        // check if IFC2X3
+		        if(data.contains(FLAG_IFC2X3_TC1) || data.contains(FLAG_IFC2X3)) {
+		        	schema = FLAG_IFC2X3_TC1;
 		        	break;
 				}
-				else if(data.contains(IFC4)) {
-					schema = IFC4;
+		        // check if IFC4
+				else if(data.contains(FLAG_IFC4)) {
+					schema = FLAG_IFC4;
 					break;
 				}
+
 		      }
 		      reader.close();
 		} catch (FileNotFoundException e) {
@@ -101,14 +142,38 @@ public class BIMtoOSMParser {
 	}
 
 	/**
+	 * Shows error dialog is file loading failed
+	 * @param filepath of ifc file
+	 * @param msg Error message
+	 */
+	private void showsLoadingErrorView(String filepath, String msg) {
+		showErrorView(msg);
+		Logging.info(this.getClass().getName() + ": " + filepath + " loading failed");
+	}
+
+	/**
 	 * Shows error dialog
 	 * @param msg Error message
 	 */
 	private void showErrorView(String msg) {
-		JOptionPane.showMessageDialog(MainApplication.getMainFrame(),
-			    msg,
-			    "Error",
-			    JOptionPane.ERROR_MESSAGE);
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				JOptionPane.showMessageDialog(MainApplication.getMainFrame(),
+						msg,
+	     			    "Error",
+	     			    JOptionPane.ERROR_MESSAGE);
+	         }
+	     });
+	}
+
+	/**
+	 * Data structure holding specific BIM data elements.
+	 * @author rebsc
+	 */
+	private class FilteredBIMData {
+
+		//TODO Lists for each important osm object
 	}
 
 }
