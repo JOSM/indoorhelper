@@ -34,7 +34,7 @@ public class ImportDataController implements ImportEventListener{
 		model = new ImportDataModel();
 		parser = new BIMtoOSMParser(this);
 		importBIMAction = new ImportBIMDataAction(this);
-		MainMenu.add(MainApplication.getMenu().fileMenu, importBIMAction);
+		MainMenu.add(MainApplication.getMenu().fileMenu, importBIMAction, false, 21);
 		initProgressProcess();
 	}
 

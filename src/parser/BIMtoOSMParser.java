@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.Scanner;
+import java.util.Vector;
 
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
@@ -17,6 +18,8 @@ import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.tools.Logging;
 
 import controller.io.ImportEventListener;
+import model.io.BIMtoOSMCatalog;
+import nl.tue.buildingsmart.express.population.EntityInstance;
 import nl.tue.buildingsmart.express.population.ModelPopulation;
 
 /**
@@ -85,9 +88,8 @@ public class BIMtoOSMParser {
 
 		// extract important data and put them into internal data structure
 		FilteredBIMData filteredBIMdata = extractMajorBIMData();
-
-		// TODO transform coordinates
 		// TODO parse FilteredBIMData into osm DataSet
+		// TODO transform coordinates
 
 		// send parsed data to controller
 		importListener.onDataParsed(osmData);
@@ -100,9 +102,56 @@ public class BIMtoOSMParser {
 	 * @return FilteredBIMData including BIM objects of ways, rooms, etc.
 	 */
 	private FilteredBIMData extractMajorBIMData() {
-		// TODO extract
-		return null;
+		FilteredBIMData bimData = new FilteredBIMData();
+
+		// get all areas
+		Vector<EntityInstance> areaObjects = new Vector<>();
+		BIMtoOSMCatalog.getAreaTags().forEach(tag ->{
+			ifcModel.getInstancesOfType(tag).forEach(entity ->{
+				areaObjects.add(entity);
+			});
+		});
+		bimData.setAreaObjects(areaObjects);
+
+		// get all walls
+		Vector<EntityInstance> wallObjects = new Vector<>();
+		BIMtoOSMCatalog.getWallTags().forEach(tag ->{
+			ifcModel.getInstancesOfType(tag).forEach(entity ->{
+				wallObjects.add(entity);
+			});
+		});
+		bimData.setWallObjects(wallObjects);
+
+		// get all columns
+		Vector<EntityInstance> colObjects = new Vector<>();
+		BIMtoOSMCatalog.getColumnTags().forEach(tag ->{
+			ifcModel.getInstancesOfType(tag).forEach(entity ->{
+				colObjects.add(entity);
+			});
+		});
+		bimData.setColumnObjects(colObjects);
+
+		// get all doors
+		Vector<EntityInstance> doorObjects = new Vector<>();
+		BIMtoOSMCatalog.getDoorTags().forEach(tag ->{
+			ifcModel.getInstancesOfType(tag).forEach(entity ->{
+				doorObjects.add(entity);
+			});
+		});
+		bimData.setDoorObjects(doorObjects);
+
+		// get all doors
+		Vector<EntityInstance> stairObjects = new Vector<>();
+		BIMtoOSMCatalog.getStairTags().forEach(tag ->{
+			ifcModel.getInstancesOfType(tag).forEach(entity ->{
+				stairObjects.add(entity);
+			});
+		});
+		bimData.setDoorObjects(stairObjects);
+
+		return bimData;
 	}
+
 
 	/**
 	 * Read the FILE_SCHEMA flag from ifc file and return used schema
@@ -172,8 +221,42 @@ public class BIMtoOSMParser {
 	 * @author rebsc
 	 */
 	private class FilteredBIMData {
+		private Vector<EntityInstance> areaObjects;
+		private Vector<EntityInstance> wallObjects;
+		private Vector<EntityInstance> columnObjects;
+		private Vector<EntityInstance> doorObjects;
+		private Vector<EntityInstance> stairObjects;
 
-		//TODO Lists for each important osm object
+		public Vector<EntityInstance> getAreaObjects() {
+			return areaObjects;
+		}
+		public void setAreaObjects(Vector<EntityInstance> areaObjects) {
+			this.areaObjects = areaObjects;
+		}
+		public Vector<EntityInstance> getWallObjects() {
+			return wallObjects;
+		}
+		public void setWallObjects(Vector<EntityInstance> wallObjects) {
+			this.wallObjects = wallObjects;
+		}
+		public Vector<EntityInstance> getColumnObjects() {
+			return columnObjects;
+		}
+		public void setColumnObjects(Vector<EntityInstance> columnObjects) {
+			this.columnObjects = columnObjects;
+		}
+		public Vector<EntityInstance> getDoorObjects() {
+			return doorObjects;
+		}
+		public void setDoorObjects(Vector<EntityInstance> doorObjects) {
+			this.doorObjects = doorObjects;
+		}
+		public Vector<EntityInstance> getStairObjects() {
+			return stairObjects;
+		}
+		public void setStairObjects(Vector<EntityInstance> stairObjects) {
+			this.stairObjects = stairObjects;
+		}
 	}
 
 }
