@@ -133,6 +133,19 @@ public class BIMtoOSMCatalog {
     }
 
     /**
+     * Get IFCSITE tag
+     * @return List of IFCSITE tags
+     */
+    public static List<String> getIFCSITETags(){
+    	String tag = "IfcSite";
+    	ArrayList<String> ifcSiteTags = new ArrayList<>();
+    	ifcSiteTags.add(tag);
+    	ifcSiteTags.add(tag.toString().toUpperCase());
+    	ifcSiteTags.add(tag.toString().toLowerCase());
+    	return ifcSiteTags;
+    }
+
+    /**
      * Relevant BIM objects.
      * @author rebsc
      *
