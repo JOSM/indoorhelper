@@ -40,6 +40,7 @@ public class ImportDataController implements ImportEventListener{
 
 	@Override
 	public void onBIMImport(String filepath) {
+		// TODO check if a file is already loaded
 		importBIMData(filepath);
 	}
 
