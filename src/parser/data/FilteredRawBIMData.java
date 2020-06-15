@@ -65,4 +65,9 @@ public class FilteredRawBIMData {
 		this.stairObjects = stairObjects;
 	}
 
+	public int getSize(){
+		return (areaObjects.size() + wallObjects.size() +
+				columnObjects.size() + doorObjects.size() + stairObjects.size());
+	}
+
 }
