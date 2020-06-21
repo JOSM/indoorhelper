@@ -24,6 +24,7 @@ import model.io.BIMtoOSMCatalog;
 import nl.tue.buildingsmart.express.population.ModelPopulation;
 import parser.data.FilteredRawBIMData;
 import parser.data.PreparedBIMObject3D;
+import parser.helper.BIMtoOSMHelper;
 
 /**
  * Parser for BIM data. Extracts major BIM elements and transforms coordinates into OSM convenient format
@@ -61,9 +62,9 @@ public class BIMtoOSMParser {
 		FilteredRawBIMData filteredBIMdata = BIMtoOSMHelper.extractMajorBIMData(ifcModel);
 
 		// for preparation of filtered BIM data find Id of BIM root IFCLOCALPLACEMENT element (kept in IFCSITE flag)
-		int BIMRootId = BIMtoOSMHelper.getIFCLOCALPLACEMENTRootObject(filteredBIMdata);
+		int BIMRootId = BIMtoOSMHelper.getIfcLocalPlacementRootObject(filteredBIMdata);
 		if(BIMRootId == -1) {
-			showsParsingErrorView(filepath, "Could not import IFC file.\nIFC file doesn't contain IFCSITE element.");
+			showsParsingErrorView(filepath, "Could not import IFC file.\nIFC file doesn't contain IFCSITE element.", true);
 			return;
 		}
 
@@ -81,7 +82,7 @@ public class BIMtoOSMParser {
 
 		// check if file is corrupted. File is corrupted if some data could not pass the preparation steps
 		if(preparedBIMdata.size() != filteredBIMdata.getSize()) {
-			showsParsingErrorView(filepath, "Caution!\nImported data might include errors!");
+			showsParsingErrorView(filepath, "Caution!\nImported data might include errors!", false);
 		}
 
 		// send parsed data to controller
@@ -182,10 +183,13 @@ public class BIMtoOSMParser {
 	 * Shows error dialog is file loading failed
 	 * @param filepath of IFC file
 	 * @param msg Error message
+	 * @param logInfo log info to console
 	 */
-	private void showsParsingErrorView(String filepath, String msg) {
+	private void showsParsingErrorView(String filepath, String msg, boolean logInfo) {
 		showErrorView(tr(msg));
-		Logging.info(this.getClass().getName() + ": " + filepath + " parsing failed");
+		if(logInfo) {
+			Logging.info(this.getClass().getName() + ": " + filepath + " parsing failed");
+		}
 	}
 
 	/**
