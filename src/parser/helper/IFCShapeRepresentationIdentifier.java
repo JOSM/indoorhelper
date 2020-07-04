@@ -8,6 +8,7 @@ import org.openstreetmap.josm.tools.Logging;
 
 import nl.tue.buildingsmart.express.population.EntityInstance;
 import nl.tue.buildingsmart.express.population.ModelPopulation;
+import parser.data.ifc.IFCShapeRepresentationIdentity;
 import parser.helper.IFCShapeRepresentationCatalog.AdvancedBrepRepresentationTypeItems;
 import parser.helper.IFCShapeRepresentationCatalog.AdvancedSweptSolidRepresentationTypeItems;
 import parser.helper.IFCShapeRepresentationCatalog.BoundingBoxRepresentationTypeItems;
@@ -30,14 +31,17 @@ import parser.helper.IFCShapeRepresentationCatalog.TessellationRepresentationTyp
 public class IFCShapeRepresentationIdentifier {
 
 	/**
-	 * Method gets IFCSHAPEREPRESENTATION.RepresentationIdentifier and IFCSHAPEREPRESENTATION.RepresentationType of object
+	 * Method gets IFCSHAPEREPRESENTATION.REPRESENTATIONIDENTIFIER and IFCSHAPEREPRESENTATION.REPRESENTATIONTYPE of object
 	 * @param shapeRepresentation IFCShapeRepresentationIdentity
-	 * @return Returns object containing IFCSHAPEREPRESENTATION.RepresentationIdentifier and IFCSHAPEREPRESENTATION.RepresentationType
+	 * @return Returns object containing IFCSHAPEREPRESENTATION.REPRESENTATIONIDENTIFIER and IFCSHAPEREPRESENTATION.REPRESENTATIONTYPE
 	 */
 	public static IFCShapeRepresentationIdentity identifyShapeRepresentation(EntityInstance shapeRepresentation){
 		IFCShapeRepresentationIdentity rep = new IFCShapeRepresentationIdentity();
 		String identifier = prepareRepresentationAttribute(shapeRepresentation.getAttributeValueBN("RepresentationIdentifier").toString());
 		String type = prepareRepresentationAttribute(shapeRepresentation.getAttributeValueBN("RepresentationType").toString());
+
+		// set representationObjectId
+		rep.setRepresentationObjectEntity(shapeRepresentation);
 
 		// TODO the performance of iterating thru every value might needs to be improved!
 		// get identifier
@@ -62,14 +66,14 @@ public class IFCShapeRepresentationIdentifier {
 	}
 
 	/**
-	 * Gets the type of specific IFCSHAPEREPRESENTATION.Items. If item type is not supported for IFCSHAPEREPRESENTATION.RepresentationType
+	 * Gets the type of specific IFCSHAPEREPRESENTATION.ITEMS. If item type is not supported for IFCSHAPEREPRESENTATION.REPRESENTATIONTYPE
 	 * method will return null.
 	 * @param ifcModel ifcModel
-	 * @param ident IfcShapeRepresentation object
-	 * @param itemId Id of IFCSHAPEREPRESENTATION.Item
-	 * @return String with IFCSHAPEREPRESENTATION.Item type definition or null if not allowed in standard
+	 * @param ident IFCREPRESENTATIONTYPEOBJECT object
+	 * @param item to get the representation type for (IFCSHAPEREPRESENTATION.ITEM packed into EntityInstance object)
+	 * @return String with IFCSHAPEREPRESENTATION.ITEM type definition or null if not allowed in standard
 	 */
-	public static String getRepresentationItemType(ModelPopulation ifcModel, IFCShapeRepresentationIdentity ident, String itemId) {
+	public static String getRepresentationItemType(ModelPopulation ifcModel, IFCShapeRepresentationIdentity ident, EntityInstance item) {
 
 		//TODO cleanup code
 
@@ -77,16 +81,15 @@ public class IFCShapeRepresentationIdentifier {
 			// here IFC standard only allows IFCADVANCEDBREP and IFCFACETEDBREP as item
 
 			// get all IFCADVANCEDBREP and IFCFACETEDBREP objects and check if item is part of it
-			Vector<EntityInstance> ifcAdvancedBrep = new Vector<>();
+			ArrayList<EntityInstance> ifcAdvancedBrep = new ArrayList<>();
 			for(String flag : getIdentifierTags(AdvancedBrepRepresentationTypeItems.IfcAdvancedBrep.name())) {
 				ifcAdvancedBrep.addAll(ifcModel.getInstancesOfType(flag));
 			}
-			Vector<EntityInstance> ifcFacetedBrep = new Vector<>();
+			ArrayList<EntityInstance> ifcFacetedBrep = new ArrayList<>();
 			for(String flag : getIdentifierTags(AdvancedBrepRepresentationTypeItems.IfcFacetedBrep.name())) {
 				ifcFacetedBrep.addAll(ifcModel.getInstancesOfType(flag));
 			}
 
-			EntityInstance item = ifcModel.getEntity(getIntFromBIMId(itemId));
 			if(ifcAdvancedBrep.contains(item))	return AdvancedBrepRepresentationTypeItems.IfcAdvancedBrep.name();
 			if(ifcFacetedBrep.contains(item))	return AdvancedBrepRepresentationTypeItems.IfcFacetedBrep.name();
 			Logging.info(IFCShapeRepresentationIdentifier.class.getName() + ": " + item.getEntityDefinition() + " is not supported");
@@ -97,16 +100,15 @@ public class IFCShapeRepresentationIdentifier {
 			// here IFC standard only allows IFCSWEPTDISKSOLID and IFCSWEPTDISKSOLIDPOLYGON as item
 
 			// get all IFCSWEPTDISKSOLID and IFCSWEPTDISKSOLIDPOLYGON objects and check if item is part of it
-			Vector<EntityInstance>  ifcSweptDiskSolids = new Vector<>();
+			ArrayList<EntityInstance>  ifcSweptDiskSolids = new ArrayList<>();
 			for(String flag : getIdentifierTags(AdvancedSweptSolidRepresentationTypeItems.IfcSweptDiskSolid.name())) {
 				ifcSweptDiskSolids.addAll(ifcModel.getInstancesOfType(flag));
 			}
-			Vector<EntityInstance> IfcSweptDiskSolidPolygonals = new Vector<>();
+			ArrayList<EntityInstance> IfcSweptDiskSolidPolygonals = new ArrayList<>();
 			for(String flag : getIdentifierTags(AdvancedSweptSolidRepresentationTypeItems.IfcSweptDiskSolidPolygonal.name())) {
 				IfcSweptDiskSolidPolygonals.addAll(ifcModel.getInstancesOfType(flag));
 			}
 
-			EntityInstance item = ifcModel.getEntity(getIntFromBIMId(itemId));
 			if(ifcSweptDiskSolids.contains(item))			return AdvancedSweptSolidRepresentationTypeItems.IfcSweptDiskSolid.name();
 			if(IfcSweptDiskSolidPolygonals.contains(item))	return AdvancedSweptSolidRepresentationTypeItems.IfcSweptDiskSolidPolygonal.name();
 			Logging.info(IFCShapeRepresentationIdentifier.class.getName() + ": " + item.getEntityDefinition() + " is not supported");
@@ -117,7 +119,6 @@ public class IFCShapeRepresentationIdentifier {
 			// here IFC standard only allows IFCFACETEDBREP as item
 
 			// get all IFCFACETEDBREP objects and check if item is part of it
-			EntityInstance item = ifcModel.getEntity(getIntFromBIMId(itemId));
 			for(String flag : getIdentifierTags(BrepRepresentationTypeItems.IfcFacetedBrep.name())) {
 				if(ifcModel.getInstancesOfType(flag).contains(item)){
 					return BrepRepresentationTypeItems.IfcFacetedBrep.name();
@@ -131,20 +132,19 @@ public class IFCShapeRepresentationIdentifier {
 			// here IFC standard only allows IFCCSGSOLID, IFCBOOLEANRESULT and IFCPRIMITIVE3D as items
 
 			// get all IFCCSGSOLID, IFCBOOLEANRESULT and IFCPRIMITIVE3D objects and check if item is part of it
-			Vector<EntityInstance> ifcBooleanResults = new Vector<>();
+			ArrayList<EntityInstance> ifcBooleanResults = new ArrayList<>();
 			for(String flag : getIdentifierTags(CSGRepresentationTypeItems.IfcBooleanResult.name())) {
 				ifcBooleanResults.addAll(ifcModel.getInstancesOfType(flag));
 			}
-			Vector<EntityInstance> ifcCSGSolids = new Vector<>();
+			ArrayList<EntityInstance> ifcCSGSolids = new ArrayList<>();
 			for(String flag : getIdentifierTags(CSGRepresentationTypeItems.IfcCsgSolid.name())) {
 				ifcCSGSolids.addAll(ifcModel.getInstancesOfType(flag));
 			}
-			Vector<EntityInstance> ifcPrimitive3Ds = new Vector<>();
+			ArrayList<EntityInstance> ifcPrimitive3Ds = new ArrayList<>();
 			for(String flag : getIdentifierTags(CSGRepresentationTypeItems.IfcPrimitive3D.name())) {
 				ifcPrimitive3Ds.addAll(ifcModel.getInstancesOfType(flag));
 			}
 
-			EntityInstance item = ifcModel.getEntity(getIntFromBIMId(itemId));
 			if(ifcBooleanResults.contains(item))	return CSGRepresentationTypeItems.IfcBooleanResult.name();
 			if(ifcCSGSolids.contains(item))			return CSGRepresentationTypeItems.IfcCsgSolid.name();
 			if(ifcPrimitive3Ds.contains(item))		return CSGRepresentationTypeItems.IfcPrimitive3D.name();
@@ -156,7 +156,6 @@ public class IFCShapeRepresentationIdentifier {
 			// here IFC standard only allows IFCTESSELATEDFACESET as item
 
 			// get all IFCTESSELATEDFACESET objects and check if item is part of it
-			EntityInstance item = ifcModel.getEntity(getIntFromBIMId(itemId));
 			for(String flag : getIdentifierTags(TessellationRepresentationTypeItems.IfcTessellatedFaceSet.name())) {
 				if(ifcModel.getInstancesOfType(flag).contains(item)){
 					return TessellationRepresentationTypeItems.IfcTessellatedFaceSet.name();
@@ -170,7 +169,6 @@ public class IFCShapeRepresentationIdentifier {
 			// here IFC standard only allows IFCBOOLEANCLIPPINGRESULT as item
 
 			// get all IFCBOOLEANCLIPPINGRESULT objects and check if item is part of it
-			EntityInstance item = ifcModel.getEntity(getIntFromBIMId(itemId));
 			for(String flag : getIdentifierTags(ClippingRepresentationTypeItems.IfcBooleanClippingResult.name())) {
 				if(ifcModel.getInstancesOfType(flag).contains(item)){
 					return ClippingRepresentationTypeItems.IfcBooleanClippingResult.name();
@@ -184,16 +182,15 @@ public class IFCShapeRepresentationIdentifier {
 			// here IFC standard only allows IFCBOUNDEDCURVE as item
 
 			// get all IFCBOUNDEDCURVE objects and check if item is part of it
-			Vector<EntityInstance> ifcBoundedCurves = new Vector<>();
+			ArrayList<EntityInstance> ifcBoundedCurves = new ArrayList<>();
 			for(String flag : getIdentifierTags(CurveRepresentationTypeItems.IfcBoundedCurve.name())) {
 				ifcBoundedCurves.addAll(ifcModel.getInstancesOfType(flag));
 			}
-			Vector<EntityInstance> ifcPolylines = new Vector<>();
+			ArrayList<EntityInstance> ifcPolylines = new ArrayList<>();
 			for(String flag : getIdentifierTags(CurveRepresentationTypeItems.IfcPolyline.name())) {
 				ifcPolylines.addAll(ifcModel.getInstancesOfType(flag));
 			}
 
-			EntityInstance item = ifcModel.getEntity(getIntFromBIMId(itemId));
 			if(ifcBoundedCurves.contains(item))		return CurveRepresentationTypeItems.IfcBoundedCurve.name();
 			if(ifcPolylines.contains(item))			return CurveRepresentationTypeItems.IfcPolyline.name();
 
@@ -207,24 +204,23 @@ public class IFCShapeRepresentationIdentifier {
 
 			// get all IFCTESSELLATEDITEM, IFCSCHELLBASEDSURFACEMODEL and
 			// IFCFACEBASEDSURFACEMODEL objects and check if item is part of it
-			Vector<EntityInstance> ifcTessellatedItems = new Vector<>();
+			ArrayList<EntityInstance> ifcTessellatedItems = new ArrayList<>();
 			for(String flag : getIdentifierTags(SurfaceModelRepresentationTypeItems.IfcTessellatedItem.name())) {
 				ifcTessellatedItems.addAll(ifcModel.getInstancesOfType(flag));
 			}
-			Vector<EntityInstance> ifcShellBasedSurfaceModels = new Vector<>();
+			ArrayList<EntityInstance> ifcShellBasedSurfaceModels = new ArrayList<>();
 			for(String flag : getIdentifierTags(SurfaceModelRepresentationTypeItems.IfcShellBasedSurfaceModel.name())) {
 				ifcShellBasedSurfaceModels.addAll(ifcModel.getInstancesOfType(flag));
 			}
-			Vector<EntityInstance> ifcFaceBasedSurfaceModels = new Vector<>();
+			ArrayList<EntityInstance> ifcFaceBasedSurfaceModels = new ArrayList<>();
 			for(String flag : getIdentifierTags(SurfaceModelRepresentationTypeItems.IfcFaceBasedSurfaceModel.name())) {
 				ifcFaceBasedSurfaceModels.addAll(ifcModel.getInstancesOfType(flag));
 			}
-			Vector<EntityInstance> ifcFacetedBreps = new Vector<>();
+			ArrayList<EntityInstance> ifcFacetedBreps = new ArrayList<>();
 			for(String flag : getIdentifierTags(SurfaceModelRepresentationTypeItems.IfcFacetedBrep.name())) {
 				ifcFacetedBreps.addAll(ifcModel.getInstancesOfType(flag));
 			}
 
-			EntityInstance item = ifcModel.getEntity(getIntFromBIMId(itemId));
 			if(ifcTessellatedItems.contains(item))			return SurfaceModelRepresentationTypeItems.IfcTessellatedItem.name();
 			if(ifcShellBasedSurfaceModels.contains(item))	return SurfaceModelRepresentationTypeItems.IfcShellBasedSurfaceModel.name();
 			if(ifcFaceBasedSurfaceModels.contains(item))	return SurfaceModelRepresentationTypeItems.IfcFaceBasedSurfaceModel.name();
@@ -237,7 +233,7 @@ public class IFCShapeRepresentationIdentifier {
 			// here IFC standard only allows IFCEXTRUDEDAREASOLID, IFCREVOLVEDAREASOLID as item
 
 			// get all IFCEXTRUDEDAREASOLID, IFCREVOLVEDAREASOLID objects and check if item is part of it
-			Vector<EntityInstance> ifcExtrudedAreaSolid = new Vector<>();
+			ArrayList<EntityInstance> ifcExtrudedAreaSolid = new ArrayList<>();
 			for(String flag : getIdentifierTags(SweptSolidRepresentationTypeItems.IfcExtrudedAreaSolid.name())) {
 				ifcExtrudedAreaSolid.addAll(ifcModel.getInstancesOfType(flag));
 			}
@@ -246,7 +242,6 @@ public class IFCShapeRepresentationIdentifier {
 				ifcRevolvedAreaSolid.addAll(ifcModel.getInstancesOfType(flag));
 			}
 
-			EntityInstance item = ifcModel.getEntity(getIntFromBIMId(itemId));
 			if(ifcExtrudedAreaSolid.contains(item))		return SweptSolidRepresentationTypeItems.IfcExtrudedAreaSolid.name();
 			if(ifcRevolvedAreaSolid.contains(item))		return SweptSolidRepresentationTypeItems.IfcRevolvedAreaSolid.name();
 			Logging.info(IFCShapeRepresentationIdentifier.class.getName() + ": " + item.getEntityDefinition() + " is not supported");
@@ -257,7 +252,6 @@ public class IFCShapeRepresentationIdentifier {
 			// here IFC standard only allows IFCBOUNDINGBOX as item
 
 			// get all IFCBOUNDINGBOX objects and check if item is part of it
-			EntityInstance item = ifcModel.getEntity(getIntFromBIMId(itemId));
 			for(String flag : getIdentifierTags(BoundingBoxRepresentationTypeItems.IfcBoundingBox.name())) {
 				if(ifcModel.getInstancesOfType(flag).contains(item)){
 					return BoundingBoxRepresentationTypeItems.IfcBoundingBox.name();
@@ -271,7 +265,6 @@ public class IFCShapeRepresentationIdentifier {
 			// here IFC standard only allows IFCMAPPEDITEM as item
 
 			// get all IFCMAPPEDITEM objects and check if item is part of it
-			EntityInstance item = ifcModel.getEntity(getIntFromBIMId(itemId));
 			for(String flag : getIdentifierTags(MappedRepresentatiobTypeItems.IfcMappedItem.name())) {
 				if(ifcModel.getInstancesOfType(flag).contains(item)){
 					return MappedRepresentatiobTypeItems.IfcMappedItem.name();
@@ -287,7 +280,7 @@ public class IFCShapeRepresentationIdentifier {
 
 	/**
 	 * Removes unnecessary chars from representation attribute string
-	 * @param attribute representation attribute (RepresentationIdentifier, RepresentationType)
+	 * @param attribute representation attribute (REPRESENTATIONIDENTIFIER, REPRESENTATIONTYPE)
 	 * @return prepared string
 	 */
 	private static String prepareRepresentationAttribute(String attribute) {
@@ -305,15 +298,6 @@ public class IFCShapeRepresentationIdentifier {
 		idents.add(identifier.toLowerCase());
 		idents.add(identifier.toUpperCase());
 		return idents;
-	}
-
-	/**
-	 * Returns integer representing BIM Id.
-	 * @param BIMIdString BIM Id
-	 * @return Integer representing BIM Id
-	 */
-	private static int getIntFromBIMId(String BIMIdString) {
-		return Integer.valueOf(BIMIdString.substring(1));
 	}
 
 }

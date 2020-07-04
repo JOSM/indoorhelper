@@ -1,3 +1,4 @@
+// License: GPL. For details, see LICENSE file.
 package parser.helper;
 
 import java.util.ArrayList;
@@ -11,6 +12,7 @@ import nl.tue.buildingsmart.express.population.ModelPopulation;
 import parser.data.FilteredRawBIMData;
 import parser.data.Point3D;
 import parser.data.PreparedBIMObject3D;
+import parser.data.ifc.IFCShapeRepresentationIdentity;
 import parser.helper.IFCShapeRepresentationCatalog.AdvancedBrepRepresentationTypeItems;
 import parser.helper.IFCShapeRepresentationCatalog.AdvancedSweptSolidRepresentationTypeItems;
 import parser.helper.IFCShapeRepresentationCatalog.BoundingBoxRepresentationTypeItems;
@@ -105,18 +107,9 @@ public class BIMtoOSMHelper {
 	 * @return Root LOCALPLACEMENT element of IFC file
 	 */
 	public static int getIfcLocalPlacementRootObject(FilteredRawBIMData filteredBIMdata) {
-		Object BIMRoot = filteredBIMdata.getIfcSite().getAttributeValueBN("ObjectPlacement");
+		EntityInstance BIMRoot = filteredBIMdata.getIfcSite().getAttributeValueBNasEntityInstance("ObjectPlacement");
 		if(BIMRoot == null)	return -1;
-		return getIntFromBIMId(BIMRoot.toString());
-	}
-
-	/**
-	 * Returns integer representing BIM Id.
-	 * @param BIMIdString BIM Id
-	 * @return Integer representing BIM Id
-	 */
-	private static int getIntFromBIMId(String BIMIdString) {
-		return Integer.valueOf(BIMIdString.substring(1));
+		return BIMRoot.getId();
 	}
 
 	/**
@@ -132,10 +125,10 @@ public class BIMtoOSMHelper {
 		for(EntityInstance object : BIMObjects) {
 
 			// get IFCLOCALPLACEMENT of object (origin of object)
-			Point3D cartesianCornerOfObject = getCartesianOriginOfObject(ifcModel, BIMFileRootId, object);
+			Point3D cartesianCornerOfObject = getCartesianOriginOfObject(BIMFileRootId, object);
 
 			// get points representing shape of object
-			ArrayList<Point3D> shapeDataOfObject = getShapeDataOfObject(ifcModel, BIMFileRootId, object);
+			ArrayList<Point3D> shapeDataOfObject = getShapeDataOfObject(ifcModel, object);
 
 			// create PreparedBIMObject3D and save
 			if(cartesianCornerOfObject != null && (shapeDataOfObject != null && !shapeDataOfObject.isEmpty())) {
@@ -149,38 +142,36 @@ public class BIMtoOSMHelper {
 	/**
 	 * Method gets shape representation of IFC object
 	 * @param ifcModel ifcModel
-	 * @param BIMFileRootId Root IFCLOCALPLACEMENT element of BIM file
-	 * @param object BIM objects
+	 * @param object BIM object
 	 * @return Array including points of shape representation
 	 */
-	private static ArrayList<Point3D> getShapeDataOfObject(ModelPopulation ifcModel, int BIMFileRootId, EntityInstance object) {
+	private static ArrayList<Point3D> getShapeDataOfObject(ModelPopulation ifcModel, EntityInstance object) {
 		ArrayList<Point3D> shapeData = new ArrayList<>();
 
-		// get IfcProductDefinitionShape.Representations objects
-		ArrayList<Integer> objectRepresentations = getRepresentationsOfObject(ifcModel, object);
+		// get EntityInstances of IFCPRODUCTDEFINITIONSHAPE.REPRESENTATIONS objects
+		ArrayList<EntityInstance> objectRepresentations = getRepresentationsOfObject(object);
 
-		// identify and keep type of IfcProductDefinitionShape.Representations objects
-		ArrayList<Pair<Integer, IFCShapeRepresentationIdentity>> repObjectIdentities =
-				identifyRepresentationsOfObject(ifcModel, objectRepresentations);
+		// identify and keep types of IFCPRODUCTDEFINITIONSHAPE.REPRESENTATIONS objects
+		ArrayList<IFCShapeRepresentationIdentity> repObjectIdentities = identifyRepresentationsOfObject(objectRepresentations);
 
-		//INFO: For now only RepresentationIdentifier axis, body and box are supported because those
+		//INFO: For now only REPRESENTATIONIDENFITIER axis, body and box are supported because those
 		//are mostly used for representing considered objects
 
-		// first check if IfcProductDefinitionShape.Representations include IfcShapeRepresentation of type "body"
-		Pair<Integer, IFCShapeRepresentationIdentity> bodyRepresentation = getRepresentationSpecificObjectType(repObjectIdentities, RepresentationIdentifier.Body);
+		// first check if IFCPRODUCTDEFINITIONSHAPE.REPRESENTATIONS include IFCSHAPEREPRESENTATION of type "body"
+		IFCShapeRepresentationIdentity bodyRepresentation = getRepresentationSpecificObjectType(repObjectIdentities, RepresentationIdentifier.Body);
 		if(bodyRepresentation != null) {
 			return getDataFromBodyRepresentation(ifcModel, bodyRepresentation);
 		}
 
-		// if no IfcShapeRepresentation of type "body" check if IfcShapeRepresentation of type "box" exists
-		Pair<Integer, IFCShapeRepresentationIdentity> boxRepresentation = getRepresentationSpecificObjectType(repObjectIdentities, RepresentationIdentifier.Box);
+		// if no IFCSHAPEREPRESENTATION of type "body" check if IFCSHAPEREPRESENTATION of type "box" exists
+		IFCShapeRepresentationIdentity boxRepresentation = getRepresentationSpecificObjectType(repObjectIdentities, RepresentationIdentifier.Box);
 		if(boxRepresentation != null) {
 			return getDataFromBoxRepresentation(ifcModel, boxRepresentation);
 
 		}
 
-		// if no IfcShapeRepresentation of type "box" check if IfcShapeRepresentation of type "axis" exists
-		Pair<Integer, IFCShapeRepresentationIdentity> axisRepresentation = getRepresentationSpecificObjectType(repObjectIdentities, RepresentationIdentifier.Axis);
+		// if no IFCSHAPEREPRESENTATION of type "box" check if IFCSHAPEREPRESENTATION of type "axis" exists
+		IFCShapeRepresentationIdentity axisRepresentation = getRepresentationSpecificObjectType(repObjectIdentities, RepresentationIdentifier.Axis);
 		if(axisRepresentation != null) {
 			return getDataFromAxisRepresentation(ifcModel, axisRepresentation);
 		}
@@ -189,45 +180,43 @@ public class BIMtoOSMHelper {
 	}
 
 	/**
-	 * Check the IfcShapeRepresentation objects for object with IfcShapeRepresentation.RepresentationIdentifier = "identifier" and
+	 * Checks the IFCSHAPEREPRESENTATION objects for object with IFCSHAPEREPRESENTATION.REPRESENTATIONIDENTIFIER = "identifier" and
 	 * returns it
 	 * @param repObjectIdentities IfcShapeRepresentation objects
 	 * @param identifier RepresentationIdentifier
 	 * @return returns IfcShapeRepresentation "identifier" or null if not in list
 	 */
-	private static Pair<Integer, IFCShapeRepresentationIdentity> getRepresentationSpecificObjectType (
-			ArrayList<Pair<Integer, IFCShapeRepresentationIdentity>> repObjectIdentities, RepresentationIdentifier identifier){
+	private static IFCShapeRepresentationIdentity getRepresentationSpecificObjectType (
+			ArrayList<IFCShapeRepresentationIdentity> repObjectIdentities, RepresentationIdentifier identifier){
 
-		for(Pair<Integer, IFCShapeRepresentationIdentity> repObject : repObjectIdentities) {
-			IFCShapeRepresentationIdentity repObjectType = repObject.getValue();
-			if(repObjectType.getIdentifier().equals(identifier))	return repObject;
+		for(IFCShapeRepresentationIdentity repObject : repObjectIdentities) {
+			if(repObject.getIdentifier().equals(identifier))	return repObject;
 		}
 		return null;
 	}
 
 	/**
 	 * Get global cartesian origin coordinates of object
-	 * @param ifcModel ifcModel
 	 * @param BIMFileRootId Root IFCLOCALPLACEMENT element of BIM file
 	 * @param object to find origin for
 	 * @return cartesian origin
 	 */
-	private static Point3D getCartesianOriginOfObject(ModelPopulation ifcModel, int BIMFileRootId, EntityInstance object) {
-		Object objectIFCLP = object.getAttributeValueBN("ObjectPlacement");
-		int objectIFCLPId = getIntFromBIMId(objectIFCLP.toString());
+	private static Point3D getCartesianOriginOfObject(int BIMFileRootId, EntityInstance object) {
+
+		// get objects IFCLOCALPLACEMENT entity
+		EntityInstance objectIFCLP = object.getAttributeValueBNasEntityInstance("ObjectPlacement");
 
 		// get all RELATIVEPLACEMENTs to root
-		ArrayList<Integer> objectRP = getRelativePlacementsToRoot(ifcModel, BIMFileRootId, objectIFCLPId, new ArrayList<Integer>());
+		ArrayList<EntityInstance> objectRP = getRelativePlacementsToRoot(BIMFileRootId, objectIFCLP, new ArrayList<EntityInstance>());
 
 		// calculate cartesian corner of object (origin) by using the relative placements
 		Point3D cartesianCornerOfWall = new Point3D(0.0, 0.0, 0.0);
 
-		for(Integer relativeId : objectRP) {
+		for(EntityInstance relativeObject : objectRP) {
 			// get LOCATION (IFCCARTESIANPOINT) of IFCAXIS2PLACEMENT2D/3D including relative coordinates
-			Object objectCP = ifcModel.getEntity(relativeId).getAttributeValueBN("Location");
-			int objectCPId = getIntFromBIMId(objectCP.toString());
+			EntityInstance objectCP = relativeObject.getAttributeValueBNasEntityInstance("Location");
 			@SuppressWarnings("unchecked")
-			Vector<String> objectCoords = (Vector<String>)ifcModel.getEntity(objectCPId).getAttributeValueBN("Coordinates");
+			Vector<String> objectCoords = (Vector<String>)objectCP.getAttributeValueBN("Coordinates");
 			double relativeX = prepareCoordinateString(objectCoords.get(0));
 			double relativeY = prepareCoordinateString(objectCoords.get(1));
 			double relativeZ = prepareCoordinateString(objectCoords.get(2));
@@ -245,25 +234,22 @@ public class BIMtoOSMHelper {
 	}
 
 	/**
-	 * Method recursive walks thru IFC file and collects the RELATIVEPLACEMENT Ids of from start entity to root entity
-	 * @param ifcModel ifcModel
-	 * @param BIMFileRootId Root IFCLOCALPLACEMENT element of BIMFile
-	 * @param entityId Id of entity you want to collect the RELATIVEPLACEMENT from
+	 * Method recursive walks thru IFC file and collects the RELATIVEPLACEMENT EntityInstances from start entity to root entity
+	 * @param BIMFileRootId of root IFCLOCALPLACEMENT element of BIMFile
+	 * @param entity you want to collect the RELATIVEPLACEMENT from
 	 * @param relativePlacementsToRoot empty list at beginning, needed for recursive iteration
-	 * @return List with Ids to RELATIVEPLACEMENTs
+	 * @return List with EntityInstances of RELATIVEPLACEMENTs
 	 */
-	private static ArrayList<Integer> getRelativePlacementsToRoot(ModelPopulation ifcModel, int BIMFileRootId, int entityId, ArrayList<Integer> relativePlacementsToRoot){
-		if(entityId == BIMFileRootId)	return relativePlacementsToRoot;
+	private static ArrayList<EntityInstance> getRelativePlacementsToRoot(int BIMFileRootId, EntityInstance entity, ArrayList<EntityInstance> relativePlacementsToRoot){
+		if(entity.getId() == BIMFileRootId)	return relativePlacementsToRoot;
 
-		// get and add relative placements (RELATIVEPLACEMENT)
-		Object relativePlacement = ifcModel.getEntity(entityId).getAttributeValueBN("RelativePlacement");
-		int relativePlacementId = getIntFromBIMId(relativePlacement.toString());
-		relativePlacementsToRoot.add(relativePlacementId);
+		// get objects IFCRELATIVEPLACEMENT entity
+		EntityInstance relativePlacement = entity.getAttributeValueBNasEntityInstance("RelativePlacement");
+		relativePlacementsToRoot.add(relativePlacement);
 
 		// get id of placement relative to this (PLACEMENTRELTO)
-		Object placementRelTo = ifcModel.getEntity(entityId).getAttributeValueBN("PlacementRelTo");
-		int placementRelToId = getIntFromBIMId(placementRelTo.toString());
-		getRelativePlacementsToRoot(ifcModel, BIMFileRootId, placementRelToId, relativePlacementsToRoot);
+		EntityInstance placementRelTo = entity.getAttributeValueBNasEntityInstance("PlacementRelTo");
+		getRelativePlacementsToRoot(BIMFileRootId, placementRelTo, relativePlacementsToRoot);
 
 		return relativePlacementsToRoot;
 	}
@@ -286,70 +272,56 @@ public class BIMtoOSMHelper {
 	}
 
 	/**
-	 * Get Ids of IFCSHAPEREPRESENTATIONs of object
-	 * @param ifcModel ifcModel
+	 * Get EntityInstances of IFCSHAPEREPRESENTATIONs of object
 	 * @param object to find origin for
-	 * @return List with Ids of IFCSHAPEREPRESENTATIONs
+	 * @return List with EntityInstances of IFCSHAPEREPRESENTATIONs
 	 */
-	private static ArrayList<Integer> getRepresentationsOfObject (ModelPopulation ifcModel, EntityInstance object){
-		ArrayList<Integer> objectIFCSRIds = new ArrayList<>();
-
+	private static ArrayList<EntityInstance> getRepresentationsOfObject (EntityInstance object){
 		// get IFCPRODUCTDEFINITIONSHAPE of object
-		Object objectIFCPDS = object.getAttributeValueBN("Representation");
-		int objectIFCPDSId = getIntFromBIMId(objectIFCPDS.toString());
+		EntityInstance objectIFCPDS = object.getAttributeValueBNasEntityInstance("Representation");
 
 		// get all IFCSHAPEREPRESENTATIONS of IFCOBJECT
-		@SuppressWarnings("unchecked")
-		Vector<Object> objectIFCSR = (Vector<Object>) ifcModel.getEntity(objectIFCPDSId).getAttributeValueBN("Representations");
+		ArrayList<EntityInstance> objectIFCSR = objectIFCPDS.getAttributeValueBNasEntityInstanceList("Representations");
 
-		// extract from each IFCSHAPEREPRESENTATION object the Id and save it into objectIFCPDSId
-		objectIFCSR.forEach(shapeId ->{
-			objectIFCSRIds.add(getIntFromBIMId(shapeId.toString()));
-		});
-
-		return objectIFCSRIds;
+		return objectIFCSR;
 	}
 
 	/**
-	 * Identifies the type of an IfcRepresentation object.
-	 * @param ifcModel ifcModel
-	 * @param objectRepresentations List with Ids of IfcProductDefinitionShape.Representations objects
-	 * @return List of Pairs with IfcRepresentation object id and identifier. Returns null if type is not allowed in IFC standard
+	 * Identifies the type of an IFCREPRESENTATION object.
+	 * @param objectRepresentations List with EntityInstances of IFCPRODUCTDEFINITIONSHAPE.REPRESENTATIONS objects
+	 * @return List of IFCShapeRepresentationIdentity holding an ifc representation object and it's idenitfier
 	 */
-	private static ArrayList<Pair<Integer, IFCShapeRepresentationIdentity>> identifyRepresentationsOfObject(ModelPopulation ifcModel, ArrayList<Integer> objectRepresentations){
-		ArrayList<Pair<Integer, IFCShapeRepresentationIdentity>> repObjectIdentities = new ArrayList<>();
-		for(Integer repObjectId : objectRepresentations) {
-			// get IfcShapeRepresentation object from id
-			EntityInstance objectIFCSR = ifcModel.getEntity(repObjectId);
-			//identify IfcShapeRepresentation type
-			IFCShapeRepresentationIdentity repIdentity = IFCShapeRepresentationIdentifier.identifyShapeRepresentation(objectIFCSR);
+	private static ArrayList<IFCShapeRepresentationIdentity> identifyRepresentationsOfObject(ArrayList<EntityInstance> objectRepresentations){
+		ArrayList< IFCShapeRepresentationIdentity> repObjectIdentities = new ArrayList<>();
+
+		for(EntityInstance repObject : objectRepresentations) {
+			//identify IFCSHAPEREPRESENTATION type
+			IFCShapeRepresentationIdentity repIdentity = IFCShapeRepresentationIdentifier.identifyShapeRepresentation(repObject);
 			if(!repIdentity.isFilled())	return null;
-			repObjectIdentities.add(new Pair<>(objectIFCSR.getId(), repIdentity));
+			repObjectIdentities.add(repIdentity);
 		}
 		return repObjectIdentities;
 	}
 
 	/**
-	 * Extract representation data from IfcRepresentationItem body
+	 * Extract representation data from IFCREPRESENTATIONITEM body
 	 * @param ifcModel ifc Model
 	 * @param bodyRepresentation representation of body
 	 * @return List of points representing object shape or null if object type not supported
 	 */
-	private static ArrayList<Point3D> getDataFromBodyRepresentation(ModelPopulation ifcModel, Pair<Integer, IFCShapeRepresentationIdentity> bodyRepresentation) {
+	private static ArrayList<Point3D> getDataFromBodyRepresentation(ModelPopulation ifcModel, IFCShapeRepresentationIdentity bodyRepresentation) {
 		ArrayList<Point3D> shapeRep = new ArrayList<>();
 
-		// get IFCObject and RepresentationIdentifier
-		EntityInstance repObject = ifcModel.getEntity(bodyRepresentation.getKey());
-		IFCShapeRepresentationIdentity repObjectType = bodyRepresentation.getValue();
+		// get IFCOBJECT and REPRESENTATIONIDENTIFIER
+		EntityInstance repObject = bodyRepresentation.getRepresentationObjectEntity();
 
-		// get IfcRepresentationItems
-		@SuppressWarnings("unchecked")
-		Vector<String> bodyItems = (Vector<String>) repObject.getAttributeValueBN("Items");
+		// get IFCREPRESENTATIONITEMS
+		ArrayList<EntityInstance> bodyItems = repObject.getAttributeValueBNasEntityInstanceList("Items");
 
 		// extract informations from IfcRepresentationItems
-		for(String item : bodyItems) {
+		for(EntityInstance item : bodyItems) {
 			// get type of item
-			String repItemType = IFCShapeRepresentationIdentifier.getRepresentationItemType(ifcModel, repObjectType, item);
+			String repItemType = IFCShapeRepresentationIdentifier.getRepresentationItemType(ifcModel, bodyRepresentation, item);
 			if(repItemType == null) return null;
 
 			// handle types
@@ -415,21 +387,19 @@ public class BIMtoOSMHelper {
 	 * @param boxRepresentation representation of box
 	 * @return List of points representing object shape or null if object type not supported
 	 */
-	private static ArrayList<Point3D> getDataFromBoxRepresentation(ModelPopulation ifcModel, Pair<Integer, IFCShapeRepresentationIdentity> boxRepresentation) {
+	private static ArrayList<Point3D> getDataFromBoxRepresentation(ModelPopulation ifcModel, IFCShapeRepresentationIdentity boxRepresentation) {
 		ArrayList<Point3D> shapeRep = new ArrayList<>();
 
 		// get IFCObject and RepresentationIdentifier
-		EntityInstance repObject = ifcModel.getEntity(boxRepresentation.getKey());
-		IFCShapeRepresentationIdentity repObjectType = boxRepresentation.getValue();
+		EntityInstance repObject = boxRepresentation.getRepresentationObjectEntity();
 
 		// get IfcRepresentationItems
-		@SuppressWarnings("unchecked")
-		Vector<String> boxItems = (Vector<String>) repObject.getAttributeValueBN("Items");
+		ArrayList<EntityInstance> boxItems = repObject.getAttributeValueBNasEntityInstanceList("Items");
 
 		// extract informations from IfcRepresentationItems
-		for(String item : boxItems) {
+		for(EntityInstance item : boxItems) {
 			// get type of IfcRepresentationItem
-			String repItemType = IFCShapeRepresentationIdentifier.getRepresentationItemType(ifcModel, repObjectType, item);
+			String repItemType = IFCShapeRepresentationIdentifier.getRepresentationItemType(ifcModel, boxRepresentation, item);
 			if(repItemType == null) return null;
 
 			if(repItemType.equals(BoundingBoxRepresentationTypeItems.IfcBoundingBox.name())) {
@@ -446,21 +416,19 @@ public class BIMtoOSMHelper {
 	 * @param axisRepresentation representation of axis
 	 * @return List of points representing object shape or null if object type not supported
 	 */
-	private static ArrayList<Point3D> getDataFromAxisRepresentation(ModelPopulation ifcModel, Pair<Integer, IFCShapeRepresentationIdentity> axisRepresentation) {
+	private static ArrayList<Point3D> getDataFromAxisRepresentation(ModelPopulation ifcModel, IFCShapeRepresentationIdentity axisRepresentation) {
 		ArrayList<Point3D> shapeRep = new ArrayList<>();
 
 		// get IFCObject and RepresentationIdentifier
-		EntityInstance repObject = ifcModel.getEntity(axisRepresentation.getKey());
-		IFCShapeRepresentationIdentity repObjectType = axisRepresentation.getValue();
+		EntityInstance repObject = axisRepresentation.getRepresentationObjectEntity();
 
 		// get IfcRepresentationItems of object
-		@SuppressWarnings("unchecked")
-		Vector<String> axisItems = (Vector<String>) repObject.getAttributeValueBN("Items");
+		ArrayList<EntityInstance> axisItems = repObject.getAttributeValueBNasEntityInstanceList("Items");
 
 		// extract informations from IfcRepresentationItems
-		for(String item : axisItems) {
+		for(EntityInstance item : axisItems) {
 			// get type of IfcRepresentationItem
-			String repItemType = IFCShapeRepresentationIdentifier.getRepresentationItemType(ifcModel, repObjectType, item);
+			String repItemType = IFCShapeRepresentationIdentifier.getRepresentationItemType(ifcModel, axisRepresentation, item);
 			if(repItemType == null) return null;
 
 			if(repItemType.equals(CurveRepresentationTypeItems.IfcBoundedCurve.name())) {
@@ -473,31 +441,5 @@ public class BIMtoOSMHelper {
 
 		return shapeRep;
 	}
-
-	/**
-	 * Helper class. Stores a pair.
-	 * @author rebsc
-	 *
-	 * @param <T1> key
-	 * @param <T2> value
-	 */
-	private static class Pair<T1, T2> {
-		private T1 key;
-		private T2 value;
-
-		public Pair(T1 key, T2 value) {
-			this.key = key;
-			this.value = value;
-		}
-
-		public T1 getKey() {
-			return key;
-		}
-
-		public T2 getValue() {
-			return value;
-		}
-	}
-
 
 }

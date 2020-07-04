@@ -1,5 +1,7 @@
-package parser.helper;
+// License: GPL. For details, see LICENSE file.
+package parser.data.ifc;
 
+import nl.tue.buildingsmart.express.population.EntityInstance;
 import parser.helper.IFCShapeRepresentationCatalog.RepresentationIdentifier;
 import parser.helper.IFCShapeRepresentationCatalog.RepresentationType;
 
@@ -9,15 +11,18 @@ import parser.helper.IFCShapeRepresentationCatalog.RepresentationType;
  *
  */
 public class IFCShapeRepresentationIdentity {
+	private EntityInstance representationObjectEntity;
 	private RepresentationIdentifier identifier;
 	private RepresentationType type;
 
 	public IFCShapeRepresentationIdentity() {
+		this.representationObjectEntity = null;
 		this.identifier = null;
 		this.type = null;
 	}
 
-	public IFCShapeRepresentationIdentity(RepresentationIdentifier identifier, RepresentationType type) {
+	public IFCShapeRepresentationIdentity(EntityInstance representationObject, RepresentationIdentifier identifier, RepresentationType type) {
+		this.setRepresentationObjectEntity(representationObject);
 		this.identifier = identifier;
 		this.type = type;
 	}
@@ -50,5 +55,14 @@ public class IFCShapeRepresentationIdentity {
 		if(this.identifier != null && this.type != null) return true;
 		return false;
 	}
+
+	public EntityInstance getRepresentationObjectEntity() {
+		return representationObjectEntity;
+	}
+
+	public void setRepresentationObjectEntity(EntityInstance representationObjectEntity) {
+		this.representationObjectEntity = representationObjectEntity;
+	}
+
 
 }
