@@ -69,7 +69,6 @@ public class BIMtoOSMParser {
 		}
 
 		// prepare filtered BIM data - find global object coordinates and other attributes like object height, width etc.
-		// TODO handle 2D case!
 		ArrayList<PreparedBIMObject3D> preparedBIMdata = new ArrayList<>();
 		preparedBIMdata.addAll(BIMtoOSMHelper.prepareBIMObjects(ifcModel, BIMRootId, BIMtoOSMCatalog.BIMObject.IfcSlab, filteredBIMdata.getAreaObjects()));
 		preparedBIMdata.addAll(BIMtoOSMHelper.prepareBIMObjects(ifcModel, BIMRootId, BIMtoOSMCatalog.BIMObject.IfcWall, filteredBIMdata.getWallObjects()));
