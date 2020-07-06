@@ -115,4 +115,26 @@ public class IFCShapeRepresentationCatalog {
 
 
 
+	// Items of IFC representation subtypes
+	// Note: Not all of those subtypes are supported right now
+
+	/**
+	 * Allowed IFCSHAPEREPRESENTATION.Items types for IFCREPRESENTATIONITEM IFCLOOP
+	 *
+	 */
+	public enum LoopSubRepresentationTypeItems {
+		IfcEdgeLoop, IfcPolyLoop, IfcVertexLoop
+	}
+
+	/**
+	 * Allowed IFCSHAPEREPRESENTATION.Items types for IFCREPRESENTATIONITEM IFCPROFILEDEF
+	 *
+	 */
+	public enum ProfileDefRepresentationTypeItems{
+		IfcRectangleProfileDef, IfcTrapeziumProfileDef, IfcCircleProfileDef, IfcEllipseProfileDef,
+		IfcShapeProfileDef
+	}
+
+
+
 }

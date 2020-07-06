@@ -2,7 +2,6 @@
 package parser.helper;
 
 import java.util.ArrayList;
-import java.util.Vector;
 
 import org.openstreetmap.josm.tools.Logging;
 
@@ -16,7 +15,9 @@ import parser.helper.IFCShapeRepresentationCatalog.BrepRepresentationTypeItems;
 import parser.helper.IFCShapeRepresentationCatalog.CSGRepresentationTypeItems;
 import parser.helper.IFCShapeRepresentationCatalog.ClippingRepresentationTypeItems;
 import parser.helper.IFCShapeRepresentationCatalog.CurveRepresentationTypeItems;
+import parser.helper.IFCShapeRepresentationCatalog.LoopSubRepresentationTypeItems;
 import parser.helper.IFCShapeRepresentationCatalog.MappedRepresentatiobTypeItems;
+import parser.helper.IFCShapeRepresentationCatalog.ProfileDefRepresentationTypeItems;
 import parser.helper.IFCShapeRepresentationCatalog.RepresentationIdentifier;
 import parser.helper.IFCShapeRepresentationCatalog.RepresentationType;
 import parser.helper.IFCShapeRepresentationCatalog.SurfaceModelRepresentationTypeItems;
@@ -66,7 +67,7 @@ public class IFCShapeRepresentationIdentifier {
 	}
 
 	/**
-	 * Gets the type of specific IFCSHAPEREPRESENTATION.ITEMS. If item type is not supported for IFCSHAPEREPRESENTATION.REPRESENTATIONTYPE
+	 * Gets the type of specific IFCSHAPEREPRESENTATION.ITEM. If item type is not supported for IFCSHAPEREPRESENTATION.REPRESENTATIONTYPE
 	 * method will return null.
 	 * @param ifcModel ifcModel
 	 * @param ident IFCREPRESENTATIONTYPEOBJECT object
@@ -85,13 +86,14 @@ public class IFCShapeRepresentationIdentifier {
 			for(String flag : getIdentifierTags(AdvancedBrepRepresentationTypeItems.IfcAdvancedBrep.name())) {
 				ifcAdvancedBrep.addAll(ifcModel.getInstancesOfType(flag));
 			}
+			if(ifcAdvancedBrep.contains(item))	return AdvancedBrepRepresentationTypeItems.IfcAdvancedBrep.name();
+
 			ArrayList<EntityInstance> ifcFacetedBrep = new ArrayList<>();
 			for(String flag : getIdentifierTags(AdvancedBrepRepresentationTypeItems.IfcFacetedBrep.name())) {
 				ifcFacetedBrep.addAll(ifcModel.getInstancesOfType(flag));
 			}
-
-			if(ifcAdvancedBrep.contains(item))	return AdvancedBrepRepresentationTypeItems.IfcAdvancedBrep.name();
 			if(ifcFacetedBrep.contains(item))	return AdvancedBrepRepresentationTypeItems.IfcFacetedBrep.name();
+
 			Logging.info(IFCShapeRepresentationIdentifier.class.getName() + ": " + item.getEntityDefinition() + " is not supported");
 			return null;
 		}
@@ -104,13 +106,14 @@ public class IFCShapeRepresentationIdentifier {
 			for(String flag : getIdentifierTags(AdvancedSweptSolidRepresentationTypeItems.IfcSweptDiskSolid.name())) {
 				ifcSweptDiskSolids.addAll(ifcModel.getInstancesOfType(flag));
 			}
+			if(ifcSweptDiskSolids.contains(item))			return AdvancedSweptSolidRepresentationTypeItems.IfcSweptDiskSolid.name();
+
 			ArrayList<EntityInstance> IfcSweptDiskSolidPolygonals = new ArrayList<>();
 			for(String flag : getIdentifierTags(AdvancedSweptSolidRepresentationTypeItems.IfcSweptDiskSolidPolygonal.name())) {
 				IfcSweptDiskSolidPolygonals.addAll(ifcModel.getInstancesOfType(flag));
 			}
-
-			if(ifcSweptDiskSolids.contains(item))			return AdvancedSweptSolidRepresentationTypeItems.IfcSweptDiskSolid.name();
 			if(IfcSweptDiskSolidPolygonals.contains(item))	return AdvancedSweptSolidRepresentationTypeItems.IfcSweptDiskSolidPolygonal.name();
+
 			Logging.info(IFCShapeRepresentationIdentifier.class.getName() + ": " + item.getEntityDefinition() + " is not supported");
 			return null;
 		}
@@ -136,18 +139,20 @@ public class IFCShapeRepresentationIdentifier {
 			for(String flag : getIdentifierTags(CSGRepresentationTypeItems.IfcBooleanResult.name())) {
 				ifcBooleanResults.addAll(ifcModel.getInstancesOfType(flag));
 			}
+			if(ifcBooleanResults.contains(item))	return CSGRepresentationTypeItems.IfcBooleanResult.name();
+
 			ArrayList<EntityInstance> ifcCSGSolids = new ArrayList<>();
 			for(String flag : getIdentifierTags(CSGRepresentationTypeItems.IfcCsgSolid.name())) {
 				ifcCSGSolids.addAll(ifcModel.getInstancesOfType(flag));
 			}
+			if(ifcCSGSolids.contains(item))			return CSGRepresentationTypeItems.IfcCsgSolid.name();
+
 			ArrayList<EntityInstance> ifcPrimitive3Ds = new ArrayList<>();
 			for(String flag : getIdentifierTags(CSGRepresentationTypeItems.IfcPrimitive3D.name())) {
 				ifcPrimitive3Ds.addAll(ifcModel.getInstancesOfType(flag));
 			}
-
-			if(ifcBooleanResults.contains(item))	return CSGRepresentationTypeItems.IfcBooleanResult.name();
-			if(ifcCSGSolids.contains(item))			return CSGRepresentationTypeItems.IfcCsgSolid.name();
 			if(ifcPrimitive3Ds.contains(item))		return CSGRepresentationTypeItems.IfcPrimitive3D.name();
+
 			Logging.info(IFCShapeRepresentationIdentifier.class.getName() + ": " + item.getEntityDefinition() + " is not supported");
 			return null;
 		}
@@ -186,12 +191,12 @@ public class IFCShapeRepresentationIdentifier {
 			for(String flag : getIdentifierTags(CurveRepresentationTypeItems.IfcBoundedCurve.name())) {
 				ifcBoundedCurves.addAll(ifcModel.getInstancesOfType(flag));
 			}
+			if(ifcBoundedCurves.contains(item))		return CurveRepresentationTypeItems.IfcBoundedCurve.name();
+
 			ArrayList<EntityInstance> ifcPolylines = new ArrayList<>();
 			for(String flag : getIdentifierTags(CurveRepresentationTypeItems.IfcPolyline.name())) {
 				ifcPolylines.addAll(ifcModel.getInstancesOfType(flag));
 			}
-
-			if(ifcBoundedCurves.contains(item))		return CurveRepresentationTypeItems.IfcBoundedCurve.name();
 			if(ifcPolylines.contains(item))			return CurveRepresentationTypeItems.IfcPolyline.name();
 
 			Logging.info(IFCShapeRepresentationIdentifier.class.getName() + ": " + item.getEntityDefinition() + " is not supported");
@@ -208,23 +213,26 @@ public class IFCShapeRepresentationIdentifier {
 			for(String flag : getIdentifierTags(SurfaceModelRepresentationTypeItems.IfcTessellatedItem.name())) {
 				ifcTessellatedItems.addAll(ifcModel.getInstancesOfType(flag));
 			}
+			if(ifcTessellatedItems.contains(item))			return SurfaceModelRepresentationTypeItems.IfcTessellatedItem.name();
+
 			ArrayList<EntityInstance> ifcShellBasedSurfaceModels = new ArrayList<>();
 			for(String flag : getIdentifierTags(SurfaceModelRepresentationTypeItems.IfcShellBasedSurfaceModel.name())) {
 				ifcShellBasedSurfaceModels.addAll(ifcModel.getInstancesOfType(flag));
 			}
+			if(ifcShellBasedSurfaceModels.contains(item))	return SurfaceModelRepresentationTypeItems.IfcShellBasedSurfaceModel.name();
+
 			ArrayList<EntityInstance> ifcFaceBasedSurfaceModels = new ArrayList<>();
 			for(String flag : getIdentifierTags(SurfaceModelRepresentationTypeItems.IfcFaceBasedSurfaceModel.name())) {
 				ifcFaceBasedSurfaceModels.addAll(ifcModel.getInstancesOfType(flag));
 			}
+			if(ifcFaceBasedSurfaceModels.contains(item))	return SurfaceModelRepresentationTypeItems.IfcFaceBasedSurfaceModel.name();
+
 			ArrayList<EntityInstance> ifcFacetedBreps = new ArrayList<>();
 			for(String flag : getIdentifierTags(SurfaceModelRepresentationTypeItems.IfcFacetedBrep.name())) {
 				ifcFacetedBreps.addAll(ifcModel.getInstancesOfType(flag));
 			}
-
-			if(ifcTessellatedItems.contains(item))			return SurfaceModelRepresentationTypeItems.IfcTessellatedItem.name();
-			if(ifcShellBasedSurfaceModels.contains(item))	return SurfaceModelRepresentationTypeItems.IfcShellBasedSurfaceModel.name();
-			if(ifcFaceBasedSurfaceModels.contains(item))	return SurfaceModelRepresentationTypeItems.IfcFaceBasedSurfaceModel.name();
 			if(ifcFacetedBreps.contains(item))				return SurfaceModelRepresentationTypeItems.IfcFacetedBrep.name();
+
 			Logging.info(IFCShapeRepresentationIdentifier.class.getName() + ": " + item.getEntityDefinition() + " is not supported");
 			return null;
 		}
@@ -237,13 +245,14 @@ public class IFCShapeRepresentationIdentifier {
 			for(String flag : getIdentifierTags(SweptSolidRepresentationTypeItems.IfcExtrudedAreaSolid.name())) {
 				ifcExtrudedAreaSolid.addAll(ifcModel.getInstancesOfType(flag));
 			}
-			Vector<EntityInstance> ifcRevolvedAreaSolid = new Vector<>();
+			if(ifcExtrudedAreaSolid.contains(item))		return SweptSolidRepresentationTypeItems.IfcExtrudedAreaSolid.name();
+
+			ArrayList<EntityInstance> ifcRevolvedAreaSolid = new ArrayList<>();
 			for(String flag : getIdentifierTags(SweptSolidRepresentationTypeItems.IfcRevolvedAreaSolid.name())) {
 				ifcRevolvedAreaSolid.addAll(ifcModel.getInstancesOfType(flag));
 			}
-
-			if(ifcExtrudedAreaSolid.contains(item))		return SweptSolidRepresentationTypeItems.IfcExtrudedAreaSolid.name();
 			if(ifcRevolvedAreaSolid.contains(item))		return SweptSolidRepresentationTypeItems.IfcRevolvedAreaSolid.name();
+
 			Logging.info(IFCShapeRepresentationIdentifier.class.getName() + ": " + item.getEntityDefinition() + " is not supported");
 			return null;
 		}
@@ -277,6 +286,84 @@ public class IFCShapeRepresentationIdentifier {
 		Logging.info(IFCShapeRepresentationIdentifier.class.getName() + ": " + ident.getType() + " RepresentationType is not supported");
 		return null;
 	}
+
+
+	/**
+	 * Gets the type of IFCLOOP. Types can be IFCEDGELOOP, IFCPOLYLOOP, IFCVERTEXLOOP
+	 * @param ifcModel ifcModel
+	 * @param loop to get type of
+	 * @return type as string
+	 */
+	public static String getIFCLoopType(ModelPopulation ifcModel, EntityInstance loop) {
+		// here IFC standard only allows IFCEDGELOOP, IFCPOLYLOOP, IFCVERTEXLOOP as item
+
+		ArrayList<EntityInstance> edgeLoops = new ArrayList<>();
+		for(String flag : getIdentifierTags(LoopSubRepresentationTypeItems.IfcEdgeLoop.name())) {
+			edgeLoops.addAll(ifcModel.getInstancesOfType(flag));
+		}
+		if(edgeLoops.contains(loop))		return LoopSubRepresentationTypeItems.IfcEdgeLoop.name();
+
+		ArrayList<EntityInstance> polyLoops = new ArrayList<>();
+		for(String flag : getIdentifierTags(LoopSubRepresentationTypeItems.IfcPolyLoop.name())) {
+			polyLoops.addAll(ifcModel.getInstancesOfType(flag));
+		}
+		if(polyLoops.contains(loop))		return LoopSubRepresentationTypeItems.IfcPolyLoop.name();
+
+		ArrayList<EntityInstance> vertexLoops = new ArrayList<>();
+		for(String flag : getIdentifierTags(LoopSubRepresentationTypeItems.IfcVertexLoop.name())) {
+			vertexLoops.addAll(ifcModel.getInstancesOfType(flag));
+		}
+		if(vertexLoops.contains(loop))		return LoopSubRepresentationTypeItems.IfcVertexLoop.name();
+
+		Logging.info(IFCShapeRepresentationIdentifier.class.getName() + ": " + loop.toString() + " LoopRepresentationType is not supported");
+		return null;
+	}
+
+	/**
+	 * Gets the type of IFCPROFILEDEF.
+	 * @param ifcModel ifcModel
+	 * @param profileDef to get type of
+	 * @return type as string
+	 */
+	public static String getIFCProfileDefType(ModelPopulation ifcModel, EntityInstance profileDef) {
+		// here IFC standard only allows IFCRECTANGLEPROFILEDEF, IFCTRAPEZIUMPROFILEDEF, IFCCIRCLEPROFILEDEF,
+		// IFCELLIPSEPROFILEDEF, IFCSHAPEPROFILEDEF as item
+
+		ArrayList<EntityInstance> rectanglePD = new ArrayList<>();
+		for(String flag : getIdentifierTags(ProfileDefRepresentationTypeItems.IfcRectangleProfileDef.name())) {
+			rectanglePD.addAll(ifcModel.getInstancesOfType(flag));
+		}
+
+		if(rectanglePD.contains(profileDef))		return ProfileDefRepresentationTypeItems.IfcRectangleProfileDef.name();
+
+		ArrayList<EntityInstance> trapeziumPD = new ArrayList<>();
+		for(String flag : getIdentifierTags(ProfileDefRepresentationTypeItems.IfcTrapeziumProfileDef.name())) {
+			trapeziumPD.addAll(ifcModel.getInstancesOfType(flag));
+		}
+		if(trapeziumPD.contains(profileDef))		return ProfileDefRepresentationTypeItems.IfcTrapeziumProfileDef.name();
+
+		ArrayList<EntityInstance> circlePD = new ArrayList<>();
+		for(String flag : getIdentifierTags(ProfileDefRepresentationTypeItems.IfcCircleProfileDef.name())) {
+			circlePD.addAll(ifcModel.getInstancesOfType(flag));
+		}
+		if(circlePD.contains(profileDef))		return ProfileDefRepresentationTypeItems.IfcCircleProfileDef.name();
+
+		ArrayList<EntityInstance> ellipsePD = new ArrayList<>();
+		for(String flag : getIdentifierTags(ProfileDefRepresentationTypeItems.IfcEllipseProfileDef.name())) {
+			ellipsePD.addAll(ifcModel.getInstancesOfType(flag));
+		}
+		if(ellipsePD.contains(profileDef))		return ProfileDefRepresentationTypeItems.IfcEllipseProfileDef.name();
+
+		ArrayList<EntityInstance> shapePD = new ArrayList<>();
+		for(String flag : getIdentifierTags(ProfileDefRepresentationTypeItems.IfcShapeProfileDef.name())) {
+			shapePD.addAll(ifcModel.getInstancesOfType(flag));
+		}
+		if(shapePD.contains(profileDef))		return ProfileDefRepresentationTypeItems.IfcShapeProfileDef.name();
+
+		Logging.info(IFCShapeRepresentationIdentifier.class.getName() + ": " + profileDef.toString() + " ProfileDefRepresentationType is not supported");
+		return null;
+	}
+
 
 	/**
 	 * Removes unnecessary chars from representation attribute string

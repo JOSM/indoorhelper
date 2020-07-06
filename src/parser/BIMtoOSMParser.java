@@ -15,14 +15,18 @@ import java.util.Scanner;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
-import org.openstreetmap.josm.data.osm.DataSet;
+import org.openstreetmap.josm.data.coor.LatLon;
+import org.openstreetmap.josm.data.osm.Node;
+import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.tools.Logging;
 
 import controller.io.ImportEventListener;
+import model.TagCatalog;
 import model.io.BIMtoOSMCatalog;
 import nl.tue.buildingsmart.express.population.ModelPopulation;
 import parser.data.FilteredRawBIMData;
+import parser.data.Point3D;
 import parser.data.PreparedBIMObject3D;
 import parser.helper.BIMtoOSMHelper;
 
@@ -43,11 +47,11 @@ public class BIMtoOSMParser {
 	private ImportEventListener importListener;
 	private FileInputStream inputfs = null;
 	private ModelPopulation ifcModel;
-	private DataSet osmData;
+	private TagCatalog tagCatalog;
 
 	public BIMtoOSMParser(ImportEventListener listener) {
 		importListener = listener;
-		osmData = new DataSet();
+		tagCatalog = new TagCatalog();
 	}
 
 	/**
@@ -77,7 +81,26 @@ public class BIMtoOSMParser {
 		preparedBIMdata.addAll(BIMtoOSMHelper.prepareBIMObjects(ifcModel, BIMRootId, BIMtoOSMCatalog.BIMObject.IfcStair, filteredBIMdata.getStairObjects()));
 
 		// TODO transform coordinates
+
 		// TODO parse FilteredBIMData into OSM DataSet
+		ArrayList<Way> ways = new ArrayList<>();
+		ArrayList<Node> nodes = new ArrayList<>();
+
+
+		// TODO fix, for development only -----------
+		for(PreparedBIMObject3D object : preparedBIMdata){
+			if(object.getType().equals(BIMtoOSMCatalog.BIMObject.IfcWall)) {
+				for(Point3D point : object.getCartesianShapeCoordinates()) {
+					Node n = new Node(new LatLon(point.getY(), point.getX()));
+					nodes.add(n);
+				}
+				Way w = new Way();
+				w.setNodes(nodes);
+				tagCatalog.getTags(TagCatalog.IndoorObject.CONCRETE_WALL).forEach(tag -> w.put(tag));
+				ways.add(w);
+			}
+		}
+		// -----------
 
 		// check if file is corrupted. File is corrupted if some data could not pass the preparation steps
 		if(preparedBIMdata.size() != filteredBIMdata.getSize()) {
@@ -85,7 +108,7 @@ public class BIMtoOSMParser {
 		}
 
 		// send parsed data to controller
-		importListener.onDataParsed(osmData);
+		importListener.onDataParsed(ways, nodes);
 		Logging.info(this.getClass().getName() + ": " + filepath + " parsed successfully");
 	}
 
