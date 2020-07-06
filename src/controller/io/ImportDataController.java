@@ -2,12 +2,14 @@
 package controller.io;
 
 import java.awt.BorderLayout;
+import java.util.ArrayList;
 
 import javax.swing.JFrame;
 import javax.swing.JProgressBar;
 
 import org.openstreetmap.josm.actions.JosmAction;
-import org.openstreetmap.josm.data.osm.DataSet;
+import org.openstreetmap.josm.data.osm.Node;
+import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.MainMenu;
 
@@ -61,9 +63,18 @@ public class ImportDataController implements ImportEventListener{
 	}
 
 	@Override
-	public void onDataParsed(DataSet osmData) {
-		model.setImportData(osmData);
-		// TODO render data
+	public void onDataParsed(ArrayList<Way> ways, ArrayList<Node> nodes) {
+		model.setImportData(ways, nodes);
+
+		// TODO render on new layer and put code in own method
+
+		nodes.forEach(node ->{
+			MainApplication.getLayerManager().getActiveDataSet().addPrimitive(node);
+		});
+
+		ways.forEach(way ->{
+			MainApplication.getLayerManager().getActiveDataSet().addPrimitive(way);
+		});
 	}
 
 	/**

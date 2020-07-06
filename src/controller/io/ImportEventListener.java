@@ -1,7 +1,10 @@
 // License: GPL. For details, see LICENSE file.
 package controller.io;
 
-import org.openstreetmap.josm.data.osm.DataSet;
+import java.util.ArrayList;
+
+import org.openstreetmap.josm.data.osm.Node;
+import org.openstreetmap.josm.data.osm.Way;
 
 /**
  * Listener handles import actions.
@@ -18,7 +21,8 @@ public interface ImportEventListener {
 
 	/**
 	 * Will be called after finishing parsing
-	 * @param osmData DataSet with parsed data
+	 * @param ways to render
+	 * @param nodes to render
 	 */
-	void onDataParsed(DataSet osmData);
+	void onDataParsed(ArrayList<Way> ways, ArrayList<Node> nodes);
 }
