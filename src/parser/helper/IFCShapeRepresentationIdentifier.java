@@ -10,6 +10,7 @@ import nl.tue.buildingsmart.express.population.ModelPopulation;
 import parser.data.ifc.IFCShapeRepresentationIdentity;
 import parser.helper.IFCShapeRepresentationCatalog.AdvancedBrepRepresentationTypeItems;
 import parser.helper.IFCShapeRepresentationCatalog.AdvancedSweptSolidRepresentationTypeItems;
+import parser.helper.IFCShapeRepresentationCatalog.Axis2PlacementRepresentationTypeItems;
 import parser.helper.IFCShapeRepresentationCatalog.BoundingBoxRepresentationTypeItems;
 import parser.helper.IFCShapeRepresentationCatalog.BrepRepresentationTypeItems;
 import parser.helper.IFCShapeRepresentationCatalog.CSGRepresentationTypeItems;
@@ -360,10 +361,44 @@ public class IFCShapeRepresentationIdentifier {
 		}
 		if(shapePD.contains(profileDef))		return ProfileDefRepresentationTypeItems.IfcShapeProfileDef.name();
 
+		ArrayList<EntityInstance> arbitraryPD = new ArrayList<>();
+		for(String flag : getIdentifierTags(ProfileDefRepresentationTypeItems.IfcArbitraryClosedProfileDef.name())) {
+			arbitraryPD.addAll(ifcModel.getInstancesOfType(flag));
+		}
+		if(arbitraryPD.contains(profileDef))		return ProfileDefRepresentationTypeItems.IfcArbitraryClosedProfileDef.name();
+
+
 		Logging.info(IFCShapeRepresentationIdentifier.class.getName() + ": " + profileDef.toString() + " ProfileDefRepresentationType is not supported");
 		return null;
 	}
 
+	/**
+	 * Checks if entity is of type IFCPOLYLINE
+	 * @param ifcModel ifc model
+	 * @param entity to check type of
+	 * @return true if IFCPOLYLINE else false
+	 */
+	public static boolean isIfcPolyline(ModelPopulation ifcModel, EntityInstance entity) {
+		ArrayList<EntityInstance> polylines = new ArrayList<>();
+		for(String flag : getIdentifierTags(CurveRepresentationTypeItems.IfcPolyline.name())) {
+			polylines.addAll(ifcModel.getInstancesOfType(flag));
+		}
+		return polylines.contains(entity);
+	}
+
+	/**
+	 * Checks if entity is of type IFCAXIS2PLACEMENT3D
+	 * @param ifcModel ifc model
+	 * @param entity entity to check type of
+	 * @return true if IFCAXIS2PLACEMENT3D else false
+	 */
+	public static boolean isIfcAxis2Placement3D(ModelPopulation ifcModel, EntityInstance entity) {
+		ArrayList<EntityInstance> axis2placement3Ds = new ArrayList<>();
+		for(String flag : getIdentifierTags(Axis2PlacementRepresentationTypeItems.IfcAxis2Placement3D.name())) {
+			axis2placement3Ds.addAll(ifcModel.getInstancesOfType(flag));
+		}
+		return axis2placement3Ds.contains(entity);
+	}
 
 	/**
 	 * Removes unnecessary chars from representation attribute string

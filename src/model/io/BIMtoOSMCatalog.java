@@ -1,3 +1,4 @@
+// License: GPL. For details, see LICENSE file.
 package model.io;
 
 import java.util.ArrayList;
@@ -140,8 +141,8 @@ public class BIMtoOSMCatalog {
     	String tag = "IfcSite";
     	ArrayList<String> ifcSiteTags = new ArrayList<>();
     	ifcSiteTags.add(tag);
-    	ifcSiteTags.add(tag.toString().toUpperCase());
-    	ifcSiteTags.add(tag.toString().toLowerCase());
+    	ifcSiteTags.add(tag.toUpperCase());
+    	ifcSiteTags.add(tag.toLowerCase());
     	return ifcSiteTags;
     }
 
