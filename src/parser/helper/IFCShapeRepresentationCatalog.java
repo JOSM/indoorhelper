@@ -132,7 +132,11 @@ public class IFCShapeRepresentationCatalog {
 	 */
 	public enum ProfileDefRepresentationTypeItems{
 		IfcRectangleProfileDef, IfcTrapeziumProfileDef, IfcCircleProfileDef, IfcEllipseProfileDef,
-		IfcShapeProfileDef
+		IfcShapeProfileDef, IfcArbitraryClosedProfileDef
+	}
+
+	public enum Axis2PlacementRepresentationTypeItems{
+		IfcAxis2Placement2D, IfcAxis2Placement3D
 	}
 
 

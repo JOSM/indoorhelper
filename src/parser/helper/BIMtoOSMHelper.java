@@ -14,6 +14,7 @@ import parser.data.Point3D;
 import parser.data.PreparedBIMObject3D;
 import parser.data.ifc.IFCShapeRepresentationIdentity;
 import parser.helper.IFCShapeRepresentationCatalog.RepresentationIdentifier;
+import parser.math.ParserMath;
 
 /**
  * Class helps parsing BIM data with providing methods to extract OSM relevant data.
@@ -38,6 +39,7 @@ public class BIMtoOSMHelper {
 				ifcSiteObjects.add(entity);
 			});
 		});
+
 		if(!ifcSiteObjects.isEmpty()) {
 			bimData.setIfcSite(ifcSiteObjects.firstElement());
 		}
@@ -120,11 +122,34 @@ public class BIMtoOSMHelper {
 			// get IFCLOCALPLACEMENT of object (origin of object)
 			Point3D cartesianPlacementOfObject = getCartesianOriginOfObject(BIMFileRootId, object);
 
+			// get rotation matrices of object
+			double[][] xRotMatrix = getXAxisRotationMatrix(BIMFileRootId, object);
+//			double[][] zRotMatrix = getZAxisRotationMatrix(ifcModel, BIMFileRootId, object);
+
 			// get local points representing shape of object
 			ArrayList<Point3D> shapeDataOfObject = getShapeDataOfObject(ifcModel, object);
 
 			// create PreparedBIMObject3D and save
 			if(cartesianPlacementOfObject != null && (shapeDataOfObject != null && !shapeDataOfObject.isEmpty())) {
+				// rotate points about z-axis
+//				if(zRotMatrix != null) {
+//					for(Point3D point : shapeDataOfObject) {
+//						double[] pointAsVector = {point.getY(), point.getZ(), point.getZ()};
+//						double[] rotatedPoint = ParserMath.rotate3DPoint(pointAsVector, zRotMatrix);
+//						point.setX(rotatedPoint[0]);
+//						point.setY(rotatedPoint[1]);
+//						point.setZ(rotatedPoint[2]);
+//					}
+//				}
+				// rotate points about x-axis
+				shapeDataOfObject.forEach(point ->{
+					double[] pointAsVector = {point.getX(), point.getY(), point.getZ()};
+					double[] rotatedPoint = ParserMath.rotate3DPoint(pointAsVector, xRotMatrix);
+					point.setX(rotatedPoint[0]);
+					point.setY(rotatedPoint[1]);
+					point.setZ(rotatedPoint[2]);
+				});
+
 				// transform points to object placement origin
 				shapeDataOfObject.forEach(point ->{
 					point.setX(point.getX() + cartesianPlacementOfObject.getX());
@@ -217,7 +242,8 @@ public class BIMtoOSMHelper {
 			if(objectCoords.isEmpty())	return null;
 			double relativeX = prepareDoubleString(objectCoords.get(0));
 			double relativeY = prepareDoubleString(objectCoords.get(1));
-			double relativeZ = prepareDoubleString(objectCoords.get(2));
+			double relativeZ = 0.0;
+			if(objectCoords.size() == 3) 	relativeZ = prepareDoubleString(objectCoords.get(2));
 			if(Double.isNaN(relativeX) || Double.isNaN(relativeY) || Double.isNaN(relativeZ)) {
 				return null;
 			}
@@ -229,6 +255,130 @@ public class BIMtoOSMHelper {
 		}
 
 		return cartesianCornerOfWall;
+	}
+
+	/**
+	 * Gets rotation matrix about x-axis for ifc object
+	 * @param BIMFileRootId root IFCLOCALPLACEMENT element of BIM file
+	 * @param object to get rotation matrix for
+	 * @return rotation matrix about x-axis for object
+	 */
+	private static double[][] getXAxisRotationMatrix(int BIMFileRootId, EntityInstance object){
+		// get objects IFCLOCALPLACEMENT entity
+		EntityInstance objectIFCLP = object.getAttributeValueBNasEntityInstance("ObjectPlacement");
+
+		// get all RELATIVEPLACEMENTs to root
+		ArrayList<EntityInstance> objectRP = getRelativePlacementsToRoot(BIMFileRootId, objectIFCLP, new ArrayList<EntityInstance>());
+
+		double rotAngle = 0.0;	// in rad
+		double[] parentXVector = null;
+
+		for(EntityInstance relativeObject : objectRP) {
+			// get REFDIRECTION (x axis vector)
+			EntityInstance xRefDirection = relativeObject.getAttributeValueBNasEntityInstance("RefDirection");
+			// get DIRECTIONRATIOS from REFDIRECTION (vector values)
+			@SuppressWarnings("unchecked")
+			Vector<String> xDirectionRatios = (Vector<String>)xRefDirection.getAttributeValueBN("DirectionRatios");
+			if(xDirectionRatios.isEmpty())	return null;
+
+			if(xDirectionRatios.size() == 2) {
+				double x = prepareDoubleString(xDirectionRatios.get(0));
+				double y = prepareDoubleString(xDirectionRatios.get(1));
+				if(parentXVector != null) {
+					double[] xVector = {x,y};
+					rotAngle += ParserMath.getAngleBetweenVectors(parentXVector, xVector);
+				}
+				// update parent vector
+				parentXVector = new double[2];
+				parentXVector[0] = x;
+				parentXVector[1] = y;
+			}
+			if(xDirectionRatios.size() == 3) {
+				double x = prepareDoubleString(xDirectionRatios.get(0));
+				double y = prepareDoubleString(xDirectionRatios.get(1));
+				double z = prepareDoubleString(xDirectionRatios.get(2));
+				if(parentXVector!= null) {
+					double[] xVector = {x,y,z};
+					rotAngle += ParserMath.getAngleBetweenVectors(parentXVector, xVector);
+				}
+				// update parent vector
+				parentXVector = new double[3];
+				parentXVector[0] = x;
+				parentXVector[1] = y;
+				parentXVector[2] = z;
+			}
+		}
+		// check if rotAngle greater than 6.28319 rad or smaller than -6.28319 rad
+		if(rotAngle > 6.28319)	rotAngle -= 6.28319;
+		if(rotAngle < -6.28319)	rotAngle += 6.28319;
+
+		// pack and return rotation matrix about x-axis
+		return ParserMath.getRotationMatrixAboutZAxis(rotAngle);
+	}
+
+	/**
+	 * Gets rotation matrix about z-axis for ifc object
+	 * @param BIMFileRootId root IFCLOCALPLACEMENT element of BIM file
+	 * @param ifcModel ifc model
+	 * @param object to get rotation matrix for
+	 * @return rotation matrix about z-axis for object
+	 */
+	private static double[][] getZAxisRotationMatrix(ModelPopulation ifcModel, int BIMFileRootId, EntityInstance object){
+		// get objects IFCLOCALPLACEMENT entity
+		EntityInstance objectIFCLP = object.getAttributeValueBNasEntityInstance("ObjectPlacement");
+
+		// get all RELATIVEPLACEMENTs to root
+		ArrayList<EntityInstance> objectRP = getRelativePlacementsToRoot(BIMFileRootId, objectIFCLP, new ArrayList<EntityInstance>());
+
+		double rotAngle = 0.0;	// in rad
+		double[] parentZVector = null;
+
+		for(EntityInstance relativeObject : objectRP) {
+			// if IFCAXIS2PLACEMENT2D return
+			if(!IFCShapeRepresentationIdentifier.isIfcAxis2Placement3D(ifcModel, relativeObject)) continue;
+
+			// get AXIS (z-axis vector)
+			EntityInstance zAxis = relativeObject.getAttributeValueBNasEntityInstance("Axis");
+			// get DIRECTIONRATIOS from AXIS (vector values)
+			@SuppressWarnings("unchecked")
+			Vector<String> zDirectionRatios = (Vector<String>)zAxis.getAttributeValueBN("DirectionRatios");
+
+			if(zDirectionRatios.isEmpty())	return null;
+
+			if(zDirectionRatios.size() == 2) {
+				double x = prepareDoubleString(zDirectionRatios.get(0));
+				double y = prepareDoubleString(zDirectionRatios.get(1));
+				if(parentZVector != null) {
+					double[] zVector = {x,y};
+					rotAngle += ParserMath.getAngleBetweenVectors(parentZVector, zVector);
+				}
+				// update parent vector
+				parentZVector = new double[2];
+				parentZVector[0] = x;
+				parentZVector[1] = y;
+
+			}
+			if(zDirectionRatios.size() == 3) {
+				double x = prepareDoubleString(zDirectionRatios.get(0));
+				double y = prepareDoubleString(zDirectionRatios.get(1));
+				double z = prepareDoubleString(zDirectionRatios.get(2));
+				if(parentZVector != null) {
+					double[] zVector = {x,y,z};
+					rotAngle += ParserMath.getAngleBetweenVectors(parentZVector, zVector);
+				}
+				// update parent vector
+				parentZVector = new double[3];
+				parentZVector[0] = x;
+				parentZVector[1] = y;
+				parentZVector[2] = z;
+			}
+		}
+		// check if rotAngle greater than 6.28319 rad or smaller than -6.28319 rad
+		if(rotAngle > 6.28319)	rotAngle -= 6.28319;
+		if(rotAngle < -6.28319)	rotAngle += 6.28319;
+
+		// pack and return rotation matrix about z-axis
+		return ParserMath.getRotationMatrixAboutXAxis(rotAngle);
 	}
 
 	/**

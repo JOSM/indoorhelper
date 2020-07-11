@@ -68,7 +68,7 @@ public class BIMtoOSMParser {
 		// for preparation of filtered BIM data find Id of BIM root IFCLOCALPLACEMENT element (kept in IFCSITE flag)
 		int BIMRootId = BIMtoOSMHelper.getIfcLocalPlacementRootObject(filteredBIMdata);
 		if(BIMRootId == -1) {
-			showsParsingErrorView(filepath, "Could not import IFC file.\nIFC file doesn't contain IFCSITE element.", true);
+			showsParsingErrorView(filepath, "Could not import IFC file.\nIFC file does not contains IFCSITE element.", true);
 			return;
 		}
 
@@ -79,6 +79,7 @@ public class BIMtoOSMParser {
 		preparedBIMdata.addAll(BIMtoOSMHelper.prepareBIMObjects(ifcModel, BIMRootId, BIMtoOSMCatalog.BIMObject.IfcColumn, filteredBIMdata.getColumnObjects()));
 		preparedBIMdata.addAll(BIMtoOSMHelper.prepareBIMObjects(ifcModel, BIMRootId, BIMtoOSMCatalog.BIMObject.IfcDoor, filteredBIMdata.getDoorObjects()));
 		preparedBIMdata.addAll(BIMtoOSMHelper.prepareBIMObjects(ifcModel, BIMRootId, BIMtoOSMCatalog.BIMObject.IfcStair, filteredBIMdata.getStairObjects()));
+		//TODO add IFCBEAM!
 
 		// TODO transform coordinates
 
@@ -89,16 +90,26 @@ public class BIMtoOSMParser {
 
 		// TODO fix, for development only -----------
 		for(PreparedBIMObject3D object : preparedBIMdata){
-			if(object.getType().equals(BIMtoOSMCatalog.BIMObject.IfcWall)) {
+			//if(object.getType().equals(BIMtoOSMCatalog.BIMObject.IfcColumn)) {
+				ArrayList<Node> tmpNodes = new ArrayList<>();
 				for(Point3D point : object.getCartesianShapeCoordinates()) {
 					Node n = new Node(new LatLon(point.getY(), point.getX()));
-					nodes.add(n);
+					tmpNodes.add(n);
+				}
+				if(tmpNodes.get(0).lat() == tmpNodes.get(tmpNodes.size()-1).lat() && tmpNodes.get(0).lon() == tmpNodes.get(tmpNodes.size()-1).lon()) {
+					tmpNodes.remove(tmpNodes.size()-1);
+					nodes.addAll(tmpNodes);
+					tmpNodes.add(tmpNodes.get(0));
+				}
+				else {
+					nodes.addAll(tmpNodes);
 				}
 				Way w = new Way();
-				w.setNodes(nodes);
+				w.setNodes(tmpNodes);
 				tagCatalog.getTags(TagCatalog.IndoorObject.CONCRETE_WALL).forEach(tag -> w.put(tag));
 				ways.add(w);
-			}
+
+			//}
 		}
 		// -----------
 

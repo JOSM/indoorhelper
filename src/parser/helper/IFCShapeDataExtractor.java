@@ -17,7 +17,6 @@ import parser.helper.IFCShapeRepresentationCatalog.BrepRepresentationTypeItems;
 import parser.helper.IFCShapeRepresentationCatalog.CSGRepresentationTypeItems;
 import parser.helper.IFCShapeRepresentationCatalog.ClippingRepresentationTypeItems;
 import parser.helper.IFCShapeRepresentationCatalog.CurveRepresentationTypeItems;
-import parser.helper.IFCShapeRepresentationCatalog.LoopSubRepresentationTypeItems;
 import parser.helper.IFCShapeRepresentationCatalog.MappedRepresentatiobTypeItems;
 import parser.helper.IFCShapeRepresentationCatalog.ProfileDefRepresentationTypeItems;
 import parser.helper.IFCShapeRepresentationCatalog.SurfaceModelRepresentationTypeItems;
@@ -177,6 +176,7 @@ public class IFCShapeDataExtractor {
 	 * @return points representing shape of IFCFACETEDBREP
 	 */
 	private static ArrayList<Point3D> getDataFromIfcFacetedBrep(ModelPopulation ifcModel, EntityInstance faceBrepItem) {
+		/*
 		// get IFCCLOSEDSHELL stored in IFCFACETEDBREP.OUTER
 		EntityInstance closedShell = faceBrepItem.getAttributeValueBNasEntityInstance("Outer");
 
@@ -211,10 +211,14 @@ public class IFCShapeDataExtractor {
 					if(cPointAsPoint3D == null)	return null;
 					cartesianPointsOfClosedShell.add(cPointAsPoint3D);
 				}
+				// add last point again to close loop
+				//cartesianPointsOfClosedShell.add(cartesianPointsOfClosedShell.get(0));
+
 				return cartesianPointsOfClosedShell;
 			}
 			// other loop types are not supported right now
 		}
+		*/
 		return null;
 	}
 
@@ -245,6 +249,8 @@ public class IFCShapeDataExtractor {
 			double halfxDim = xDim/2.0;
 			double halfyDim = yDim/2.0;
 
+			// TODO handle rotation
+
 			// get points of shape
 			ArrayList<Point3D> cartesianPointsOfSArea = new ArrayList<>();
 			cartesianPointsOfSArea.add(new Point3D(locationPoint3D.getX()-halfxDim, locationPoint3D.getY()-halfyDim, 0.0));
@@ -253,6 +259,30 @@ public class IFCShapeDataExtractor {
 			cartesianPointsOfSArea.add(new Point3D(locationPoint3D.getX()-halfxDim, locationPoint3D.getY()+halfyDim, 0.0));
 			cartesianPointsOfSArea.add(new Point3D(locationPoint3D.getX()-halfxDim, locationPoint3D.getY()-halfyDim, 0.0));
 			return cartesianPointsOfSArea;
+		}
+		if(sweptAreaType.equals(ProfileDefRepresentationTypeItems.IfcArbitraryClosedProfileDef.name())) {
+			String profileType = (String)profileDef.getAttributeValueBN("ProfileType");
+
+			if(profileType.equals(".AREA.")) {
+				// extract polyline coordinates
+				EntityInstance outerCurve = profileDef.getAttributeValueBNasEntityInstance("OuterCurve");
+
+				// check if curve is represented by polyloop
+				if(IFCShapeRepresentationIdentifier.isIfcPolyline(ifcModel, outerCurve)) {
+					// extract coordinates
+					ArrayList<EntityInstance> curvePoints = outerCurve.getAttributeValueBNasEntityInstanceList("Points");
+					ArrayList<Point3D> cartesianPointsOfSArea = new ArrayList<>();
+					curvePoints.forEach(point ->{
+						Point3D pointAsPoint3D = IfcCartesianCoordinateToPoint3D(point);
+						cartesianPointsOfSArea.add(
+								new Point3D(locationPoint3D.getX()+ pointAsPoint3D.getX(), locationPoint3D.getY() + pointAsPoint3D.getY(), 0.0));
+					});
+					return cartesianPointsOfSArea;
+				}
+			}
+			if(profileType.equals(".CURVE.")) {
+				// not supported right now
+			}
 		}
 		// other types are not supported right now
 		return null;
@@ -269,7 +299,8 @@ public class IFCShapeDataExtractor {
 		if(objectCoords.isEmpty())	return null;
 		double x = prepareDoubleString(objectCoords.get(0));
 		double y = prepareDoubleString(objectCoords.get(1));
-		double z = prepareDoubleString(objectCoords.get(2));
+		double z = 0.0;
+		if(objectCoords.size() == 3) 	prepareDoubleString(objectCoords.get(2));
 		if(Double.isNaN(x) || Double.isNaN(y) || Double.isNaN(z)) {
 			return null;
 		}
