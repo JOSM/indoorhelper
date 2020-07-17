@@ -17,6 +17,9 @@ import parser.helper.IFCShapeRepresentationCatalog.BrepRepresentationTypeItems;
 import parser.helper.IFCShapeRepresentationCatalog.CSGRepresentationTypeItems;
 import parser.helper.IFCShapeRepresentationCatalog.ClippingRepresentationTypeItems;
 import parser.helper.IFCShapeRepresentationCatalog.CurveRepresentationTypeItems;
+import parser.helper.IFCShapeRepresentationCatalog.IfcBooleanOperandType;
+import parser.helper.IFCShapeRepresentationCatalog.IfcBoundedCurveTypes;
+import parser.helper.IFCShapeRepresentationCatalog.LoopSubRepresentationTypeItems;
 import parser.helper.IFCShapeRepresentationCatalog.MappedRepresentatiobTypeItems;
 import parser.helper.IFCShapeRepresentationCatalog.ProfileDefRepresentationTypeItems;
 import parser.helper.IFCShapeRepresentationCatalog.SurfaceModelRepresentationTypeItems;
@@ -29,6 +32,8 @@ import parser.helper.IFCShapeRepresentationCatalog.TessellationRepresentationTyp
  *
  */
 public class IFCShapeDataExtractor {
+
+	public static Point3D defaultPoint = new Point3D(-99.0, -99.0, -99.0);
 
 	/**
 	 * Extract representation data from IFCREPRESENTATIONITEM body
@@ -55,9 +60,6 @@ public class IFCShapeDataExtractor {
 			if(repItemType.equals(AdvancedBrepRepresentationTypeItems.IfcAdvancedBrep.name())) {
 				// TODO extract data
 			}
-			else if(repItemType.equals(AdvancedBrepRepresentationTypeItems.IfcFacetedBrep.name())) {
-				return getDataFromIfcFacetedBrep(ifcModel, item);
-			}
 			else if(repItemType.equals(AdvancedSweptSolidRepresentationTypeItems.IfcSweptDiskSolid.name())) {
 				// TODO extract data
 			}
@@ -65,7 +67,7 @@ public class IFCShapeDataExtractor {
 				// TODO extract data
 			}
 			else if(repItemType.equals(BrepRepresentationTypeItems.IfcFacetedBrep.name())) {
-				// TODO extract data
+				return getShapeDataFromIfcFacetedBrep(ifcModel, item);
 			}
 			else if(repItemType.equals(CSGRepresentationTypeItems.IfcBooleanResult.name())) {
 				// TODO extract data
@@ -80,7 +82,7 @@ public class IFCShapeDataExtractor {
 				// TODO extract data
 			}
 			else if(repItemType.equals(ClippingRepresentationTypeItems.IfcBooleanClippingResult.name())) {
-				// TODO extract data
+				return getShapeDataFromIfcBooleanResult(ifcModel, item, IfcBooleanOperator.DIFFERENCE);
 			}
 			else if(repItemType.equals(SurfaceModelRepresentationTypeItems.IfcTessellatedItem.name())) {
 				// TODO extract data
@@ -95,7 +97,7 @@ public class IFCShapeDataExtractor {
 				// TODO extract data
 			}
 			else if(repItemType.equals(SweptSolidRepresentationTypeItems.IfcExtrudedAreaSolid.name())) {
-				return getDataFromIfcExtrudedAreaSolid(ifcModel, item);
+				return getShapeDataFromIfcExtrudedAreaSolid(ifcModel, item);
 			}
 			else if(repItemType.equals(SweptSolidRepresentationTypeItems.IfcRevolvedAreaSolid.name())) {
 				// TODO extract data
@@ -175,13 +177,22 @@ public class IFCShapeDataExtractor {
 	 * @param faceBrepItem to get shape representation coordinates for
 	 * @return points representing shape of IFCFACETEDBREP
 	 */
-	private static ArrayList<Point3D> getDataFromIfcFacetedBrep(ModelPopulation ifcModel, EntityInstance faceBrepItem) {
-		/*
+	private static ArrayList<Point3D> getShapeDataFromIfcFacetedBrep(ModelPopulation ifcModel, EntityInstance faceBrepItem) {
 		// get IFCCLOSEDSHELL stored in IFCFACETEDBREP.OUTER
 		EntityInstance closedShell = faceBrepItem.getAttributeValueBNasEntityInstance("Outer");
+		return getShapeDataFromIfcClosedShell(ifcModel, closedShell);
 
+	}
+
+	/**
+	 * Method extracts shape representation coordinates from IFCCLOSEDSHELL object
+	 * @param ifcModel ifc model
+	 * @param shellItem to get shape representation coordinates for
+	 * @return points representing shape of IFCCLOSEDSHELL
+	 */
+	private static ArrayList<Point3D> getShapeDataFromIfcClosedShell(ModelPopulation ifcModel, EntityInstance shellItem){
 		// get IFCFACEs of IFCCLOSEDSHELL
-		ArrayList<EntityInstance> facesOfClosedShell = closedShell.getAttributeValueBNasEntityInstanceList("CfsFaces");
+		ArrayList<EntityInstance> facesOfClosedShell = shellItem.getAttributeValueBNasEntityInstanceList("CfsFaces");
 
 		// get IFCFACEBOUNDs of every IFCFACE
 		ArrayList<EntityInstance> faceBoundsOfClosedShell = new ArrayList<>();
@@ -195,30 +206,156 @@ public class IFCShapeDataExtractor {
 			loopsOfClosedShell.addAll(bound.getAttributeValueBNasEntityInstanceList("Bound"));
 		});
 
-		// get points of IFCLOOPS
+		// collect points of IFCLOOPs
+		ArrayList<Point3D> shapePoints = new ArrayList<>();
 		for(EntityInstance loop : loopsOfClosedShell) {
-			// handle different loop types
-			String loopType = IFCShapeRepresentationIdentifier.getIFCLoopType(ifcModel, loop);
-			if(loopType == null)	return null;
-
-			if(loopType.equals(LoopSubRepresentationTypeItems.IfcPolyLoop.name())) {
-				// get all IFCCARTESIANPOINTs
-				ArrayList<Point3D> cartesianPointsOfClosedShell = new ArrayList<>();
-
-				for(EntityInstance cPoint : loop.getAttributeValueBNasEntityInstanceList("Polygon")){
-					// get coordinates of point and turn it into Point3D
-					Point3D cPointAsPoint3D	= IfcCartesianCoordinateToPoint3D(cPoint);
-					if(cPointAsPoint3D == null)	return null;
-					cartesianPointsOfClosedShell.add(cPointAsPoint3D);
-				}
-				// add last point again to close loop
-				//cartesianPointsOfClosedShell.add(cartesianPointsOfClosedShell.get(0));
-
-				return cartesianPointsOfClosedShell;
-			}
-			// other loop types are not supported right now
+			ArrayList<Point3D> pointsOfLoop = getShapeDataFromIfcLoop(ifcModel, loop);
+			if(pointsOfLoop == null)	return null;
+			// workaround: Add points of every loop to shapePoints but also add a default point after each loop as separator (needed later on for rendering)
+			shapePoints.addAll(pointsOfLoop);
+			shapePoints.add(defaultPoint);
 		}
-		*/
+
+		return shapePoints;
+	}
+
+	/**
+	 * Method extracts shape representation coordinates from IFCLOOP object
+	 * @param ifcModel ifc model
+	 * @param loop to get shape representation coordinates for
+	 * @return points representing shape of IFCLOOP
+	 */
+	private static ArrayList<Point3D> getShapeDataFromIfcLoop(ModelPopulation ifcModel, EntityInstance loop){
+		// get loop type
+		String loopType = IFCShapeRepresentationIdentifier.getIFCLoopType(ifcModel, loop);
+		if(loopType == null)	return null;
+
+		if(loopType.equals(LoopSubRepresentationTypeItems.IfcPolyLoop.name())) {
+			// get all IFCCARTESIANPOINTs
+			ArrayList<Point3D> cartesianPointsOfClosedShell = new ArrayList<>();
+			for(EntityInstance cPoint : loop.getAttributeValueBNasEntityInstanceList("Polygon")){
+				Point3D cPointAsPoint3D	= IfcCartesianCoordinateToPoint3D(cPoint);
+				if(cPointAsPoint3D == null)	return null;
+				cartesianPointsOfClosedShell.add(cPointAsPoint3D);
+			}
+			return cartesianPointsOfClosedShell;
+		}
+		// other loop types are not supported right now
+		return null;
+	}
+
+	/**
+	 * Extracts coordinate data from IFCBOOLEANRESULT. If IFCBOOLEANRESULT holds operands of type IFCBOOLEANRESULT it will
+	 * recursive run thru every operation.
+	 * @param ifcModel ifc model
+	 * @param resultEntity to get coordinates from
+	 * @param operator IFCBOOLEANOPERATOR
+	 * @return Extracts coordinate data from IFCBOOLEANRESULT
+	 */
+	private static ArrayList<Point3D> getShapeDataFromIfcBooleanResult(ModelPopulation ifcModel, EntityInstance resultEntity, IfcBooleanOperator operator) {
+		// get and identify both operands
+		EntityInstance operand1 = resultEntity.getAttributeValueBNasEntityInstance("FirstOperand");
+		EntityInstance operand2 = resultEntity.getAttributeValueBNasEntityInstance("SecondOperand");
+
+		// extract shape data from operands
+		ArrayList<Point3D> pointsOfOperand1 = getShapeDataFromBooleanOperand(ifcModel, operand1);
+		ArrayList<Point3D> pointsOfOperand2 = getShapeDataFromBooleanOperand(ifcModel, operand2);
+		if(pointsOfOperand1 == null || pointsOfOperand2 == null)	return null;
+
+		// do operation
+		if(operator.equals(IfcBooleanOperator.DIFFERENCE)) {
+			ArrayList<Point3D> pointsOfOperand1Copy = pointsOfOperand1;
+			for(Point3D point1 : pointsOfOperand1) {
+				for(Point3D point2 : pointsOfOperand2) {
+					if(point1.equalsPoint3D(point2)) {
+						pointsOfOperand1Copy.remove(point1);
+					}
+				}
+			}
+			return pointsOfOperand1Copy;
+		}
+		if(operator.equals(IfcBooleanOperator.INTERSECTION)) {
+			// TODO implement
+		}
+		if(operator.equals(IfcBooleanOperator.UNION)) {
+			// TODO implement
+		}
+
+		return null;
+	}
+
+	/**
+	 * Method extracts shape data from boolean operand. For this the operand will be identified and
+	 * handled dependent on type.
+	 * @param ifcModel ifc model
+	 * @param operand to get shape data from
+	 * @return points representing shape of operand
+	 */
+	private static ArrayList<Point3D> getShapeDataFromBooleanOperand(ModelPopulation ifcModel, EntityInstance operand){
+		String operandType = IFCShapeRepresentationIdentifier.getIfcBooleanOperandType(ifcModel, operand);
+
+		if(operandType == null)	return null;
+
+		if(operandType.equals(IfcBooleanOperandType.IfcSolidModel.name())) {
+
+		}
+		if(operandType.equals(IfcBooleanOperandType.IfcHalfSpaceSolid.name())) {
+
+		}
+		if(operandType.equals(IfcBooleanOperandType.IfcPolygonalBoundedHalfSpace.name())) {
+			return getShapeDataFromIfcPolygonalBoundedHalfSpace(ifcModel, operand);
+		}
+		if(operandType.equals(IfcBooleanOperandType.IfcBooleanResult.name()) || operandType.equals(IfcBooleanOperandType.IfcBooleanClippingResult.name())) {
+			String operand1Operator = (String) operand.getAttributeValueBN("Operator");
+			if(operand1Operator.equals("." + IfcBooleanOperator.DIFFERENCE + "."))
+				return getShapeDataFromIfcBooleanResult(ifcModel, operand, IfcBooleanOperator.DIFFERENCE);
+			if(operand1Operator.equals("." + IfcBooleanOperator.INTERSECTION + "."))
+				return getShapeDataFromIfcBooleanResult(ifcModel, operand, IfcBooleanOperator.INTERSECTION);
+			if(operand1Operator.equals("." + IfcBooleanOperator.UNION + "."))
+				return getShapeDataFromIfcBooleanResult(ifcModel, operand, IfcBooleanOperator.UNION);
+		}
+		if(operandType.equals(IfcBooleanOperandType.IfcCsgPrimitive3D.name())) {
+
+		}
+		if(operandType.equals(SweptSolidRepresentationTypeItems.IfcExtrudedAreaSolid.name())) {
+			return getShapeDataFromIfcExtrudedAreaSolid(ifcModel, operand);
+		}
+		if(operandType.equals(IfcBooleanOperandType.IfcFacetedBrep.name())) {
+			return getShapeDataFromIfcFacetedBrep(ifcModel, operand);
+		}
+		// other types are not supported right now
+		return null;
+	}
+
+	/**
+	 *  Method extracts shape representation coordinates from IFCPOLYGONALBUNDEDHALFSPACE object
+	 * @param ifcModel ifc model
+	 * @param polygon object to get shape coordinates from
+	 * @return points representing shape of IFCPOLYGONALBUNDEDHALFSPACE
+	 */
+	private static ArrayList<Point3D> getShapeDataFromIfcPolygonalBoundedHalfSpace(ModelPopulation ifcModel, EntityInstance polygon){
+		// TODO handle rotation to parent system
+
+		// get local origin position
+		EntityInstance localSystemPosition = polygon.getAttributeValueBNasEntityInstance("Position");
+		EntityInstance locationPoint = localSystemPosition.getAttributeValueBNasEntityInstance("Location");
+		Point3D locationPoint3D = IfcCartesianCoordinateToPoint3D(locationPoint);
+		if(locationPoint3D == null)	return null;
+
+		// get boundary
+		EntityInstance localPolygonBoundary = polygon.getAttributeValueBNasEntityInstance("PolygonalBoundary");
+		String localPolygonBoundaryType = IFCShapeRepresentationIdentifier.getIfcBoundedCurveType(ifcModel, localPolygonBoundary);
+
+		// get coordinates of boundary
+		if(localPolygonBoundaryType.equals(IfcBoundedCurveTypes.IfcPolyline.name())) {
+			ArrayList<Point3D> pointsOfPolyline = getCoordinatesFromIfcPolyline(localPolygonBoundary);
+			pointsOfPolyline.forEach(point->{
+				point = new Point3D(locationPoint3D.getX()+ point.getX(), locationPoint3D.getY() + point.getY(), 0.0);
+			});
+			return pointsOfPolyline;
+		}
+
+		// other types are not supported right now
 		return null;
 	}
 
@@ -228,7 +365,7 @@ public class IFCShapeDataExtractor {
 	 * @param extrudedArea to get shape representation for
 	 * @return points representing shape of IFCEXTRUDEDAREASOLID
 	 */
-	private static ArrayList<Point3D> getDataFromIfcExtrudedAreaSolid(ModelPopulation ifcModel, EntityInstance extrudedArea) {
+	private static ArrayList<Point3D> getShapeDataFromIfcExtrudedAreaSolid(ModelPopulation ifcModel, EntityInstance extrudedArea) {
 		// get POSITION attribute and extract local object origin coordinates
 		EntityInstance axisPlacement = extrudedArea.getAttributeValueBNasEntityInstance("Position");
 		EntityInstance locationPoint = axisPlacement.getAttributeValueBNasEntityInstance("Location");
@@ -249,8 +386,6 @@ public class IFCShapeDataExtractor {
 			double halfxDim = xDim/2.0;
 			double halfyDim = yDim/2.0;
 
-			// TODO handle rotation
-
 			// get points of shape
 			ArrayList<Point3D> cartesianPointsOfSArea = new ArrayList<>();
 			cartesianPointsOfSArea.add(new Point3D(locationPoint3D.getX()-halfxDim, locationPoint3D.getY()-halfyDim, 0.0));
@@ -267,17 +402,14 @@ public class IFCShapeDataExtractor {
 				// extract polyline coordinates
 				EntityInstance outerCurve = profileDef.getAttributeValueBNasEntityInstance("OuterCurve");
 
-				// check if curve is represented by polyloop
+				// check if curve is represented by polyline
 				if(IFCShapeRepresentationIdentifier.isIfcPolyline(ifcModel, outerCurve)) {
 					// extract coordinates
-					ArrayList<EntityInstance> curvePoints = outerCurve.getAttributeValueBNasEntityInstanceList("Points");
-					ArrayList<Point3D> cartesianPointsOfSArea = new ArrayList<>();
-					curvePoints.forEach(point ->{
-						Point3D pointAsPoint3D = IfcCartesianCoordinateToPoint3D(point);
-						cartesianPointsOfSArea.add(
-								new Point3D(locationPoint3D.getX()+ pointAsPoint3D.getX(), locationPoint3D.getY() + pointAsPoint3D.getY(), 0.0));
+					ArrayList<Point3D> pointsOfPolyline = getCoordinatesFromIfcPolyline(outerCurve);
+					pointsOfPolyline.forEach(point ->{
+						point = new Point3D(locationPoint3D.getX()+ point.getX(), locationPoint3D.getY() + point.getY(), 0.0);
 					});
-					return cartesianPointsOfSArea;
+					return pointsOfPolyline;
 				}
 			}
 			if(profileType.equals(".CURVE.")) {
@@ -286,6 +418,21 @@ public class IFCShapeDataExtractor {
 		}
 		// other types are not supported right now
 		return null;
+	}
+
+	/**
+	 * Method extracts local coordinates of polyline
+	 * @param polyline o get coordinates from
+	 * @return coordinates of polyline (local)
+	 */
+	private static ArrayList<Point3D> getCoordinatesFromIfcPolyline(EntityInstance polyline){
+		ArrayList<EntityInstance> points = polyline.getAttributeValueBNasEntityInstanceList("Points");
+		ArrayList<Point3D> cartesianPointsOfSArea = new ArrayList<>();
+		points.forEach(point ->{
+			Point3D pointAsPoint3D = IfcCartesianCoordinateToPoint3D(point);
+			cartesianPointsOfSArea.add(new Point3D(pointAsPoint3D.getX(),pointAsPoint3D.getY(), 0.0));
+		});
+		return cartesianPointsOfSArea;
 	}
 
 	/**
@@ -322,6 +469,16 @@ public class IFCShapeDataExtractor {
 			Logging.error(e.getMessage());
 			return Double.NaN;
 		}
+	}
+
+	/**
+	 * This type defines the three Boolean operators used in the definition of CSG solids.
+	 *
+	 */
+	private enum IfcBooleanOperator{
+		UNION,
+		INTERSECTION,
+		DIFFERENCE
 	}
 
 

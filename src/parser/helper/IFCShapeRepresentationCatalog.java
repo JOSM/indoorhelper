@@ -139,6 +139,29 @@ public class IFCShapeRepresentationCatalog {
 		IfcAxis2Placement2D, IfcAxis2Placement3D
 	}
 
+	/**
+	 * This enumeration defines the available predefined types of a slab
+	 *
+	 */
+	public enum IfcSlabTypeEnum{
+	 	FLOOR, ROOF, LANDING, BASESLAB, USERDEFINED, NOTDEFINED
+	}
+
+	/**
+	 * Types of entities which may participate in a Boolean operation to form a CSG solid
+	 *
+	 */
+	public enum IfcBooleanOperandType{
+	 	IfcSolidModel, IfcCsgSolid, IfcManifoldSolidBrep, IfcSweptAreaSolid, IfcSweptDiskSolid,
+	 	IfcHalfSpaceSolid, IfcBoxedHalfSpace, IfcPolygonalBoundedHalfSpace,
+	 	IfcBooleanResult, IfcBooleanClippingResult,
+	 	IfcCsgPrimitive3D, IfcBlock, IfcRectangularPyramid, IfcRightCircularCone, IfcRightCircularCylinder, IfcSphere,
+	 	IfcExtrudedAreaSolid, IfcFacetedBrep
+	}
+
+	public enum IfcBoundedCurveTypes{
+		IfcCompositeCurve, IfcPolyline, IfcTrimmedCurve, IfcBSplineCurve
+	}
 
 
 }

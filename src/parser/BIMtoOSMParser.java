@@ -87,15 +87,17 @@ public class BIMtoOSMParser {
 		ArrayList<Way> ways = new ArrayList<>();
 		ArrayList<Node> nodes = new ArrayList<>();
 
-
 		// TODO fix, for development only -----------
 		for(PreparedBIMObject3D object : preparedBIMdata){
+
 			//if(object.getType().equals(BIMtoOSMCatalog.BIMObject.IfcColumn)) {
 				ArrayList<Node> tmpNodes = new ArrayList<>();
 				for(Point3D point : object.getCartesianShapeCoordinates()) {
 					Node n = new Node(new LatLon(point.getY(), point.getX()));
 					tmpNodes.add(n);
 				}
+				if(tmpNodes.isEmpty())	continue;
+
 				if(tmpNodes.get(0).lat() == tmpNodes.get(tmpNodes.size()-1).lat() && tmpNodes.get(0).lon() == tmpNodes.get(tmpNodes.size()-1).lon()) {
 					tmpNodes.remove(tmpNodes.size()-1);
 					nodes.addAll(tmpNodes);
@@ -106,7 +108,7 @@ public class BIMtoOSMParser {
 				}
 				Way w = new Way();
 				w.setNodes(tmpNodes);
-				tagCatalog.getTags(TagCatalog.IndoorObject.CONCRETE_WALL).forEach(tag -> w.put(tag));
+//				tagCatalog.getTags(TagCatalog.IndoorObject.CONCRETE_WALL).forEach(tag -> w.put(tag));
 				ways.add(w);
 
 			//}
