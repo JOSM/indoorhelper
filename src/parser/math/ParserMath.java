@@ -45,6 +45,14 @@ public class ParserMath {
 		return Double.NaN;
 	}
 
+	public static double[] rotate3DPoint(double[] point, double[][] rotationMatrix) {
+		double[] result = new double[3];
+		result[0] = rotationMatrix[0][0] * point[0] + rotationMatrix[0][1] * point[1] + rotationMatrix[0][2] * point[2];
+		result[1] = rotationMatrix[1][0] * point[0] + rotationMatrix[1][1] * point[1] + rotationMatrix[1][2] * point[2];
+		result[2] = rotationMatrix[2][0] * point[0] + rotationMatrix[2][1] * point[1] + rotationMatrix[2][2] * point[2];
+		return result;
+	}
+
 	/**
 	 * Creates rotation matrix about x-axis from rotAngle
 	 * https://en.wikipedia.org/wiki/Rotation_matrix
@@ -59,12 +67,18 @@ public class ParserMath {
 		return matrix;
 	}
 
-	public static double[] rotate3DPoint(double[] point, double[][] rotationMatrix) {
-		double[] result = new double[3];
-		result[0] = rotationMatrix[0][0] * point[0] + rotationMatrix[0][1] * point[1] + rotationMatrix[0][2] * point[2];
-		result[1] = rotationMatrix[1][0] * point[0] + rotationMatrix[1][1] * point[1] + rotationMatrix[1][2] * point[2];
-		result[2] = rotationMatrix[2][0] * point[0] + rotationMatrix[2][1] * point[1] + rotationMatrix[2][2] * point[2];
-		return result;
+	/**
+	 * Creates rotation matrix about y-axis from rotAngle
+	 * https://en.wikipedia.org/wiki/Rotation_matrix
+	 * @param rotAngle in rad
+	 * @return rotation matrix about y-axis
+	 */
+	public static double[][] getRotationMatrixAboutYAxis(double rotAngle){
+		double[][] matrix = new double[3][3];
+		matrix[0][0] = Math.cos(rotAngle); matrix[0][1] = 0; matrix[0][2] = Math.sin(rotAngle);
+		matrix[1][0] = 0; matrix[1][1] = 1; matrix[1][2] = 0;
+		matrix[2][0] = -Math.sin(rotAngle); matrix[2][1] = 0; matrix[2][2] = Math.cos(rotAngle);
+		return matrix;
 	}
 
 	/**

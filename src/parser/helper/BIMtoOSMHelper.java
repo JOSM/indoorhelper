@@ -13,6 +13,7 @@ import parser.data.FilteredRawBIMData;
 import parser.data.Point3D;
 import parser.data.PreparedBIMObject3D;
 import parser.data.ifc.IFCShapeRepresentationIdentity;
+import parser.helper.IFCShapeRepresentationCatalog.IfcSlabTypeEnum;
 import parser.helper.IFCShapeRepresentationCatalog.RepresentationIdentifier;
 import parser.math.ParserMath;
 
@@ -44,11 +45,14 @@ public class BIMtoOSMHelper {
 			bimData.setIfcSite(ifcSiteObjects.firstElement());
 		}
 
-		// get all areas
+		// get all relevant areas
 		Vector<EntityInstance> areaObjects = new Vector<>();
 		BIMtoOSMCatalog.getAreaTags().forEach(tag ->{
 			ifcModel.getInstancesOfType(tag).forEach(entity ->{
-				areaObjects.add(entity);
+				String identifier = (String)entity.getAttributeValueBN("PredefinedType");
+				if(!identifier.equals("." + IfcSlabTypeEnum.ROOF + ".")) {
+					areaObjects.add(entity);
+				}
 			});
 		});
 		bimData.setAreaObjects(areaObjects);
@@ -117,6 +121,7 @@ public class BIMtoOSMHelper {
 	 */
 	public static ArrayList<PreparedBIMObject3D> prepareBIMObjects(ModelPopulation ifcModel, int BIMFileRootId, BIMtoOSMCatalog.BIMObject objectType, Vector<EntityInstance> BIMObjects) {
 		ArrayList<PreparedBIMObject3D> preparedObjects = new ArrayList<>();
+
 		for(EntityInstance object : BIMObjects) {
 
 			// get IFCLOCALPLACEMENT of object (origin of object)
@@ -134,31 +139,54 @@ public class BIMtoOSMHelper {
 				// rotate points about z-axis
 //				if(zRotMatrix != null) {
 //					for(Point3D point : shapeDataOfObject) {
-//						double[] pointAsVector = {point.getY(), point.getZ(), point.getZ()};
+//						double[] pointAsVector = {point.getX(), point.getY(), point.getZ()};
 //						double[] rotatedPoint = ParserMath.rotate3DPoint(pointAsVector, zRotMatrix);
 //						point.setX(rotatedPoint[0]);
 //						point.setY(rotatedPoint[1]);
 //						point.setZ(rotatedPoint[2]);
 //					}
 //				}
+
 				// rotate points about x-axis
-				shapeDataOfObject.forEach(point ->{
+				for(Point3D point : shapeDataOfObject) {
+					if(point.equalsPoint3D(IFCShapeDataExtractor.defaultPoint))	continue;	// for workaround
 					double[] pointAsVector = {point.getX(), point.getY(), point.getZ()};
 					double[] rotatedPoint = ParserMath.rotate3DPoint(pointAsVector, xRotMatrix);
 					point.setX(rotatedPoint[0]);
 					point.setY(rotatedPoint[1]);
 					point.setZ(rotatedPoint[2]);
-				});
+				}
 
 				// transform points to object placement origin
-				shapeDataOfObject.forEach(point ->{
+				for(Point3D point : shapeDataOfObject) {
+					if(point.equalsPoint3D(IFCShapeDataExtractor.defaultPoint))	continue;	// for workaround
 					point.setX(point.getX() + cartesianPlacementOfObject.getX());
 					point.setY(point.getY() + cartesianPlacementOfObject.getY());
-				});
+				}
 
-				preparedObjects.add(new PreparedBIMObject3D(objectType, cartesianPlacementOfObject, shapeDataOfObject));
+
+				// Check if data includes IFCShapeDataExtractor.defaultPoint. IFCShapeDataExtractor.defaultPoint got added
+				// for workaround handling multiple closed loops in data set
+				if(!shapeDataOfObject.contains(IFCShapeDataExtractor.defaultPoint)) {
+					preparedObjects.add(new PreparedBIMObject3D(objectType, cartesianPlacementOfObject, shapeDataOfObject));
+					continue;
+				}
+
+				// Workaround: Check data set for closed loops (separated by defaultPoint). If closed loop in data set, extract and add as own way
+				ArrayList<Point3D> loop = new ArrayList<>();
+				for(Point3D point : shapeDataOfObject) {
+					if(point.equalsPoint3D(IFCShapeDataExtractor.defaultPoint) && !loop.isEmpty()) {
+						preparedObjects.add(new PreparedBIMObject3D(objectType, cartesianPlacementOfObject, loop));
+						loop = new ArrayList<>();
+					}
+					else if(!point.equalsPoint3D(IFCShapeDataExtractor.defaultPoint)){
+						loop.add(point);
+					}
+				}
+
 			}
 		}
+
 		return preparedObjects;
 	}
 
@@ -176,9 +204,6 @@ public class BIMtoOSMHelper {
 
 		// identify and keep types of IFCPRODUCTDEFINITIONSHAPE.REPRESENTATIONS objects
 		ArrayList<IFCShapeRepresentationIdentity> repObjectIdentities = identifyRepresentationsOfObject(objectRepresentations);
-
-		//INFO: For now only REPRESENTATIONIDENFITIER axis, body and box are supported because those
-		//are mostly used for representing considered objects
 
 		// first check if IFCPRODUCTDEFINITIONSHAPE.REPRESENTATIONS include IFCSHAPEREPRESENTATION of type "body"
 		IFCShapeRepresentationIdentity bodyRepresentation = getRepresentationSpecificObjectType(repObjectIdentities, RepresentationIdentifier.Body);
@@ -378,7 +403,7 @@ public class BIMtoOSMHelper {
 		if(rotAngle < -6.28319)	rotAngle += 6.28319;
 
 		// pack and return rotation matrix about z-axis
-		return ParserMath.getRotationMatrixAboutXAxis(rotAngle);
+		return ParserMath.getRotationMatrixAboutYAxis(rotAngle);
 	}
 
 	/**

@@ -40,4 +40,8 @@ public class Point3D {
 	public void setZ(double z) {
 		this.z = z;
 	}
+
+	public boolean equalsPoint3D(Point3D point) {
+		return (this.x == point.getX() && this.y == point.getY() && this.z == point.getZ());
+	}
 }
