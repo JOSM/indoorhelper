@@ -93,6 +93,15 @@ public class BIMtoOSMHelper {
 		});
 		bimData.setStairObjects(stairObjects);
 
+		// get all windows
+		Vector<EntityInstance> windowObjects = new Vector<>();
+		BIMtoOSMCatalog.getWindowTags().forEach(tag ->{
+			ifcModel.getInstancesOfType(tag).forEach(entity ->{
+				windowObjects.add(entity);
+			});
+		});
+		bimData.setWindowObjects(windowObjects);
+
 		return bimData;
 	}
 
@@ -119,11 +128,11 @@ public class BIMtoOSMHelper {
 	 * @param BIMObjects All BIM objects of objectType
 	 * @return Prepared BIM objects
 	 */
-	public static ArrayList<PreparedBIMObject3D> prepareBIMObjects(ModelPopulation ifcModel, int BIMFileRootId, BIMtoOSMCatalog.BIMObject objectType, Vector<EntityInstance> BIMObjects) {
+	public static ArrayList<PreparedBIMObject3D> prepareBIMObjects(ModelPopulation ifcModel, int BIMFileRootId, BIMtoOSMCatalog.BIMObject objectType, Vector<EntityInstance> BIMObjects){
+
 		ArrayList<PreparedBIMObject3D> preparedObjects = new ArrayList<>();
 
 		for(EntityInstance object : BIMObjects) {
-
 			// get IFCLOCALPLACEMENT of object (origin of object)
 			Point3D cartesianPlacementOfObject = getCartesianOriginOfObject(BIMFileRootId, object);
 
@@ -182,6 +191,9 @@ public class BIMtoOSMHelper {
 					else if(!point.equalsPoint3D(IFCShapeDataExtractor.defaultPoint)){
 						loop.add(point);
 					}
+					if(shapeDataOfObject.indexOf(point) == shapeDataOfObject.size()-1 && !loop.isEmpty()) {
+						preparedObjects.add(new PreparedBIMObject3D(objectType, cartesianPlacementOfObject, loop));
+					}
 				}
 
 			}
@@ -196,18 +208,15 @@ public class BIMtoOSMHelper {
 	 * @param object BIM object
 	 * @return Array including points of shape representation
 	 */
-	private static ArrayList<Point3D> getShapeDataOfObject(ModelPopulation ifcModel, EntityInstance object) {
+	public static ArrayList<Point3D> getShapeDataOfObject(ModelPopulation ifcModel, EntityInstance object) {
 		ArrayList<Point3D> shapeData = new ArrayList<>();
 
-		// get EntityInstances of IFCPRODUCTDEFINITIONSHAPE.REPRESENTATIONS objects
-		ArrayList<EntityInstance> objectRepresentations = getRepresentationsOfObject(object);
-
 		// identify and keep types of IFCPRODUCTDEFINITIONSHAPE.REPRESENTATIONS objects
-		ArrayList<IFCShapeRepresentationIdentity> repObjectIdentities = identifyRepresentationsOfObject(objectRepresentations);
+		ArrayList<IFCShapeRepresentationIdentity> repObjectIdentities = identifyRepresentationsOfObject(object);
 
 		// first check if IFCPRODUCTDEFINITIONSHAPE.REPRESENTATIONS include IFCSHAPEREPRESENTATION of type "body"
 		IFCShapeRepresentationIdentity bodyRepresentation = getRepresentationSpecificObjectType(repObjectIdentities, RepresentationIdentifier.Body);
-		if(bodyRepresentation != null) {
+		if(bodyRepresentation != null && !IFCShapeRepresentationIdentifier.isIfcWindowOrIfcWall(ifcModel, object)) {
 			return IFCShapeDataExtractor.getDataFromBodyRepresentation(ifcModel, bodyRepresentation);
 		}
 
@@ -233,9 +242,7 @@ public class BIMtoOSMHelper {
 	 * @param identifier RepresentationIdentifier
 	 * @return returns IfcShapeRepresentation "identifier" or null if not in list
 	 */
-	private static IFCShapeRepresentationIdentity getRepresentationSpecificObjectType (
-			ArrayList<IFCShapeRepresentationIdentity> repObjectIdentities, RepresentationIdentifier identifier){
-
+	private static IFCShapeRepresentationIdentity getRepresentationSpecificObjectType (ArrayList<IFCShapeRepresentationIdentity> repObjectIdentities, RepresentationIdentifier identifier){
 		for(IFCShapeRepresentationIdentity repObject : repObjectIdentities) {
 			if(repObject.getIdentifier().equals(identifier))	return repObject;
 		}
@@ -444,15 +451,20 @@ public class BIMtoOSMHelper {
 
 	/**
 	 * Identifies the type of an IFCREPRESENTATION object.
-	 * @param objectRepresentations List with EntityInstances of IFCPRODUCTDEFINITIONSHAPE.REPRESENTATIONS objects
+	 * @param object object to get the IFCPRODUCTDEFINITIONSHAPE.REPRESENTATIONS from which will be identified
 	 * @return List of IFCShapeRepresentationIdentity holding an IFC representation object and it's identifier
 	 */
-	private static ArrayList<IFCShapeRepresentationIdentity> identifyRepresentationsOfObject(ArrayList<EntityInstance> objectRepresentations){
+	private static ArrayList<IFCShapeRepresentationIdentity> identifyRepresentationsOfObject(EntityInstance object){
 		ArrayList< IFCShapeRepresentationIdentity> repObjectIdentities = new ArrayList<>();
 
+		// get representation objects
+		ArrayList<EntityInstance> objectRepresentations = getRepresentationsOfObject(object);
+
+		// identify each object
 		for(EntityInstance repObject : objectRepresentations) {
 			//identify IFCSHAPEREPRESENTATION type
 			IFCShapeRepresentationIdentity repIdentity = IFCShapeRepresentationIdentifier.identifyShapeRepresentation(repObject);
+			repIdentity.setRootObjectEntity(object);
 			if(!repIdentity.isFilled())	return null;
 			repObjectIdentities.add(repIdentity);
 		}

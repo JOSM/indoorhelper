@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import org.openstreetmap.josm.tools.Logging;
 
+import model.io.BIMtoOSMCatalog.BIMObject;
 import nl.tue.buildingsmart.express.population.EntityInstance;
 import nl.tue.buildingsmart.express.population.ModelPopulation;
 import parser.data.ifc.IFCShapeRepresentationIdentity;
@@ -18,6 +19,7 @@ import parser.helper.IFCShapeRepresentationCatalog.ClippingRepresentationTypeIte
 import parser.helper.IFCShapeRepresentationCatalog.CurveRepresentationTypeItems;
 import parser.helper.IFCShapeRepresentationCatalog.IfcBooleanOperandType;
 import parser.helper.IFCShapeRepresentationCatalog.IfcBoundedCurveTypes;
+import parser.helper.IFCShapeRepresentationCatalog.IfcRelVoidsElementTypes;
 import parser.helper.IFCShapeRepresentationCatalog.LoopSubRepresentationTypeItems;
 import parser.helper.IFCShapeRepresentationCatalog.MappedRepresentatiobTypeItems;
 import parser.helper.IFCShapeRepresentationCatalog.ProfileDefRepresentationTypeItems;
@@ -521,7 +523,7 @@ public class IFCShapeRepresentationIdentifier {
 	 * Checks if entity is of type IFCPOLYLINE
 	 * @param ifcModel ifc model
 	 * @param entity to check type of
-	 * @return true if IFCPOLYLINE else false
+	 * @return true if IFCPOLYLINE, else false
 	 */
 	public static boolean isIfcPolyline(ModelPopulation ifcModel, EntityInstance entity) {
 		ArrayList<EntityInstance> polylines = new ArrayList<>();
@@ -534,8 +536,8 @@ public class IFCShapeRepresentationIdentifier {
 	/**
 	 * Checks if entity is of type IFCAXIS2PLACEMENT3D
 	 * @param ifcModel ifc model
-	 * @param entity entity to check type of
-	 * @return true if IFCAXIS2PLACEMENT3D else false
+	 * @param entity to check type of
+	 * @return true if IFCAXIS2PLACEMENT3D, else false
 	 */
 	public static boolean isIfcAxis2Placement3D(ModelPopulation ifcModel, EntityInstance entity) {
 		ArrayList<EntityInstance> axis2placement3Ds = new ArrayList<>();
@@ -543,6 +545,85 @@ public class IFCShapeRepresentationIdentifier {
 			axis2placement3Ds.addAll(ifcModel.getInstancesOfType(flag));
 		}
 		return axis2placement3Ds.contains(entity);
+	}
+
+	/**
+	 * Checks if entity is of type IFCOPENINGELEMENT
+	 * @param ifcModel ifc model
+	 * @param entity to check type of
+	 * @return true if IFCOPENINGELEMENT, else false
+	 */
+	public static boolean isIfcOpeningElement(ModelPopulation ifcModel, EntityInstance entity) {
+		ArrayList<EntityInstance> openingElement = new ArrayList<>();
+		for(String flag : getIdentifierTags(IfcRelVoidsElementTypes.IfcOpeningElement.name())) {
+			openingElement.addAll(ifcModel.getInstancesOfType(flag));
+		}
+		return openingElement.contains(entity);
+	}
+
+	/**
+	 * Checks if entity is of type IFCSLAB
+	 * @param ifcModel ifc model
+	 * @param entity to check type of
+	 * @return true if IFCSLAB, else false
+	 */
+	public static boolean isIfcSlab(ModelPopulation ifcModel, EntityInstance entity) {
+		ArrayList<EntityInstance> slabElements = new ArrayList<>();
+		for(String flag : getIdentifierTags(BIMObject.IfcSlab.name())) {
+			slabElements.addAll(ifcModel.getInstancesOfType(flag));
+		}
+		return slabElements.contains(entity);
+	}
+
+	/**
+	 * Checks if entity is of type IFCDOOR
+	 * @param ifcModel ifc model
+	 * @param entity to check type of
+	 * @return true if IFCDOOR, else false
+	 */
+	public static boolean isIfcDoor(ModelPopulation ifcModel, EntityInstance entity) {
+		ArrayList<EntityInstance> doorElements = new ArrayList<>();
+		for(String flag : getIdentifierTags(BIMObject.IfcDoor.name())) {
+			doorElements.addAll(ifcModel.getInstancesOfType(flag));
+		}
+		return doorElements.contains(entity);
+	}
+
+	/**
+	 * Checks if entity is of type IFCWINDOW
+	 * @param ifcModel ifc model
+	 * @param entity to check type of
+	 * @return true if IFCWINDOW, else false
+	 */
+	public static boolean isIfcWindow(ModelPopulation ifcModel, EntityInstance entity) {
+		ArrayList<EntityInstance> windowElements = new ArrayList<>();
+		for(String flag : getIdentifierTags(BIMObject.IfcWindow.name())) {
+			windowElements.addAll(ifcModel.getInstancesOfType(flag));
+		}
+		return windowElements.contains(entity);
+	}
+
+	public static boolean isIfcWindowOrIfcWall(ModelPopulation ifcModel, EntityInstance entity) {
+		if(!isIfcWindow(ifcModel, entity) && !isIfcDoor(ifcModel, entity)) return false;
+		return true;
+	}
+
+	/**
+	 * Checks if entity is part of IFCRELVOIDSELEMENT, if yes than returns IFCRELVOIDSELEMENT, else null
+	 * @param ifcModel ifc model
+	 * @param entity to get IFCRELVOIDSELEMENT for
+	 * @return if entity part of an IFCRELVOIDSELEMENT the EntityInstance if IFCRELVOIDSELEMENT, else null
+	 */
+	public static EntityInstance getRelVoidsElementOfEntity(ModelPopulation ifcModel, EntityInstance entity) {
+		ArrayList<EntityInstance> relVoidsElements = new ArrayList<>();
+		for(String flag : getIdentifierTags(BIMObject.IfcRelVoidsElement.name())) {
+			relVoidsElements.addAll(ifcModel.getInstancesOfType(flag));
+		}
+		for(EntityInstance relVoidsElement : relVoidsElements) {
+			int relatingBuildingElementId = relVoidsElement.getAttributeValueBNasEntityInstance("RelatingBuildingElement").getId();
+			if(relatingBuildingElementId == entity.getId())	return relVoidsElement;
+		}
+		return null;
 	}
 
 	/**

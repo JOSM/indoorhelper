@@ -68,7 +68,7 @@ public class BIMtoOSMParser {
 		// for preparation of filtered BIM data find Id of BIM root IFCLOCALPLACEMENT element (kept in IFCSITE flag)
 		int BIMRootId = BIMtoOSMHelper.getIfcLocalPlacementRootObject(filteredBIMdata);
 		if(BIMRootId == -1) {
-			showsParsingErrorView(filepath, "Could not import IFC file.\nIFC file does not contains IFCSITE element.", true);
+			showParsingErrorView(filepath, "Could not import IFC file.\nIFC file does not contains IFCSITE element.", true);
 			return;
 		}
 
@@ -77,7 +77,8 @@ public class BIMtoOSMParser {
 		preparedBIMdata.addAll(BIMtoOSMHelper.prepareBIMObjects(ifcModel, BIMRootId, BIMtoOSMCatalog.BIMObject.IfcSlab, filteredBIMdata.getAreaObjects()));
 		preparedBIMdata.addAll(BIMtoOSMHelper.prepareBIMObjects(ifcModel, BIMRootId, BIMtoOSMCatalog.BIMObject.IfcWall, filteredBIMdata.getWallObjects()));
 		preparedBIMdata.addAll(BIMtoOSMHelper.prepareBIMObjects(ifcModel, BIMRootId, BIMtoOSMCatalog.BIMObject.IfcColumn, filteredBIMdata.getColumnObjects()));
-		preparedBIMdata.addAll(BIMtoOSMHelper.prepareBIMObjects(ifcModel, BIMRootId, BIMtoOSMCatalog.BIMObject.IfcDoor, filteredBIMdata.getDoorObjects()));
+//		preparedBIMdata.addAll(BIMtoOSMHelper.prepareBIMObjects(ifcModel, BIMRootId, BIMtoOSMCatalog.BIMObject.IfcDoor, filteredBIMdata.getDoorObjects()));
+//		preparedBIMdata.addAll(BIMtoOSMHelper.prepareBIMObjects(ifcModel, BIMRootId, BIMtoOSMCatalog.BIMObject.IfcWindow, filteredBIMdata.getWindowObjects()));
 		preparedBIMdata.addAll(BIMtoOSMHelper.prepareBIMObjects(ifcModel, BIMRootId, BIMtoOSMCatalog.BIMObject.IfcStair, filteredBIMdata.getStairObjects()));
 		//TODO add IFCBEAM!
 
@@ -117,7 +118,7 @@ public class BIMtoOSMParser {
 
 		// check if file is corrupted. File is corrupted if some data could not pass the preparation steps
 		if(preparedBIMdata.size() != filteredBIMdata.getSize()) {
-			showsParsingErrorView(filepath, "Caution!\nImported data might include errors!", false);
+			showParsingErrorView(filepath, "Caution!\nImported data might include errors!", false);
 		}
 
 		// send parsed data to controller
@@ -136,7 +137,7 @@ public class BIMtoOSMParser {
 			String usedIfcSchema = chooseSchemaFile(filepath);
 
 			if(usedIfcSchema.isEmpty()) {
-				showsLoadingErrorView(filepath, "Could not load IFC file.\nIFC schema is no supported.");
+				showLoadingErrorView(filepath, "Could not load IFC file.\nIFC schema is no supported.");
 				return false;
 			}
 			if(usedIfcSchema.equals(FLAG_IFC4)) {
@@ -152,7 +153,7 @@ public class BIMtoOSMParser {
 
 			// if loading throws ParseException check if ifcModel is empty to recognize something went wrong
 			if(ifcModel.getInstances() == null) {
-				showsLoadingErrorView(filepath, "Could not load IFC file.");
+				showLoadingErrorView(filepath, "Could not load IFC file.");
 				return false;
 			}
 		} catch (FileNotFoundException e) {
@@ -209,7 +210,7 @@ public class BIMtoOSMParser {
 	 * @param filepath of ifc file
 	 * @param msg Error message
 	 */
-	private void showsLoadingErrorView(String filepath, String msg) {
+	private void showLoadingErrorView(String filepath, String msg) {
 		showErrorView(tr(msg));
 		Logging.info(this.getClass().getName() + ": " + filepath + " loading failed");
 	}
@@ -220,7 +221,7 @@ public class BIMtoOSMParser {
 	 * @param msg Error message
 	 * @param logInfo log info to console
 	 */
-	private void showsParsingErrorView(String filepath, String msg, boolean logInfo) {
+	private void showParsingErrorView(String filepath, String msg, boolean logInfo) {
 		showErrorView(tr(msg));
 		if(logInfo) {
 			Logging.info(this.getClass().getName() + ": " + filepath + " parsing failed");

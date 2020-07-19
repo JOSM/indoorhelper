@@ -16,6 +16,8 @@ public class FilteredRawBIMData {
 	private Vector<EntityInstance> columnObjects;
 	private Vector<EntityInstance> doorObjects;
 	private Vector<EntityInstance> stairObjects;
+	private Vector<EntityInstance> windowObjects;
+	private Vector<EntityInstance> relVoidsElements;	// IFCRELVOIDSELEMENT
 
 	public EntityInstance getIfcSite() {
 		return ifcSite;
@@ -63,6 +65,22 @@ public class FilteredRawBIMData {
 
 	public void setStairObjects(Vector<EntityInstance> stairObjects) {
 		this.stairObjects = stairObjects;
+	}
+
+	public Vector<EntityInstance> getWindowObjects() {
+		return windowObjects;
+	}
+
+	public void setWindowObjects(Vector<EntityInstance> windowObjects) {
+		this.windowObjects = windowObjects;
+	}
+
+	public Vector<EntityInstance> getRelVoidsElements() {
+		return relVoidsElements;
+	}
+
+	public void setRelVoidsElements(Vector<EntityInstance> relVoidsElements) {
+		this.relVoidsElements = relVoidsElements;
 	}
 
 	public int getSize(){

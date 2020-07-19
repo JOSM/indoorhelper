@@ -11,6 +11,7 @@ import parser.helper.IFCShapeRepresentationCatalog.RepresentationType;
  *
  */
 public class IFCShapeRepresentationIdentity {
+	private EntityInstance rootObjectEntity;
 	private EntityInstance representationObjectEntity;
 	private RepresentationIdentifier identifier;
 	private RepresentationType type;
@@ -21,8 +22,9 @@ public class IFCShapeRepresentationIdentity {
 		this.type = null;
 	}
 
-	public IFCShapeRepresentationIdentity(EntityInstance representationObject, RepresentationIdentifier identifier, RepresentationType type) {
-		this.setRepresentationObjectEntity(representationObject);
+	public IFCShapeRepresentationIdentity(EntityInstance representationObject, EntityInstance rootEntity, RepresentationIdentifier identifier, RepresentationType type) {
+		this.setRootObjectEntity(rootEntity);
+		this.representationObjectEntity = representationObject;
 		this.identifier = identifier;
 		this.type = type;
 	}
@@ -62,6 +64,14 @@ public class IFCShapeRepresentationIdentity {
 
 	public void setRepresentationObjectEntity(EntityInstance representationObjectEntity) {
 		this.representationObjectEntity = representationObjectEntity;
+	}
+
+	public EntityInstance getRootObjectEntity() {
+		return rootObjectEntity;
+	}
+
+	public void setRootObjectEntity(EntityInstance rootObjectEntity) {
+		this.rootObjectEntity = rootObjectEntity;
 	}
 
 
