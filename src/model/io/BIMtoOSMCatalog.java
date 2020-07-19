@@ -125,12 +125,36 @@ public class BIMtoOSMCatalog {
      * Returns all BIM tags representing a stair.
      * @return List of BIMObjects representing a stair.
      */
+    public static List<String> getWindowTags() {
+    	ArrayList<String> stairTags = new ArrayList<>();
+    	stairTags.add(BIMObject.IfcWindow.toString());
+    	stairTags.add(BIMObject.IfcWindow.toString().toUpperCase());
+    	stairTags.add(BIMObject.IfcWindow.toString().toLowerCase());
+    	return stairTags;
+    }
+
+    /**
+     * Returns all BIM tags representing a stair.
+     * @return List of BIMObjects representing a stair.
+     */
     public static List<String> getStairTags() {
     	ArrayList<String> stairTags = new ArrayList<>();
     	stairTags.add(BIMObject.IfcStair.toString());
     	stairTags.add(BIMObject.IfcStair.toString().toUpperCase());
     	stairTags.add(BIMObject.IfcStair.toString().toLowerCase());
     	return stairTags;
+    }
+
+    /**
+     *  Returns all BIM tags representing a RelVoidsElement.
+     * @return List of BIMObjects representing a RelVoidsElement.
+     */
+    public static List<String> getRelVoidsElementTags(){
+    	ArrayList<String> relVoidsTags = new ArrayList<>();
+    	relVoidsTags.add(BIMObject.IfcRelVoidsElement.toString());
+    	relVoidsTags.add(BIMObject.IfcRelVoidsElement.toString().toUpperCase());
+    	relVoidsTags.add(BIMObject.IfcRelVoidsElement.toString().toLowerCase());
+    	return relVoidsTags;
     }
 
     /**
@@ -153,6 +177,7 @@ public class BIMtoOSMCatalog {
      */
 	public enum BIMObject {
         IfcSlab, IfcSlabStandardCase, IfcSlabElementedCase, IfcSlabType, IfcWall, IfcWallStandardCase,
-        IfcWallElementedCase, IfcWallType, IfcColumn, IfcColumnType, IfcDoor, IfcDoorStandardCase, IfcStair
+        IfcWallElementedCase, IfcWallType, IfcColumn, IfcColumnType, IfcDoor, IfcDoorStandardCase, IfcStair,
+        IfcRelVoidsElement, IfcWindow
     }
 }

@@ -10,7 +10,6 @@ public class IFCShapeRepresentationCatalog {
 
 	/**
      *  RepresentationIdentifier of IFCSHAPEREPRESENTATION
-     *  Note: Not all of those types are supported
      *
      */
 	public enum RepresentationIdentifier {
@@ -19,7 +18,6 @@ public class IFCShapeRepresentationCatalog {
 
 	/**
      *  RepresentationType of IFCSHAPEREPRESENTATION
-     *  Note: Not all of those types are supported
      *
      */
 	public enum RepresentationType {
@@ -114,9 +112,7 @@ public class IFCShapeRepresentationCatalog {
 	}
 
 
-
 	// Items of IFC representation subtypes
-	// Note: Not all of those subtypes are supported right now
 
 	/**
 	 * Allowed IFCSHAPEREPRESENTATION.Items types for IFCREPRESENTATIONITEM IFCLOOP
@@ -161,6 +157,13 @@ public class IFCShapeRepresentationCatalog {
 
 	public enum IfcBoundedCurveTypes{
 		IfcCompositeCurve, IfcPolyline, IfcTrimmedCurve, IfcBSplineCurve
+	}
+
+
+	// Items of IFC void elements
+
+	public enum IfcRelVoidsElementTypes{
+		IfcOpeningElement, IfcVoidingFeature
 	}
 
 
