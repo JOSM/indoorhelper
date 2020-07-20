@@ -177,7 +177,7 @@ public class BIMtoOSMHelper {
 				// Check if data includes IFCShapeDataExtractor.defaultPoint. IFCShapeDataExtractor.defaultPoint got added
 				// for workaround handling multiple closed loops in data set
 				if(!shapeDataOfObject.contains(IFCShapeDataExtractor.defaultPoint)) {
-					preparedObjects.add(new PreparedBIMObject3D(objectType, cartesianPlacementOfObject, shapeDataOfObject));
+					preparedObjects.add(new PreparedBIMObject3D(object.getId(), objectType, cartesianPlacementOfObject, shapeDataOfObject));
 					continue;
 				}
 
@@ -185,14 +185,14 @@ public class BIMtoOSMHelper {
 				ArrayList<Point3D> loop = new ArrayList<>();
 				for(Point3D point : shapeDataOfObject) {
 					if(point.equalsPoint3D(IFCShapeDataExtractor.defaultPoint) && !loop.isEmpty()) {
-						preparedObjects.add(new PreparedBIMObject3D(objectType, cartesianPlacementOfObject, loop));
+						preparedObjects.add(new PreparedBIMObject3D(object.getId(), objectType, cartesianPlacementOfObject, loop));
 						loop = new ArrayList<>();
 					}
 					else if(!point.equalsPoint3D(IFCShapeDataExtractor.defaultPoint)){
 						loop.add(point);
 					}
 					if(shapeDataOfObject.indexOf(point) == shapeDataOfObject.size()-1 && !loop.isEmpty()) {
-						preparedObjects.add(new PreparedBIMObject3D(objectType, cartesianPlacementOfObject, loop));
+						preparedObjects.add(new PreparedBIMObject3D(object.getId(), objectType, cartesianPlacementOfObject, loop));
 					}
 				}
 

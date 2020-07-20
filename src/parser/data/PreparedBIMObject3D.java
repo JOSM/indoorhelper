@@ -12,11 +12,13 @@ import model.io.BIMtoOSMCatalog;
  */
 public class PreparedBIMObject3D {
 
+	private int objectId;
 	private BIMtoOSMCatalog.BIMObject type;
 	private Point3D cartesianPlacement;
 	private ArrayList<Point3D> cartesianShapeCoordinates;
 
-	public PreparedBIMObject3D(BIMtoOSMCatalog.BIMObject type, Point3D cartesianCorner, ArrayList<Point3D> shapeCoordinates) {
+	public PreparedBIMObject3D(int id, BIMtoOSMCatalog.BIMObject type, Point3D cartesianCorner, ArrayList<Point3D> shapeCoordinates) {
+		this.setObjectId(id);
 		this.type = type;
 		this.cartesianPlacement = cartesianCorner;
 		this.cartesianShapeCoordinates = shapeCoordinates;
@@ -44,5 +46,13 @@ public class PreparedBIMObject3D {
 
 	public void setCartesianShapeCoordinates(ArrayList<Point3D> cartesianShapeCoordinates) {
 		this.cartesianShapeCoordinates = cartesianShapeCoordinates;
+	}
+
+	public int getObjectId() {
+		return objectId;
+	}
+
+	public void setObjectId(int objectId) {
+		this.objectId = objectId;
 	}
 }
