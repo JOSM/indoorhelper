@@ -17,6 +17,7 @@ public class IFCShapeRepresentationIdentity {
 	private RepresentationType type;
 
 	public IFCShapeRepresentationIdentity() {
+		this.rootObjectEntity = null;
 		this.representationObjectEntity = null;
 		this.identifier = null;
 		this.type = null;

@@ -88,6 +88,7 @@ public class IFCShapeDataExtractor {
 			}
 			else if(repItemType.equals(ClippingRepresentationTypeItems.IfcBooleanClippingResult.name())) {
 				ArrayList<Point3D> shapeData = getShapeDataFromIfcBooleanResult(ifcModel, item, IfcBooleanOperator.DIFFERENCE);
+
 				// check if entity includes openings and handle them
 				// shapeDataWithOpeningHandling is null, if no openings exists or type of openings will not be handles
 				ArrayList<Point3D> shapeDataWithOpeningHandling = handleOpeningsInEntityShape(ifcModel, shapeData, bodyRepresentation.getRootObjectEntity());
@@ -283,6 +284,7 @@ public class IFCShapeDataExtractor {
 		// extract shape data from operands
 		ArrayList<Point3D> pointsOfOperand1 = getShapeDataFromBooleanOperand(ifcModel, operand1);
 		ArrayList<Point3D> pointsOfOperand2 = getShapeDataFromBooleanOperand(ifcModel, operand2);
+
 		if(pointsOfOperand1 == null || pointsOfOperand2 == null)	return null;
 
 		// do operation
@@ -546,7 +548,7 @@ public class IFCShapeDataExtractor {
 	 * @param doubleString String of coordinate
 	 * @return double representing double
 	 */
-	private static double prepareDoubleString(String doubleString) {
+	public static double prepareDoubleString(String doubleString) {
 		if(doubleString.endsWith(".")) {
 			doubleString = doubleString + "0";
 		}
