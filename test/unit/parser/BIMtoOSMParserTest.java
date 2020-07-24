@@ -5,7 +5,7 @@ import java.io.File;
 
 import org.junit.Test;
 
-import parser.BIMtoOSMParser;
+import io.parser.BIMtoOSMParser;
 
 /**
  * Unit tests of {@link BIMtoOSMParser} class.

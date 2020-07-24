@@ -1,5 +1,5 @@
 // License: GPL. For details, see LICENSE file.
-package parser.data;
+package io.parser.data;
 
 import java.util.Vector;
 

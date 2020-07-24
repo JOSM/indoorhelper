@@ -1,33 +1,14 @@
 // License: GPL. For details, see LICENSE file.
-package parser.helper;
+package io.parser.data.helper;
 
 import java.util.ArrayList;
 
 import org.openstreetmap.josm.tools.Logging;
 
-import model.io.BIMtoOSMCatalog.BIMObject;
+import io.model.BIMtoOSMCatalog.BIMObject;
+import io.parser.data.ifc.IFCShapeRepresentationIdentity;
 import nl.tue.buildingsmart.express.population.EntityInstance;
 import nl.tue.buildingsmart.express.population.ModelPopulation;
-import parser.data.ifc.IFCShapeRepresentationIdentity;
-import parser.helper.IFCShapeRepresentationCatalog.AdvancedBrepRepresentationTypeItems;
-import parser.helper.IFCShapeRepresentationCatalog.AdvancedSweptSolidRepresentationTypeItems;
-import parser.helper.IFCShapeRepresentationCatalog.Axis2PlacementRepresentationTypeItems;
-import parser.helper.IFCShapeRepresentationCatalog.BoundingBoxRepresentationTypeItems;
-import parser.helper.IFCShapeRepresentationCatalog.BrepRepresentationTypeItems;
-import parser.helper.IFCShapeRepresentationCatalog.CSGRepresentationTypeItems;
-import parser.helper.IFCShapeRepresentationCatalog.ClippingRepresentationTypeItems;
-import parser.helper.IFCShapeRepresentationCatalog.CurveRepresentationTypeItems;
-import parser.helper.IFCShapeRepresentationCatalog.IfcBooleanOperandType;
-import parser.helper.IFCShapeRepresentationCatalog.IfcBoundedCurveTypes;
-import parser.helper.IFCShapeRepresentationCatalog.IfcRelVoidsElementTypes;
-import parser.helper.IFCShapeRepresentationCatalog.LoopSubRepresentationTypeItems;
-import parser.helper.IFCShapeRepresentationCatalog.MappedRepresentatiobTypeItems;
-import parser.helper.IFCShapeRepresentationCatalog.ProfileDefRepresentationTypeItems;
-import parser.helper.IFCShapeRepresentationCatalog.RepresentationIdentifier;
-import parser.helper.IFCShapeRepresentationCatalog.RepresentationType;
-import parser.helper.IFCShapeRepresentationCatalog.SurfaceModelRepresentationTypeItems;
-import parser.helper.IFCShapeRepresentationCatalog.SweptSolidRepresentationTypeItems;
-import parser.helper.IFCShapeRepresentationCatalog.TessellationRepresentationTypeItems;
 
 /**
  * Class to identify the type on an IFCSHAPEREPRESENTATION object

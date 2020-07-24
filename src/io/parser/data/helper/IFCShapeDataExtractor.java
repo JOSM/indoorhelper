@@ -1,30 +1,30 @@
 // License: GPL. For details, see LICENSE file.
-package parser.helper;
+package io.parser.data.helper;
 
 import java.util.ArrayList;
 import java.util.Vector;
 
 import org.openstreetmap.josm.tools.Logging;
 
+import io.parser.data.Point3D;
+import io.parser.data.helper.IFCShapeRepresentationCatalog.AdvancedBrepRepresentationTypeItems;
+import io.parser.data.helper.IFCShapeRepresentationCatalog.AdvancedSweptSolidRepresentationTypeItems;
+import io.parser.data.helper.IFCShapeRepresentationCatalog.BoundingBoxRepresentationTypeItems;
+import io.parser.data.helper.IFCShapeRepresentationCatalog.BrepRepresentationTypeItems;
+import io.parser.data.helper.IFCShapeRepresentationCatalog.CSGRepresentationTypeItems;
+import io.parser.data.helper.IFCShapeRepresentationCatalog.ClippingRepresentationTypeItems;
+import io.parser.data.helper.IFCShapeRepresentationCatalog.CurveRepresentationTypeItems;
+import io.parser.data.helper.IFCShapeRepresentationCatalog.IfcBooleanOperandType;
+import io.parser.data.helper.IFCShapeRepresentationCatalog.IfcBoundedCurveTypes;
+import io.parser.data.helper.IFCShapeRepresentationCatalog.LoopSubRepresentationTypeItems;
+import io.parser.data.helper.IFCShapeRepresentationCatalog.MappedRepresentatiobTypeItems;
+import io.parser.data.helper.IFCShapeRepresentationCatalog.ProfileDefRepresentationTypeItems;
+import io.parser.data.helper.IFCShapeRepresentationCatalog.SurfaceModelRepresentationTypeItems;
+import io.parser.data.helper.IFCShapeRepresentationCatalog.SweptSolidRepresentationTypeItems;
+import io.parser.data.helper.IFCShapeRepresentationCatalog.TessellationRepresentationTypeItems;
+import io.parser.data.ifc.IFCShapeRepresentationIdentity;
 import nl.tue.buildingsmart.express.population.EntityInstance;
 import nl.tue.buildingsmart.express.population.ModelPopulation;
-import parser.data.Point3D;
-import parser.data.ifc.IFCShapeRepresentationIdentity;
-import parser.helper.IFCShapeRepresentationCatalog.AdvancedBrepRepresentationTypeItems;
-import parser.helper.IFCShapeRepresentationCatalog.AdvancedSweptSolidRepresentationTypeItems;
-import parser.helper.IFCShapeRepresentationCatalog.BoundingBoxRepresentationTypeItems;
-import parser.helper.IFCShapeRepresentationCatalog.BrepRepresentationTypeItems;
-import parser.helper.IFCShapeRepresentationCatalog.CSGRepresentationTypeItems;
-import parser.helper.IFCShapeRepresentationCatalog.ClippingRepresentationTypeItems;
-import parser.helper.IFCShapeRepresentationCatalog.CurveRepresentationTypeItems;
-import parser.helper.IFCShapeRepresentationCatalog.IfcBooleanOperandType;
-import parser.helper.IFCShapeRepresentationCatalog.IfcBoundedCurveTypes;
-import parser.helper.IFCShapeRepresentationCatalog.LoopSubRepresentationTypeItems;
-import parser.helper.IFCShapeRepresentationCatalog.MappedRepresentatiobTypeItems;
-import parser.helper.IFCShapeRepresentationCatalog.ProfileDefRepresentationTypeItems;
-import parser.helper.IFCShapeRepresentationCatalog.SurfaceModelRepresentationTypeItems;
-import parser.helper.IFCShapeRepresentationCatalog.SweptSolidRepresentationTypeItems;
-import parser.helper.IFCShapeRepresentationCatalog.TessellationRepresentationTypeItems;
 
 /**
  * Class helps parsing BIM data with providing methods to extract OSM relevant data

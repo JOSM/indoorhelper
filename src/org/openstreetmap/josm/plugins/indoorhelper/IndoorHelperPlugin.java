@@ -21,7 +21,7 @@ import org.openstreetmap.josm.plugins.PluginInformation;
 import org.openstreetmap.josm.spi.preferences.Config;
 
 import controller.IndoorHelperController;
-import controller.io.ImportDataController;
+import io.controller.ImportDataController;
 
 /**
  * This is the main class for the indoorhelper plug-in.

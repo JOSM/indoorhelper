@@ -1,5 +1,5 @@
 // License: GPL. For details, see LICENSE file.
-package controller.io;
+package io.controller;
 
 import java.util.ArrayList;
 

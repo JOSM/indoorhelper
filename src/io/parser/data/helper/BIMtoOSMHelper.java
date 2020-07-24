@@ -1,21 +1,21 @@
 // License: GPL. For details, see LICENSE file.
-package parser.helper;
+package io.parser.data.helper;
 
 import java.util.ArrayList;
 import java.util.Vector;
 
 import org.openstreetmap.josm.tools.Logging;
 
-import model.io.BIMtoOSMCatalog;
+import io.model.BIMtoOSMCatalog;
+import io.parser.data.FilteredRawBIMData;
+import io.parser.data.Point3D;
+import io.parser.data.PreparedBIMObject3D;
+import io.parser.data.helper.IFCShapeRepresentationCatalog.IfcSlabTypeEnum;
+import io.parser.data.helper.IFCShapeRepresentationCatalog.RepresentationIdentifier;
+import io.parser.data.ifc.IFCShapeRepresentationIdentity;
+import io.parser.math.ParserMath;
 import nl.tue.buildingsmart.express.population.EntityInstance;
 import nl.tue.buildingsmart.express.population.ModelPopulation;
-import parser.data.FilteredRawBIMData;
-import parser.data.Point3D;
-import parser.data.PreparedBIMObject3D;
-import parser.data.ifc.IFCShapeRepresentationIdentity;
-import parser.helper.IFCShapeRepresentationCatalog.IfcSlabTypeEnum;
-import parser.helper.IFCShapeRepresentationCatalog.RepresentationIdentifier;
-import parser.math.ParserMath;
 
 /**
  * Class helps parsing BIM data with providing methods to extract OSM relevant data.
