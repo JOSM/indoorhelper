@@ -1,9 +1,9 @@
 // License: GPL. For details, see LICENSE file.
-package parser.data;
+package io.parser.data;
 
 import java.util.ArrayList;
 
-import model.io.BIMtoOSMCatalog;
+import io.model.BIMtoOSMCatalog;
 
 /**
  * Class holding OSM relevant data of a 3D BIM object

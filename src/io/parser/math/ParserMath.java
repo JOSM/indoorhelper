@@ -1,5 +1,5 @@
 // License: GPL. For details, see LICENSE file.
-package parser.math;
+package io.parser.math;
 
 /**
  * Class providing transformation and rotation methods

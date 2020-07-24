@@ -1,5 +1,5 @@
 // License: GPL. For details, see LICENSE file.
-package parser.helper;
+package io.parser.data.helper;
 
 /**
  *

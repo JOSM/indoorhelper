@@ -1,5 +1,5 @@
 // License: GPL. For details, see LICENSE file.
-package parser.data;
+package io.parser.data;
 
 /**
  * Class holding dimension values of 3D object

@@ -1,5 +1,5 @@
 // License: GPL. For details, see LICENSE file.
-package parser;
+package io.parser;
 
 import static org.openstreetmap.josm.tools.I18n.tr;
 
@@ -25,16 +25,16 @@ import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.tools.Logging;
 import org.openstreetmap.josm.tools.Pair;
 
-import controller.io.ImportEventListener;
+import io.controller.ImportEventListener;
+import io.model.BIMtoOSMCatalog;
+import io.parser.data.FilteredRawBIMData;
+import io.parser.data.Point3D;
+import io.parser.data.PreparedBIMObject3D;
+import io.parser.data.helper.BIMtoOSMHelper;
+import io.parser.data.helper.IFCShapeDataExtractor;
 import model.TagCatalog;
-import model.io.BIMtoOSMCatalog;
 import nl.tue.buildingsmart.express.population.EntityInstance;
 import nl.tue.buildingsmart.express.population.ModelPopulation;
-import parser.data.FilteredRawBIMData;
-import parser.data.Point3D;
-import parser.data.PreparedBIMObject3D;
-import parser.helper.BIMtoOSMHelper;
-import parser.helper.IFCShapeDataExtractor;
 
 /**
  * Parser for BIM data. Extracts major BIM elements and transforms coordinates into OSM convenient format

@@ -11,7 +11,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import org.openstreetmap.josm.actions.JosmAction;
 import org.openstreetmap.josm.gui.MainApplication;
 
-import controller.io.ImportEventListener;
+import io.controller.ImportEventListener;
 
 /**
  * Menu entry action for BIM import function.

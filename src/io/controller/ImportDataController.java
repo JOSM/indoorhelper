@@ -1,5 +1,5 @@
 // License: GPL. For details, see LICENSE file.
-package controller.io;
+package io.controller;
 
 import java.awt.BorderLayout;
 import java.util.ArrayList;
@@ -13,8 +13,8 @@ import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.MainMenu;
 
-import model.io.ImportDataModel;
-import parser.BIMtoOSMParser;
+import io.model.ImportDataModel;
+import io.parser.BIMtoOSMParser;
 import views.io.ImportBIMDataAction;
 
 /**
