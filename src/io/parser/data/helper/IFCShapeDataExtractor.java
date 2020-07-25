@@ -529,7 +529,7 @@ public class IFCShapeDataExtractor {
 	 * @param cartesianCoordinate to transform
 	 * @return coordinate as Point3D
 	 */
-	private static Point3D IfcCartesianCoordinateToPoint3D(EntityInstance cartesianCoordinate) {
+	public static Point3D IfcCartesianCoordinateToPoint3D(EntityInstance cartesianCoordinate) {
 		@SuppressWarnings("unchecked")
 		Vector<String> objectCoords = (Vector<String>)cartesianCoordinate.getAttributeValueBN("Coordinates");
 		if(objectCoords.isEmpty())	return null;

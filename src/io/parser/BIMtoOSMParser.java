@@ -32,6 +32,9 @@ import io.parser.data.Point3D;
 import io.parser.data.PreparedBIMObject3D;
 import io.parser.data.helper.BIMtoOSMHelper;
 import io.parser.data.helper.IFCShapeDataExtractor;
+import io.parser.data.helper.IFCShapeRepresentationCatalog.RepresentationIdentifier;
+import io.parser.data.ifc.IFCShapeRepresentationIdentity;
+import io.parser.math.ParserGeoMath;
 import model.TagCatalog;
 import nl.tue.buildingsmart.express.population.EntityInstance;
 import nl.tue.buildingsmart.express.population.ModelPopulation;
@@ -56,6 +59,11 @@ public class BIMtoOSMParser {
 	private TagCatalog tagCatalog;
 
 	private int defaultLevel = 999;
+
+	public enum IFCUnit {
+		m, ft
+    }
+	private IFCUnit lengthUnit = IFCUnit.m;
 
 	public BIMtoOSMParser(ImportEventListener listener) {
 		importListener = listener;
@@ -88,14 +96,18 @@ public class BIMtoOSMParser {
 //		preparedBIMdata.addAll(BIMtoOSMHelper.prepareBIMObjects(ifcModel, BIMRootId, BIMtoOSMCatalog.BIMObject.IfcDoor, filteredBIMdata.getDoorObjects()));
 //		preparedBIMdata.addAll(BIMtoOSMHelper.prepareBIMObjects(ifcModel, BIMRootId, BIMtoOSMCatalog.BIMObject.IfcWindow, filteredBIMdata.getWindowObjects()));
 		preparedBIMdata.addAll(BIMtoOSMHelper.prepareBIMObjects(ifcModel, BIMRootId, BIMtoOSMCatalog.BIMObject.IfcStair, filteredBIMdata.getStairObjects()));
-		//TODO add IFCBEAM!
 
-		// TODO transform coordinates
+		// set length unit
+		setLengthUnit();
 
-		// TODO parse FilteredBIMData into OSM DataSet
+		// transform coordinates from local system to geodetic
+		LatLon latlonBuildingOrigin = getLatLonOriginOfBuilding(filteredBIMdata.getIfcSite());
+		transformCoordinatesToLatLon(latlonBuildingOrigin, preparedBIMdata);
+
+
+		// pack FilteredBIMData into OSM data
 		ArrayList<Way> ways = new ArrayList<>();
 		ArrayList<Node> nodes = new ArrayList<>();
-
 
 		// TODO fix, for development only -----------
 		ArrayList<Pair<Double,Integer>> levelIdentifier = extractAndIdentifyLevels();
@@ -105,10 +117,11 @@ public class BIMtoOSMParser {
 			int level = getLevelTagOfPreparedBIMObject(object, levelIdentifier);
 
 			ArrayList<Node> tmpNodes = new ArrayList<>();
-			for(Point3D point : object.getCartesianShapeCoordinates()) {
-				Node n = new Node(new LatLon(point.getY(), point.getX()));
+			for(LatLon point : object.getGeodeticShapeCoordinates()) {
+				Node n = new Node(point);
 				tmpNodes.add(n);
 			}
+
 			if(tmpNodes.isEmpty())	continue;
 
 			if(tmpNodes.get(0).lat() == tmpNodes.get(tmpNodes.size()-1).lat() && tmpNodes.get(0).lon() == tmpNodes.get(tmpNodes.size()-1).lon()) {
@@ -332,6 +345,94 @@ public class BIMtoOSMParser {
 	    	}
 	    }
 	    return levelIdentifier;
+	}
+
+	/**
+	 * Method sets geodetic shape coordinates of PreparedBIMObject3D
+	 * @param latlonBuildingOrigin building origin latlon
+	 * @param preparedBIMdata data to set the geodetic shapes
+	 */
+	private void transformCoordinatesToLatLon(LatLon latlonBuildingOrigin, ArrayList<PreparedBIMObject3D> preparedBIMdata) {
+		if (latlonBuildingOrigin != null) {
+			for(PreparedBIMObject3D object : preparedBIMdata){
+
+				ArrayList<LatLon> transfomedCoordinates = new ArrayList<>();
+				for(Point3D point : object.getCartesianShapeCoordinates()) {
+					LatLon llPoint = ParserGeoMath.cartesianToGeodetic(point, new Point3D(0.0, 0.0, 0.0), latlonBuildingOrigin, lengthUnit);
+					transfomedCoordinates.add(llPoint);
+				}
+				object.setGeodeticShapeCoordinates(transfomedCoordinates);
+
+			}
+		}
+	}
+
+	/**
+	 * Method calculates the latlon coordinates of building origin corner
+	 * @param ifcSite IFCSITE entity
+	 * @return latlon coordinates of building corner
+	 */
+	private LatLon getLatLonOriginOfBuilding(EntityInstance ifcSite) {
+		Point3D ifcSiteOffset = null;
+		if(ifcSite.getAttributeValueBNasEntityInstance("Representation") != null) {
+			// get the offset between IFCSITE geodetic coordinates and building origin coordinate
+			// handle IFCSITE offset if IFCBOUNDINGBOX representation
+			ArrayList<IFCShapeRepresentationIdentity> repObjectIdentities = BIMtoOSMHelper.identifyRepresentationsOfObject(ifcSite);
+
+			IFCShapeRepresentationIdentity boxRepresentation = BIMtoOSMHelper.getRepresentationSpecificObjectType(repObjectIdentities, RepresentationIdentifier.Box);
+			if(boxRepresentation != null) {
+				// get offset
+				EntityInstance bb = boxRepresentation.getRepresentationObjectEntity();
+				EntityInstance bbItem = bb.getAttributeValueBNasEntityInstanceList("Items").get(0);
+				EntityInstance cartesianCorner = bbItem.getAttributeValueBNasEntityInstance("Corner");
+				ifcSiteOffset = IFCShapeDataExtractor.IfcCartesianCoordinateToPoint3D(cartesianCorner);
+			}
+		}
+
+		// get RefLatitude and RefLongitude of IFCSITE
+		@SuppressWarnings("unchecked")
+		Vector<String> refLat = (Vector<String>)ifcSite.getAttributeValueBN("RefLatitude");
+		@SuppressWarnings("unchecked")
+		Vector<String> refLon = (Vector<String>)ifcSite.getAttributeValueBN("RefLongitude");
+
+		if(refLat == null || refLon == null) return null;
+
+		// transform angle measurement to latlon
+		double lat = ParserGeoMath.degreeMinutesSecondsToLatLon(
+				IFCShapeDataExtractor.prepareDoubleString(refLat.get(0)),
+				IFCShapeDataExtractor.prepareDoubleString(refLat.get(1)),
+				IFCShapeDataExtractor.prepareDoubleString(refLat.get(2)));
+		double lon = ParserGeoMath.degreeMinutesSecondsToLatLon(
+				IFCShapeDataExtractor.prepareDoubleString(refLon.get(0)),
+				IFCShapeDataExtractor.prepareDoubleString(refLon.get(1)),
+				IFCShapeDataExtractor.prepareDoubleString(refLon.get(2)));
+
+		// if offset, calculate building origin without offset
+		if(ifcSiteOffset != null && ifcSiteOffset.getX() != 0.0 && ifcSiteOffset.getY() != 0.0) {
+			return ParserGeoMath.cartesianToGeodetic(new Point3D(0.0,  0.0,  0.0), ifcSiteOffset, new LatLon(lat, lon), lengthUnit);
+		}
+
+		return new LatLon(lat,lon);
+	}
+
+	/**
+	 * Method sets length unit of file
+	 */
+	private void setLengthUnit() {
+		ArrayList<EntityInstance> units = ifcModel.getInstancesOfType("IfcUnitAssignment").get(0).getAttributeValueBNasEntityInstanceList("Units");
+		for(EntityInstance unit : units) {
+			System.out.println(unit.getAttributes());
+			try {
+				String unitType = (String) unit.getAttributeValueBN("UnitType");
+				String unitLabel = (String) unit.getAttributeValueBN("Name");
+				if(unitType.equals(".LENGTHUNIT.")) {
+					if(!unitLabel.equals(".METRE."))	lengthUnit = IFCUnit.ft;
+					break;
+				}
+			}catch(NullPointerException e) {
+
+			}
+		}
 	}
 
 	private ArrayList<Tag> getObjectTags(PreparedBIMObject3D object){

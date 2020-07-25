@@ -16,7 +16,7 @@ public class ParserMath {
 	 */
 	public static double getAngleBetweenVectors(double[] vector1, double[] vector2) {
 		if(vector1.length != vector2.length)	return Double.NaN;
-		if(vector1[0] == vector2[0] && vector1[1] == vector2[1] && vector1[2] == vector2[2])	return 0.0;
+		if(vector1[0] == vector2[0] && vector1[1] == vector2[1])	return 0.0;
 
 		// check sign - vector order is important for rotation
 		double result2DWithSign = Math.atan2(vector1[1], vector1[0]) - Math.atan2(vector2[1], vector2[0]);

@@ -3,6 +3,8 @@ package io.parser.data;
 
 import java.util.ArrayList;
 
+import org.openstreetmap.josm.data.coor.LatLon;
+
 import io.model.BIMtoOSMCatalog;
 
 /**
@@ -15,13 +17,17 @@ public class PreparedBIMObject3D {
 	private int objectId;
 	private BIMtoOSMCatalog.BIMObject type;
 	private Point3D cartesianPlacement;
+	private LatLon geodeticPlacement;
 	private ArrayList<Point3D> cartesianShapeCoordinates;
+	private ArrayList<LatLon> geodeticShapeCoordinates;
 
 	public PreparedBIMObject3D(int id, BIMtoOSMCatalog.BIMObject type, Point3D cartesianCorner, ArrayList<Point3D> shapeCoordinates) {
 		this.setObjectId(id);
 		this.type = type;
 		this.cartesianPlacement = cartesianCorner;
+		this.geodeticPlacement = null;
 		this.cartesianShapeCoordinates = shapeCoordinates;
+		this.geodeticShapeCoordinates = null;
 	}
 
 	public BIMtoOSMCatalog.BIMObject getType() {
@@ -54,5 +60,21 @@ public class PreparedBIMObject3D {
 
 	public void setObjectId(int objectId) {
 		this.objectId = objectId;
+	}
+
+	public LatLon getGeodeticPlacement() {
+		return geodeticPlacement;
+	}
+
+	public void setGeodeticPlacement(LatLon geodeticPlacement) {
+		this.geodeticPlacement = geodeticPlacement;
+	}
+
+	public ArrayList<LatLon> getGeodeticShapeCoordinates() {
+		return geodeticShapeCoordinates;
+	}
+
+	public void setGeodeticShapeCoordinates(ArrayList<LatLon> geodeticShapeCoordinates) {
+		this.geodeticShapeCoordinates = geodeticShapeCoordinates;
 	}
 }
