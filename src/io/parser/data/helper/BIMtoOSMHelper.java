@@ -242,7 +242,7 @@ public class BIMtoOSMHelper {
 	 * @param identifier RepresentationIdentifier
 	 * @return returns IfcShapeRepresentation "identifier" or null if not in list
 	 */
-	private static IFCShapeRepresentationIdentity getRepresentationSpecificObjectType (ArrayList<IFCShapeRepresentationIdentity> repObjectIdentities, RepresentationIdentifier identifier){
+	public static IFCShapeRepresentationIdentity getRepresentationSpecificObjectType (ArrayList<IFCShapeRepresentationIdentity> repObjectIdentities, RepresentationIdentifier identifier){
 		for(IFCShapeRepresentationIdentity repObject : repObjectIdentities) {
 			if(repObject.getIdentifier().equals(identifier))	return repObject;
 		}
@@ -454,7 +454,7 @@ public class BIMtoOSMHelper {
 	 * @param object object to get the IFCPRODUCTDEFINITIONSHAPE.REPRESENTATIONS from which will be identified
 	 * @return List of IFCShapeRepresentationIdentity holding an IFC representation object and it's identifier
 	 */
-	private static ArrayList<IFCShapeRepresentationIdentity> identifyRepresentationsOfObject(EntityInstance object){
+	public static ArrayList<IFCShapeRepresentationIdentity> identifyRepresentationsOfObject(EntityInstance object){
 		ArrayList< IFCShapeRepresentationIdentity> repObjectIdentities = new ArrayList<>();
 
 		// get representation objects
