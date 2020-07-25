@@ -32,7 +32,9 @@ import io.parser.data.Point3D;
 import io.parser.data.PreparedBIMObject3D;
 import io.parser.data.helper.BIMtoOSMHelper;
 import io.parser.data.helper.IFCShapeDataExtractor;
+import io.parser.data.helper.IFCShapeRepresentationCatalog.IfcSpatialStructureElementTypes;
 import io.parser.data.helper.IFCShapeRepresentationCatalog.RepresentationIdentifier;
+import io.parser.data.helper.IFCShapeRepresentationIdentifier;
 import io.parser.data.ifc.IFCShapeRepresentationIdentity;
 import io.parser.math.ParserGeoMath;
 import model.TagCatalog;
@@ -61,7 +63,7 @@ public class BIMtoOSMParser {
 	private int defaultLevel = 999;
 
 	public enum IFCUnit {
-		m, ft
+		m, cm, mm
     }
 	private IFCUnit lengthUnit = IFCUnit.m;
 
@@ -292,8 +294,13 @@ public class BIMtoOSMParser {
 
 				if(element.getId() == object.getObjectId()){
 					// if part of contained elements get Elevation entity from object
-					EntityInstance buildingStorey = entity.getAttributeValueBNasEntityInstance("RelatingStructure");
-					double storeyElevation = IFCShapeDataExtractor.prepareDoubleString((String)buildingStorey.getAttributeValueBN("Elevation"));
+					EntityInstance relatingStructure = entity.getAttributeValueBNasEntityInstance("RelatingStructure");
+
+					String relatingStructureType = IFCShapeRepresentationIdentifier.getSpatialStructureElementType(ifcModel, relatingStructure);
+					// get type of relatingStructure
+					if(!relatingStructureType.equals(IfcSpatialStructureElementTypes.IfcBuildingStorey.name())) return 0;
+					// if of type IFCBUILDINGSTOREY
+					double storeyElevation = IFCShapeDataExtractor.prepareDoubleString((String)relatingStructure.getAttributeValueBN("Elevation"));
 
 					// get assigned level tag to Elevation entity
 					for(Pair<Double,Integer> identifier : levelIdentifierList) {
@@ -373,6 +380,7 @@ public class BIMtoOSMParser {
 	 * @param ifcSite IFCSITE entity
 	 * @return latlon coordinates of building corner
 	 */
+	@SuppressWarnings("unchecked")
 	private LatLon getLatLonOriginOfBuilding(EntityInstance ifcSite) {
 		Point3D ifcSiteOffset = null;
 		if(ifcSite.getAttributeValueBNasEntityInstance("Representation") != null) {
@@ -391,10 +399,14 @@ public class BIMtoOSMParser {
 		}
 
 		// get RefLatitude and RefLongitude of IFCSITE
-		@SuppressWarnings("unchecked")
-		Vector<String> refLat = (Vector<String>)ifcSite.getAttributeValueBN("RefLatitude");
-		@SuppressWarnings("unchecked")
-		Vector<String> refLon = (Vector<String>)ifcSite.getAttributeValueBN("RefLongitude");
+		Vector<String> refLat = null;
+		Vector<String> refLon = null;
+		try{
+			refLat = (Vector<String>)ifcSite.getAttributeValueBN("RefLatitude");
+			refLon = (Vector<String>)ifcSite.getAttributeValueBN("RefLongitude");
+		}catch(NullPointerException e) {
+			return null;
+		}
 
 		if(refLat == null || refLon == null) return null;
 
@@ -422,16 +434,25 @@ public class BIMtoOSMParser {
 	private void setLengthUnit() {
 		ArrayList<EntityInstance> units = ifcModel.getInstancesOfType("IfcUnitAssignment").get(0).getAttributeValueBNasEntityInstanceList("Units");
 		for(EntityInstance unit : units) {
-			System.out.println(unit.getAttributes());
 			try {
 				String unitType = (String) unit.getAttributeValueBN("UnitType");
 				String unitLabel = (String) unit.getAttributeValueBN("Name");
 				if(unitType.equals(".LENGTHUNIT.")) {
-					if(!unitLabel.equals(".METRE."))	lengthUnit = IFCUnit.ft;
-					break;
+					if(unitLabel.equals(".METRE.")) {
+						try {
+							String unitPrefix = (String) unit.getAttributeValueBN("Prefix");
+							if(unitPrefix.equals(".CENTI."))	lengthUnit = IFCUnit.cm;
+							if(unitPrefix.equals(".MILLI."))	lengthUnit = IFCUnit.mm;
+							break;
+							// TODO handle more prefixes
+						}catch(NullPointerException e) {
+							// do nothing
+						}
+						break;
+					}
 				}
 			}catch(NullPointerException e) {
-
+				// do nothing
 			}
 		}
 	}

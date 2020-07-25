@@ -161,9 +161,11 @@ public class BIMtoOSMHelper {
 					if(point.equalsPoint3D(IFCShapeDataExtractor.defaultPoint))	continue;	// for workaround
 					double[] pointAsVector = {point.getX(), point.getY(), point.getZ()};
 					double[] rotatedPoint = ParserMath.rotate3DPoint(pointAsVector, xRotMatrix);
-					point.setX(rotatedPoint[0]);
-					point.setY(rotatedPoint[1]);
-					point.setZ(rotatedPoint[2]);
+					if(rotatedPoint != null) {
+						point.setX(rotatedPoint[0]);
+						point.setY(rotatedPoint[1]);
+						point.setZ(rotatedPoint[2]);
+					}
 				}
 
 				// transform points to object placement origin
@@ -295,6 +297,7 @@ public class BIMtoOSMHelper {
 	 * @param object to get rotation matrix for
 	 * @return rotation matrix about x-axis for object
 	 */
+	@SuppressWarnings("unchecked")
 	private static double[][] getXAxisRotationMatrix(int BIMFileRootId, EntityInstance object){
 		// get objects IFCLOCALPLACEMENT entity
 		EntityInstance objectIFCLP = object.getAttributeValueBNasEntityInstance("ObjectPlacement");
@@ -305,13 +308,19 @@ public class BIMtoOSMHelper {
 		double rotAngle = 0.0;	// in rad
 		double[] parentXVector = null;
 
+		System.out.println(object.getId());
+
 		for(EntityInstance relativeObject : objectRP) {
 			// get REFDIRECTION (x axis vector)
-			EntityInstance xRefDirection = relativeObject.getAttributeValueBNasEntityInstance("RefDirection");
-			// get DIRECTIONRATIOS from REFDIRECTION (vector values)
-			@SuppressWarnings("unchecked")
-			Vector<String> xDirectionRatios = (Vector<String>)xRefDirection.getAttributeValueBN("DirectionRatios");
-			if(xDirectionRatios.isEmpty())	return null;
+			Vector<String> xDirectionRatios = null;
+			try {
+				EntityInstance xRefDirection = relativeObject.getAttributeValueBNasEntityInstance("RefDirection");
+				// get DIRECTIONRATIOS from REFDIRECTION (vector values)
+				xDirectionRatios = (Vector<String>)xRefDirection.getAttributeValueBN("DirectionRatios");
+				if(xDirectionRatios.isEmpty())	return null;
+			}catch(NullPointerException e) {
+				return null;
+			}
 
 			if(xDirectionRatios.size() == 2) {
 				double x = prepareDoubleString(xDirectionRatios.get(0));
@@ -355,6 +364,7 @@ public class BIMtoOSMHelper {
 	 * @param object to get rotation matrix for
 	 * @return rotation matrix about z-axis for object
 	 */
+	@SuppressWarnings("unchecked")
 	private static double[][] getZAxisRotationMatrix(ModelPopulation ifcModel, int BIMFileRootId, EntityInstance object){
 		// get objects IFCLOCALPLACEMENT entity
 		EntityInstance objectIFCLP = object.getAttributeValueBNasEntityInstance("ObjectPlacement");
@@ -369,13 +379,16 @@ public class BIMtoOSMHelper {
 			// if IFCAXIS2PLACEMENT2D return
 			if(!IFCShapeRepresentationIdentifier.isIfcAxis2Placement3D(ifcModel, relativeObject)) continue;
 
-			// get AXIS (z-axis vector)
-			EntityInstance zAxis = relativeObject.getAttributeValueBNasEntityInstance("Axis");
-			// get DIRECTIONRATIOS from AXIS (vector values)
-			@SuppressWarnings("unchecked")
-			Vector<String> zDirectionRatios = (Vector<String>)zAxis.getAttributeValueBN("DirectionRatios");
-
-			if(zDirectionRatios.isEmpty())	return null;
+			Vector<String> zDirectionRatios = null;
+			try {
+				// get AXIS (z-axis vector)
+				EntityInstance zAxis = relativeObject.getAttributeValueBNasEntityInstance("Axis");
+				// get DIRECTIONRATIOS from AXIS (vector values)
+				zDirectionRatios = (Vector<String>)zAxis.getAttributeValueBN("DirectionRatios");
+				if(zDirectionRatios.isEmpty())	return null;
+			}catch(NullPointerException e) {
+				return null;
+			}
 
 			if(zDirectionRatios.size() == 2) {
 				double x = prepareDoubleString(zDirectionRatios.get(0));

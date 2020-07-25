@@ -46,6 +46,7 @@ public class ParserMath {
 	}
 
 	public static double[] rotate3DPoint(double[] point, double[][] rotationMatrix) {
+		if(rotationMatrix == null || point == null) return point;
 		double[] result = new double[3];
 		result[0] = rotationMatrix[0][0] * point[0] + rotationMatrix[0][1] * point[1] + rotationMatrix[0][2] * point[2];
 		result[1] = rotationMatrix[1][0] * point[0] + rotationMatrix[1][1] * point[1] + rotationMatrix[1][2] * point[2];

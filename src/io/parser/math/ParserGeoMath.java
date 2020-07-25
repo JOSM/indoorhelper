@@ -17,11 +17,11 @@ public class ParserGeoMath {
 
 	/**
 	 * Method transforms cartesian point to latlon point with given latlon origin coordinate (latlon for cartesian 0.0/0.0)
-	 * and cartesian unit like m or ft
+	 * and cartesian unit like m or cm
 	 * @param cartesianPoint to translate to latlon
 	 * @param cartesianOrigin cartesian representation of latLonOfCartesianOrigin
 	 * @param latLonOfCartesianOrigin latlon of cartesian origin (0.0/0.0)
-	 * @param cartesianUnit m or ft
+	 * @param cartesianUnit m or cm
 	 * @return latlon of cartesian point
 	 */
 	public static LatLon cartesianToGeodetic(Point3D cartesianPoint, Point3D cartesianOrigin,LatLon latLonOfCartesianOrigin, IFCUnit cartesianUnit) {
@@ -37,9 +37,13 @@ public class ParserGeoMath {
 		bearing = Math.toRadians(90.0) - bearing;
 
 		// get distance
-		if(cartesianUnit.equals(IFCUnit.ft)) {
-			pointX *= 0.3048;
-			pointY *= 0.3048;
+		if(cartesianUnit.equals(IFCUnit.cm)) {
+			pointX /= 100.0;
+			pointY /= 100.0;
+		}
+		else if(cartesianUnit.equals(IFCUnit.mm)) {
+			pointX /= 1000.0;
+			pointY /= 1000.0;
 		}
 		double d = Math.sqrt(Math.pow((pointX - originCartX),2) + Math.pow((pointY - originCartY),2));
 

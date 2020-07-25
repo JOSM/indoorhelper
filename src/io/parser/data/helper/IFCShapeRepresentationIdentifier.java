@@ -17,6 +17,7 @@ import io.parser.data.helper.IFCShapeRepresentationCatalog.CurveRepresentationTy
 import io.parser.data.helper.IFCShapeRepresentationCatalog.IfcBooleanOperandType;
 import io.parser.data.helper.IFCShapeRepresentationCatalog.IfcBoundedCurveTypes;
 import io.parser.data.helper.IFCShapeRepresentationCatalog.IfcRelVoidsElementTypes;
+import io.parser.data.helper.IFCShapeRepresentationCatalog.IfcSpatialStructureElementTypes;
 import io.parser.data.helper.IFCShapeRepresentationCatalog.LoopSubRepresentationTypeItems;
 import io.parser.data.helper.IFCShapeRepresentationCatalog.MappedRepresentatiobTypeItems;
 import io.parser.data.helper.IFCShapeRepresentationCatalog.ProfileDefRepresentationTypeItems;
@@ -516,6 +517,41 @@ public class IFCShapeRepresentationIdentifier {
 		if(bSplineCurves.contains(entity))	return IfcBoundedCurveTypes.IfcBSplineCurve.name();
 
 		Logging.info(IFCShapeRepresentationIdentifier.class.getName() + ": " + entity.getEntityDefinition() + " is not supported as IfcBoundedCurveType");
+		return null;
+	}
+
+	/**
+	 * Method gets type of IFCSPATIALSTRUCTUREELEMENT
+	 * @param ifcModel ifc model
+	 * @param entity to get type of
+	 * @return type of IFCSPATIALSTRUCTUREELEMENT
+	 */
+	public static String getSpatialStructureElementType(ModelPopulation ifcModel, EntityInstance entity) {
+		ArrayList<EntityInstance> buildings = new ArrayList<>();
+		for(String flag : getIdentifierTags(IfcSpatialStructureElementTypes.IfcBuilding.name())) {
+			buildings.addAll(ifcModel.getInstancesOfType(flag));
+		}
+		if(buildings.contains(entity))	return IfcSpatialStructureElementTypes.IfcBuilding.name();
+
+		ArrayList<EntityInstance> storeys = new ArrayList<>();
+		for(String flag : getIdentifierTags(IfcSpatialStructureElementTypes.IfcBuildingStorey.name())) {
+			storeys.addAll(ifcModel.getInstancesOfType(flag));
+		}
+		if(storeys.contains(entity))	return IfcSpatialStructureElementTypes.IfcBuildingStorey.name();
+
+		ArrayList<EntityInstance> spaces = new ArrayList<>();
+		for(String flag : getIdentifierTags(IfcSpatialStructureElementTypes.IfcSpace.name())) {
+			spaces.addAll(ifcModel.getInstancesOfType(flag));
+		}
+		if(spaces.contains(entity))	return IfcSpatialStructureElementTypes.IfcSpace.name();
+
+		ArrayList<EntityInstance> sites = new ArrayList<>();
+		for(String flag : getIdentifierTags(IfcSpatialStructureElementTypes.IfcSite.name())) {
+			sites.addAll(ifcModel.getInstancesOfType(flag));
+		}
+		if(sites.contains(entity))	return IfcSpatialStructureElementTypes.IfcSite.name();
+
+		Logging.info(IFCShapeRepresentationIdentifier.class.getName() + ": " + entity.getEntityDefinition() + " is not supported as IfcSpatialStructureElement");
 		return null;
 	}
 

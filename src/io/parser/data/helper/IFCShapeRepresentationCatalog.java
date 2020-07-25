@@ -167,4 +167,8 @@ public class IFCShapeRepresentationCatalog {
 	}
 
 
+	public enum IfcSpatialStructureElementTypes{
+		IfcBuilding, IfcBuildingStorey, IfcSpace, IfcSite
+	}
+
 }

@@ -549,6 +549,7 @@ public class IFCShapeDataExtractor {
 	 * @return double representing double
 	 */
 	public static double prepareDoubleString(String doubleString) {
+		if(doubleString == null)	return Double.NaN;;
 		if(doubleString.endsWith(".")) {
 			doubleString = doubleString + "0";
 		}
