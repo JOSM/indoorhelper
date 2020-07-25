@@ -314,7 +314,6 @@ public class BIMtoOSMParser {
 	 * @return List with pairs of level Elevation entity (Double) and assigned level tag (Integer)
 	 */
 	private ArrayList<Pair<Double,Integer>> extractAndIdentifyLevels() {
-
 		// get all IfcRelContainedInSpatialStructure elements
 		Vector<EntityInstance> relContainedInSpatialStructureElements = ifcModel.getInstancesOfType("IfcRelContainedInSpatialStructure");
 
@@ -331,19 +330,21 @@ public class BIMtoOSMParser {
 		// Sort the Elevation entity ascending
 	    Collections.sort(levelList);
 
-	    // assign level integer to every Elevation entity
-	    int i = 0;
-	    int k = -1;
+	    int level0Index = -1;
+	    double level0 = 999.0;
 	    for(Double level : levelList) {
-	    	if(level < 0.0) {
-	    		levelIdentifier.add(new Pair<>(level, k));
-	    		--k;
-	    	}
-	    	if(level >= 0.0) {
-	    		levelIdentifier.add(new Pair<>(level, i));
-	    		++i;
+	    	double d = Math.abs(0.0 - level);
+	    	if(d < level0) {
+	    		level0Index =  levelList.indexOf(level);
+	    		level0 = d;
 	    	}
 	    }
+
+	    for(Double level : levelList) {
+	    	int index = levelList.indexOf(level) - level0Index;
+	    	levelIdentifier.add(new Pair<>(level, index));
+	    }
+
 	    return levelIdentifier;
 	}
 
