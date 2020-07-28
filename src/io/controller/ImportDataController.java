@@ -2,7 +2,10 @@
 package io.controller;
 
 import java.awt.BorderLayout;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.FileHandler;
+import java.util.logging.SimpleFormatter;
 
 import javax.swing.JFrame;
 import javax.swing.JProgressBar;
@@ -12,6 +15,7 @@ import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.MainMenu;
+import org.openstreetmap.josm.tools.Logging;
 
 import io.model.ImportDataModel;
 import io.parser.BIMtoOSMParser;
@@ -38,6 +42,15 @@ public class ImportDataController implements ImportEventListener{
 		importBIMAction = new ImportBIMDataAction(this);
 		MainMenu.add(MainApplication.getMenu().fileMenu, importBIMAction, false, 21);
 		initProgressProcess();
+
+		// add log file handler
+		try {
+			FileHandler fh = new FileHandler("C:/tmp/.josm/logfile_indoorhelper.log");
+	        fh.setFormatter(new SimpleFormatter());
+			Logging.getLogger().addHandler(fh);
+		} catch (SecurityException | IOException e) {
+			Logging.info(e.getMessage());
+		}
 	}
 
 	@Override
