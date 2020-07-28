@@ -118,6 +118,9 @@ public class IFCShapeDataExtractor {
 			else if(repItemType.equals(MappedRepresentatiobTypeItems.IfcMappedItem.name())) {
 				// TODO extract data
 			}
+			else {
+				Logging.info(IFCShapeDataExtractor.class.getName() + ": " + repItemType + " is not supported right now");
+			}
 		}
 
 		return shapeRep;
@@ -159,6 +162,9 @@ public class IFCShapeDataExtractor {
 				cartesianPointsOfBB.add(new Point3D(cPointAsPoint3D.getX(), cPointAsPoint3D.getY(), 0.0));
 				shapeRep.addAll(cartesianPointsOfBB);
 			}
+			else {
+				Logging.info(IFCShapeDataExtractor.class.getName() + ": " + repItemType + " is not supported right now");
+			}
 		}
 
 		return shapeRep;
@@ -190,6 +196,9 @@ public class IFCShapeDataExtractor {
 			}
 			else if(repItemType.equals(CurveRepresentationTypeItems.IfcPolyline.name())) {
 				// TODO extract data
+			}
+			else {
+				Logging.info(IFCShapeDataExtractor.class.getName() + ": " + repItemType + " is not supported right now");
 			}
 		}
 
@@ -264,7 +273,10 @@ public class IFCShapeDataExtractor {
 			}
 			return cartesianPointsOfClosedShell;
 		}
+
 		// other loop types are not supported right now
+		Logging.info(IFCShapeDataExtractor.class.getName() + ": " + loopType + " is not supported right now");
+
 		return null;
 	}
 
@@ -305,6 +317,8 @@ public class IFCShapeDataExtractor {
 		if(operator.equals(IfcBooleanOperator.UNION)) {
 			// TODO implement
 		}
+
+		Logging.info(IFCShapeDataExtractor.class.getName() + ": " + operator.name() + " is not supported right now");
 
 		return null;
 	}
@@ -354,7 +368,10 @@ public class IFCShapeDataExtractor {
 		if(operandType.equals(IfcBooleanOperandType.IfcFacetedBrep.name())) {
 			return getShapeDataFromIfcFacetedBrep(ifcModel, operand);
 		}
+
 		// other types are not supported right now
+		Logging.info(IFCShapeDataExtractor.class.getName() + ": " + operandType + " is not supported right now");
+
 		return null;
 	}
 
@@ -415,6 +432,8 @@ public class IFCShapeDataExtractor {
 		}
 
 		// other types are not supported right now
+		Logging.info(IFCShapeDataExtractor.class.getName() + ": " + localPolygonBoundaryType + " is not supported right now");
+
 		return null;
 	}
 
@@ -476,7 +495,9 @@ public class IFCShapeDataExtractor {
 				// not supported right now
 			}
 		}
+
 		// other types are not supported right now
+		Logging.info(IFCShapeDataExtractor.class.getName() + ": " + sweptAreaType + " is not supported right now");
 		return null;
 	}
 
@@ -520,7 +541,10 @@ public class IFCShapeDataExtractor {
 			// subtract points of shapeDataOfRelatinBuildingElement from shapeDataOfRelatinBuildingElement
 			return getShapeDataFromIfcFeatureElementSubtraction(shapeDataOfEntity, shapeDataOfRelatedOpeningElement);
 		}
+
 		// IfcVoidingFeature as opening element is not supported right now
+		Logging.info(IFCShapeDataExtractor.class.getName() + ": IfcVoidingFeature is not supported right now");
+
 		return null;
 	}
 
