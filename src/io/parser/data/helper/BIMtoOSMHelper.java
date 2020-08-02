@@ -308,8 +308,6 @@ public class BIMtoOSMHelper {
 		double rotAngle = 0.0;	// in rad
 		double[] parentXVector = null;
 
-		System.out.println(object.getId());
-
 		for(EntityInstance relativeObject : objectRP) {
 			// get REFDIRECTION (x axis vector)
 			Vector<String> xDirectionRatios = null;
@@ -490,7 +488,7 @@ public class BIMtoOSMHelper {
 	 * @param doubleString String of coordinate
 	 * @return double representing double
 	 */
-	private static double prepareDoubleString(String doubleString) {
+	public static double prepareDoubleString(String doubleString) {
 		if(doubleString.endsWith(".")) {
 			doubleString = doubleString + "0";
 		}
