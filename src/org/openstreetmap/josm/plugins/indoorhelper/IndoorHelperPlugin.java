@@ -32,7 +32,7 @@ import io.controller.ImportDataController;
 public class IndoorHelperPlugin extends Plugin implements PaintableInvalidationListener, ActiveLayerChangeListener {
 
     private IndoorHelperController indoorController;	// controller for indoor helper panel
-	private ImportDataController importController;		// controller for import function
+	private ImportDataController importController = null;		// controller for import function
 
     String sep = System.getProperty("file.separator");
 
@@ -60,7 +60,9 @@ public class IndoorHelperPlugin extends Plugin implements PaintableInvalidationL
         if (oldFrame == null && newFrame != null) {
             // Secures that the plug-in is only loaded, if a new MapFrame is created.
             indoorController = new IndoorHelperController();
-            importController = new ImportDataController();
+            if(importController == null) {
+                importController = new ImportDataController();
+            }
         }
     }
 
