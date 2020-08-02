@@ -37,6 +37,7 @@ import io.parser.data.helper.IFCShapeRepresentationCatalog.RepresentationIdentif
 import io.parser.data.helper.IFCShapeRepresentationIdentifier;
 import io.parser.data.ifc.IFCShapeRepresentationIdentity;
 import io.parser.math.ParserGeoMath;
+import io.parser.math.ParserMath;
 import model.TagCatalog;
 import nl.tue.buildingsmart.express.population.EntityInstance;
 import nl.tue.buildingsmart.express.population.ModelPopulation;
@@ -63,9 +64,11 @@ public class BIMtoOSMParser {
 	private int defaultLevel = 999;
 
 	public enum IFCUnit {
-		m, cm, mm
+		m, cm, mm,
+		rad, deg
     }
 	private IFCUnit lengthUnit = IFCUnit.m;
+	private IFCUnit angleUnit = IFCUnit.rad;
 
 	public BIMtoOSMParser(ImportEventListener listener) {
 		importListener = listener;
@@ -99,13 +102,13 @@ public class BIMtoOSMParser {
 //		preparedBIMdata.addAll(BIMtoOSMHelper.prepareBIMObjects(ifcModel, BIMRootId, BIMtoOSMCatalog.BIMObject.IfcWindow, filteredBIMdata.getWindowObjects()));
 		preparedBIMdata.addAll(BIMtoOSMHelper.prepareBIMObjects(ifcModel, BIMRootId, BIMtoOSMCatalog.BIMObject.IfcStair, filteredBIMdata.getStairObjects()));
 
-		// set length unit
-		setLengthUnit();
+		// set length/ angle etc. unit
+		setUnits();
+
 
 		// transform coordinates from local system to geodetic
 		LatLon latlonBuildingOrigin = getLatLonOriginOfBuilding(filteredBIMdata.getIfcSite());
 		transformCoordinatesToLatLon(latlonBuildingOrigin, preparedBIMdata);
-
 
 		// pack FilteredBIMData into OSM data
 		ArrayList<Way> ways = new ArrayList<>();
@@ -362,15 +365,32 @@ public class BIMtoOSMParser {
 	 */
 	private void transformCoordinatesToLatLon(LatLon latlonBuildingOrigin, ArrayList<PreparedBIMObject3D> preparedBIMdata) {
 		if (latlonBuildingOrigin != null) {
+
+			// get building rotation matrix
+			Point3D projectNorth = getProjectNorth();
+			Point3D trueNorth = getTrueNorth();
+			double[][] rotationMatrix = null;
+			if(projectNorth != null && trueNorth != null) {
+				double[] projectNorthVector = {projectNorth.getX(), projectNorth.getY(), projectNorth.getZ()};
+				double[] trueNorthVector = {trueNorth.getX(), trueNorth.getY(), trueNorth.getZ()};
+				double rotationAngle = ParserMath.getAngleBetweenVectors(trueNorthVector, projectNorthVector);
+				rotationMatrix = ParserMath.getRotationMatrixAboutZAxis(rotationAngle);
+			}
+
 			for(PreparedBIMObject3D object : preparedBIMdata){
-
-				ArrayList<LatLon> transfomedCoordinates = new ArrayList<>();
+				ArrayList<LatLon> transformedCoordinates = new ArrayList<>();
 				for(Point3D point : object.getCartesianShapeCoordinates()) {
+					// rotate point
+					double[] pointAsVector = {point.getX(), point.getY(), point.getZ()};
+					double[] rotatedPoint = ParserMath.rotate3DPoint(pointAsVector, rotationMatrix);
+					point.setX(rotatedPoint[0]);
+					point.setY(rotatedPoint[1]);
+					point.setZ(rotatedPoint[2]);
+					// transform point
 					LatLon llPoint = ParserGeoMath.cartesianToGeodetic(point, new Point3D(0.0, 0.0, 0.0), latlonBuildingOrigin, lengthUnit);
-					transfomedCoordinates.add(llPoint);
+					transformedCoordinates.add(llPoint);
 				}
-				object.setGeodeticShapeCoordinates(transfomedCoordinates);
-
+				object.setGeodeticShapeCoordinates(transformedCoordinates);
 			}
 		}
 	}
@@ -429,9 +449,72 @@ public class BIMtoOSMParser {
 	}
 
 	/**
+	 * Get project north of building
+	 * @return project north as Point3D
+	 */
+	@SuppressWarnings("unchecked")
+	private Point3D getProjectNorth() {
+		Vector<String> projectNorthDirectionRatios = null;
+		try {
+			EntityInstance ifcProject = ifcModel.getInstancesOfType("IfcProject").get(0);
+			EntityInstance geometricContext = ifcProject.getAttributeValueBNasEntityInstanceList("RepresentationContexts").get(0);
+			EntityInstance worldCoordinates = geometricContext.getAttributeValueBNasEntityInstance("WorldCoordinateSystem");
+			EntityInstance projectNorth = worldCoordinates.getAttributeValueBNasEntityInstance("RefDirection");
+			projectNorthDirectionRatios = (Vector<String>)projectNorth.getAttributeValueBN("DirectionRatios");
+		}catch(NullPointerException e) {
+			return null;
+		}
+
+		double x = 0;
+		double y = 0;
+		double z = 0;
+		if(projectNorthDirectionRatios.size() == 2) {
+			x = BIMtoOSMHelper.prepareDoubleString(projectNorthDirectionRatios.get(0));
+			y = BIMtoOSMHelper.prepareDoubleString(projectNorthDirectionRatios.get(1));
+		}
+		else if(projectNorthDirectionRatios.size() == 3) {
+			x = BIMtoOSMHelper.prepareDoubleString(projectNorthDirectionRatios.get(0));
+			y = BIMtoOSMHelper.prepareDoubleString(projectNorthDirectionRatios.get(1));
+			z = BIMtoOSMHelper.prepareDoubleString(projectNorthDirectionRatios.get(2));
+		}
+		return new Point3D(x,y,z);
+	}
+
+	/**
+	 * get true north vector of building
+	 * @return true north as Point3D
+	 */
+	@SuppressWarnings("unchecked")
+	private Point3D getTrueNorth() {
+		Vector<String> trueNorthDirectionRatios = null;
+		try {
+			EntityInstance ifcProject = ifcModel.getInstancesOfType("IfcProject").get(0);
+			EntityInstance geometricContext = ifcProject.getAttributeValueBNasEntityInstanceList("RepresentationContexts").get(0);
+			EntityInstance trueNorth = geometricContext.getAttributeValueBNasEntityInstance("TrueNorth");
+			trueNorthDirectionRatios = (Vector<String>)trueNorth.getAttributeValueBN("DirectionRatios");
+		}catch(NullPointerException e) {
+			return null;
+		}
+
+		double x = 0;
+		double y = 0;
+		double z = 0;
+		if(trueNorthDirectionRatios.size() == 2) {
+			x = BIMtoOSMHelper.prepareDoubleString(trueNorthDirectionRatios.get(0));
+			y = BIMtoOSMHelper.prepareDoubleString(trueNorthDirectionRatios.get(1));
+		}
+		else if(trueNorthDirectionRatios.size() == 3) {
+			x = BIMtoOSMHelper.prepareDoubleString(trueNorthDirectionRatios.get(0));
+			y = BIMtoOSMHelper.prepareDoubleString(trueNorthDirectionRatios.get(1));
+			z = BIMtoOSMHelper.prepareDoubleString(trueNorthDirectionRatios.get(2));
+		}
+		return new Point3D(x,y,z);
+	}
+
+	/**
 	 * Method sets length unit of file
 	 */
-	private void setLengthUnit() {
+	private void setUnits() {
 		ArrayList<EntityInstance> units = ifcModel.getInstancesOfType("IfcUnitAssignment").get(0).getAttributeValueBNasEntityInstanceList("Units");
 		for(EntityInstance unit : units) {
 			try {
@@ -448,6 +531,12 @@ public class BIMtoOSMParser {
 						}catch(NullPointerException e) {
 							// do nothing
 						}
+						break;
+					}
+				}
+				if(unitType.equals(".PLANEANGLEUNIT.")) {
+					if(unitLabel.equals(".DEGREE.")) {
+						angleUnit = IFCUnit.deg;
 						break;
 					}
 				}
