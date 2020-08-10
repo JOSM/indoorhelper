@@ -145,7 +145,7 @@ public class BIMtoOSMHelper {
 
 			// create PreparedBIMObject3D and save
 			if(cartesianPlacementOfObject != null && (shapeDataOfObject != null && !shapeDataOfObject.isEmpty())) {
-				// rotate points about z-axis
+				// z-axis rotation
 //				if(zRotMatrix != null) {
 //					for(Point3D point : shapeDataOfObject) {
 //						double[] pointAsVector = {point.getX(), point.getY(), point.getZ()};
@@ -156,7 +156,7 @@ public class BIMtoOSMHelper {
 //					}
 //				}
 
-				// rotate points about x-axis
+				// x-axis rotation
 				for(Point3D point : shapeDataOfObject) {
 					if(point.equalsPoint3D(IFCShapeDataExtractor.defaultPoint))	continue;	// for workaround
 					double[] pointAsVector = {point.getX(), point.getY(), point.getZ()};
@@ -174,7 +174,6 @@ public class BIMtoOSMHelper {
 					point.setX(point.getX() + cartesianPlacementOfObject.getX());
 					point.setY(point.getY() + cartesianPlacementOfObject.getY());
 				}
-
 
 				// Check if data includes IFCShapeDataExtractor.defaultPoint. IFCShapeDataExtractor.defaultPoint got added
 				// for workaround handling multiple closed loops in data set
@@ -218,7 +217,7 @@ public class BIMtoOSMHelper {
 
 		// first check if IFCPRODUCTDEFINITIONSHAPE.REPRESENTATIONS include IFCSHAPEREPRESENTATION of type "body"
 		IFCShapeRepresentationIdentity bodyRepresentation = getRepresentationSpecificObjectType(repObjectIdentities, RepresentationIdentifier.Body);
-		if(bodyRepresentation != null && !IFCShapeRepresentationIdentifier.isIfcWindowOrIfcWall(ifcModel, object)) {
+		if(bodyRepresentation != null && !IFCShapeRepresentationIdentifier.isIfcWindowOrIfcDoor(ifcModel, object)) {
 			return IFCShapeDataExtractor.getDataFromBodyRepresentation(ifcModel, bodyRepresentation);
 		}
 
@@ -347,6 +346,7 @@ public class BIMtoOSMHelper {
 				parentXVector[2] = z;
 			}
 		}
+
 		// check if rotAngle greater than 6.28319 rad or smaller than -6.28319 rad
 		if(rotAngle > 6.28319)	rotAngle -= 6.28319;
 		if(rotAngle < -6.28319)	rotAngle += 6.28319;

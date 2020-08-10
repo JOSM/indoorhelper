@@ -36,6 +36,16 @@ public class IFCShapeDataExtractor {
 	public static Point3D defaultPoint = new Point3D(-99.0, -99.0, -99.0);
 
 	/**
+	 * This type defines the three Boolean operators used in the definition of CSG solids.
+	 *
+	 */
+	private enum IfcBooleanOperator{
+		UNION,
+		INTERSECTION,
+		DIFFERENCE
+	}
+
+	/**
 	 * Extract representation data from IFCREPRESENTATIONITEM body
 	 * @param ifcModel ifc Model
 	 * @param bodyRepresentation representation of body
@@ -68,8 +78,8 @@ public class IFCShapeDataExtractor {
 			}
 			else if(repItemType.equals(BrepRepresentationTypeItems.IfcFacetedBrep.name())) {
 				ArrayList<Point3D> shapeData = getShapeDataFromIfcFacetedBrep(ifcModel, item);
-				// check if entity includes openings and handle them
-				// shapeDataWithOpeningHandling is null, if no openings exists or type of openings will not be handles
+				// check if entity includes(floor-)openings and handle them
+				// shapeDataWithOpeningHandling is null, if no openings exists or type of opening not supported
 				ArrayList<Point3D> shapeDataWithOpeningHandling = handleOpeningsInEntityShape(ifcModel, shapeData, bodyRepresentation.getRootObjectEntity());
 				if(shapeDataWithOpeningHandling != null)	shapeRep.addAll(shapeDataWithOpeningHandling);
 				else if(shapeData != null) shapeRep.addAll(shapeData);
@@ -88,9 +98,8 @@ public class IFCShapeDataExtractor {
 			}
 			else if(repItemType.equals(ClippingRepresentationTypeItems.IfcBooleanClippingResult.name())) {
 				ArrayList<Point3D> shapeData = getShapeDataFromIfcBooleanResult(ifcModel, item, IfcBooleanOperator.DIFFERENCE);
-
-				// check if entity includes openings and handle them
-				// shapeDataWithOpeningHandling is null, if no openings exists or type of openings will not be handles
+				// check if entity includes(floor-)openings and handle them
+				// shapeDataWithOpeningHandling is null, if no openings exists or type of opening not supported
 				ArrayList<Point3D> shapeDataWithOpeningHandling = handleOpeningsInEntityShape(ifcModel, shapeData, bodyRepresentation.getRootObjectEntity());
 				if(shapeDataWithOpeningHandling != null)	shapeRep.addAll(shapeDataWithOpeningHandling);
 				else if(shapeData != null) shapeRep.addAll(shapeData);
@@ -106,8 +115,8 @@ public class IFCShapeDataExtractor {
 			}
 			else if(repItemType.equals(SweptSolidRepresentationTypeItems.IfcExtrudedAreaSolid.name())) {
 				ArrayList<Point3D> shapeData = getShapeDataFromIfcExtrudedAreaSolid(ifcModel, item);
-				// check if entity includes openings and handle them
-				// shapeDataWithOpeningHandling is null, if no openings exists or type of openings will not be handles
+				// check if entity includes(floor-)openings and handle them
+				// shapeDataWithOpeningHandling is null, if no openings exists or type of opening not supported
 				ArrayList<Point3D> shapeDataWithOpeningHandling = handleOpeningsInEntityShape(ifcModel, shapeData, bodyRepresentation.getRootObjectEntity());
 				if(shapeDataWithOpeningHandling != null)	shapeRep.addAll(shapeDataWithOpeningHandling);
 				else if(shapeData != null) shapeRep.addAll(shapeData);
@@ -319,7 +328,6 @@ public class IFCShapeDataExtractor {
 		}
 
 		Logging.info(IFCShapeDataExtractor.class.getName() + ": " + operator.name() + " is not supported right now");
-
 		return null;
 	}
 
@@ -371,7 +379,6 @@ public class IFCShapeDataExtractor {
 
 		// other types are not supported right now
 		Logging.info(IFCShapeDataExtractor.class.getName() + ": " + operandType + " is not supported right now");
-
 		return null;
 	}
 
@@ -410,7 +417,7 @@ public class IFCShapeDataExtractor {
 	 * @return points representing shape of IFCPOLYGONALBUNDEDHALFSPACE
 	 */
 	private static ArrayList<Point3D> getShapeDataFromIfcPolygonalBoundedHalfSpace(ModelPopulation ifcModel, EntityInstance polygon){
-		// TODO handle rotation to parent system
+		// TODO rotation to parent system necessary?
 
 		// get local origin position
 		EntityInstance localSystemPosition = polygon.getAttributeValueBNasEntityInstance("Position");
@@ -433,7 +440,6 @@ public class IFCShapeDataExtractor {
 
 		// other types are not supported right now
 		Logging.info(IFCShapeDataExtractor.class.getName() + ": " + localPolygonBoundaryType + " is not supported right now");
-
 		return null;
 	}
 
@@ -517,7 +523,7 @@ public class IFCShapeDataExtractor {
 	}
 
 	/**
-	 * Helper method to handle openings in entities. Adds opening coordinates to entity shape data. If no opening, returns null
+	 * Helper method to handle (floor-)openings in entities. Adds opening coordinates to entity shape data. If no opening, returns null
 	 * @param ifcModel ifc model
 	 * @param shapeDataOfEntity shape data of entity without opening handling
 	 * @param rootEntityOfShapeDataEntity root entity of shape representation entity
@@ -584,16 +590,5 @@ public class IFCShapeDataExtractor {
 			return Double.NaN;
 		}
 	}
-
-	/**
-	 * This type defines the three Boolean operators used in the definition of CSG solids.
-	 *
-	 */
-	private enum IfcBooleanOperator{
-		UNION,
-		INTERSECTION,
-		DIFFERENCE
-	}
-
 
 }

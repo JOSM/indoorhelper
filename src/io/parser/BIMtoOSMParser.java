@@ -105,48 +105,14 @@ public class BIMtoOSMParser {
 		// set length/ angle etc. unit
 		setUnits();
 
-
 		// transform coordinates from local system to geodetic
 		LatLon latlonBuildingOrigin = getLatLonOriginOfBuilding(filteredBIMdata.getIfcSite());
 		transformCoordinatesToLatLon(latlonBuildingOrigin, preparedBIMdata);
 
 		// pack FilteredBIMData into OSM data
-		ArrayList<Way> ways = new ArrayList<>();
-		ArrayList<Node> nodes = new ArrayList<>();
-
-		// TODO fix, for development only -----------
-		ArrayList<Pair<Double,Integer>> levelIdentifier = extractAndIdentifyLevels();
-
-		for(PreparedBIMObject3D object : preparedBIMdata){
-
-			int level = getLevelTagOfPreparedBIMObject(object, levelIdentifier);
-
-			ArrayList<Node> tmpNodes = new ArrayList<>();
-			for(LatLon point : object.getGeodeticShapeCoordinates()) {
-				Node n = new Node(point);
-				tmpNodes.add(n);
-			}
-
-			if(tmpNodes.isEmpty())	continue;
-
-			if(tmpNodes.get(0).lat() == tmpNodes.get(tmpNodes.size()-1).lat() && tmpNodes.get(0).lon() == tmpNodes.get(tmpNodes.size()-1).lon()) {
-				tmpNodes.remove(tmpNodes.size()-1);
-				nodes.addAll(tmpNodes);
-				tmpNodes.add(tmpNodes.get(0));
-			}
-			else {
-				nodes.addAll(tmpNodes);
-			}
-			Way w = new Way();
-			w.setNodes(tmpNodes);
-			getObjectTags(object).forEach(tag->{
-				w.put(tag);
-			});
-			if(level != defaultLevel)	w.put(new Tag("level", Integer.toString(level)));
-			ways.add(w);
-		}
-		// -----------
-
+		Pair<ArrayList<Node>,ArrayList<Way>> packedOSMData = packIntoOSMData(preparedBIMdata);
+		ArrayList<Node> nodes = packedOSMData.a;
+		ArrayList<Way> ways = packedOSMData.b;
 
 		// check if file is corrupted. File is corrupted if some data could not pass the preparation steps
 		if(preparedBIMdata.size() != filteredBIMdata.getSize()) {
@@ -274,6 +240,47 @@ public class BIMtoOSMParser {
 	     			    JOptionPane.ERROR_MESSAGE);
 	         }
 	     });
+	}
+
+	/**
+	 * Method packs prepared BIM data into OSM ways and nodes
+	 * @param preparedBIMdata to transform to OSM data
+	 * @return packed data
+	 */
+	private Pair<ArrayList<Node>,ArrayList<Way>> packIntoOSMData(ArrayList<PreparedBIMObject3D> preparedBIMdata) {
+		ArrayList<Way> ways = new ArrayList<>();
+		ArrayList<Node> nodes = new ArrayList<>();
+		ArrayList<Pair<Double,Integer>> levelIdentifier = extractAndIdentifyLevels();
+
+		for(PreparedBIMObject3D object : preparedBIMdata){
+			int level = getLevelTagOfPreparedBIMObject(object, levelIdentifier);
+
+			ArrayList<Node> tmpNodes = new ArrayList<>();
+			for(LatLon point : object.getGeodeticShapeCoordinates()) {
+				Node n = new Node(point);
+				tmpNodes.add(n);
+			}
+
+			if(tmpNodes.isEmpty())	continue;
+
+			if(tmpNodes.get(0).lat() == tmpNodes.get(tmpNodes.size()-1).lat() && tmpNodes.get(0).lon() == tmpNodes.get(tmpNodes.size()-1).lon()) {
+				tmpNodes.remove(tmpNodes.size()-1);
+				nodes.addAll(tmpNodes);
+				tmpNodes.add(tmpNodes.get(0));
+			}
+			else {
+				nodes.addAll(tmpNodes);
+			}
+			Way w = new Way();
+			w.setNodes(tmpNodes);
+			getObjectTags(object).forEach(tag->{
+				w.put(tag);
+			});
+			if(level != defaultLevel)	w.put(new Tag("level", Integer.toString(level)));
+			ways.add(w);
+		}
+
+		return new Pair<>(nodes,ways);
 	}
 
 	/**
