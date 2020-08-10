@@ -639,7 +639,7 @@ public class IFCShapeRepresentationIdentifier {
 		return windowElements.contains(entity);
 	}
 
-	public static boolean isIfcWindowOrIfcWall(ModelPopulation ifcModel, EntityInstance entity) {
+	public static boolean isIfcWindowOrIfcDoor(ModelPopulation ifcModel, EntityInstance entity) {
 		if(!isIfcWindow(ifcModel, entity) && !isIfcDoor(ifcModel, entity)) return false;
 		return true;
 	}

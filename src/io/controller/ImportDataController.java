@@ -157,7 +157,7 @@ public class ImportDataController implements ImportEventListener {
         });
         infoPanel.add(closeButton, GBC.std(3, 1).span(1, 2).anchor(GBC.EAST));
         MapFrame map = MainApplication.getMap();
-        map.addTopPanel(infoPanel);
+        if(map != null)	map.addTopPanel(infoPanel);
 	}
 
 }
