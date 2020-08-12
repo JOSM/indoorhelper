@@ -3,15 +3,23 @@ package unit.parser;
 
 import java.io.File;
 
+import org.junit.Rule;
 import org.junit.Test;
 
 import io.parser.BIMtoOSMParser;
+import org.openstreetmap.josm.testutils.JOSMTestRules;
 
 /**
  * Unit tests of {@link BIMtoOSMParser} class.
  * @author rebsc
  */
 public class BIMtoOSMParserTest {
+
+	/**
+	 * Setup test.
+	 */
+	@Rule
+	public JOSMTestRules test = new JOSMTestRules().preferences();
 
 	// test setup
     String resourcePathDir = System.getProperty("user.dir") + File.separator + "test" + File.separator +"resources" + File.separator;
