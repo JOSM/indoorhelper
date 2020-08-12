@@ -27,18 +27,26 @@ dependencies {
 
 archivesBaseName = "indoorhelper"
 sourceSets {
-	main {
-	  java {
-		srcDirs = ['src']
-	  }
-	  resources {
-		srcDirs = ["$projectDir"]
-		include 'data/**'
-		include 'images/**'
-		include 'README.md'
-	  }
-	}
+  main {
+    java {
+      srcDirs = ['src']
+    }
+    resources {
+      srcDirs = ["$projectDir"]
+      include 'data/**'
+      include 'images/**'
+      include 'README.md'
+    }
   }
+  test {
+    java {
+      srcDirs = ["test/unit"]
+    }
+    resources {
+      srcDirs = ["test/data"]
+    }
+  }
+}
 
 tasks.withType(JavaCompile) {
   options.compilerArgs += [
