@@ -1,6 +1,7 @@
 // License: GPL. For details, see LICENSE file.
 package io.parser.math;
 
+import org.openstreetmap.gui.jmapviewer.OsmMercator;
 import org.openstreetmap.josm.data.coor.LatLon;
 
 import io.parser.BIMtoOSMParser.IFCUnit;
@@ -13,8 +14,6 @@ import io.parser.data.Point3D;
  */
 public class ParserGeoMath {
 
-	private static double R = 6371e3;	// earth radius in meter
-
 	/**
 	 * Method transforms cartesian point to latlon point with given latlon origin coordinate (latlon for cartesian 0.0/0.0)
 	 * and cartesian unit like m or cm
@@ -24,11 +23,11 @@ public class ParserGeoMath {
 	 * @param cartesianUnit m or cm
 	 * @return latlon of cartesian point
 	 */
-	public static LatLon cartesianToGeodetic(Point3D cartesianPoint, Point3D cartesianOrigin,LatLon latLonOfCartesianOrigin, IFCUnit cartesianUnit) {
+	public static LatLon cartesianToGeodetic(Point3D cartesianPoint, Point3D cartesianOrigin, LatLon latLonOfCartesianOrigin, IFCUnit cartesianUnit) {
 		double originCartX = cartesianOrigin.getX();
 		double originCartY = cartesianOrigin.getY();
-		double originLat = degToRad(latLonOfCartesianOrigin.lat());
-		double originLon = degToRad(latLonOfCartesianOrigin.lon());
+		double originLat = Math.toRadians(latLonOfCartesianOrigin.lat());
+		double originLon = Math.toRadians(latLonOfCartesianOrigin.lon());
 		double pointX = cartesianPoint.getX();
 		double pointY = cartesianPoint.getY();
 
@@ -48,26 +47,18 @@ public class ParserGeoMath {
 		double d = Math.sqrt(Math.pow((pointX - originCartX),2) + Math.pow((pointY - originCartY),2));
 
 		double pointLat = Math.asin(
-				Math.sin(originLat)*Math.cos(d/R) +
-				Math.cos(originLat) * Math.sin(d/R) * Math.cos(bearing));
+				Math.sin(originLat)*Math.cos(d/OsmMercator.EARTH_RADIUS) +
+				Math.cos(originLat) * Math.sin(d/OsmMercator.EARTH_RADIUS) * Math.cos(bearing));
 		double pointLon = originLon +
 				Math.atan2(
-				Math.sin(bearing) * Math.sin(d/R) * Math.cos(originLat),
-				Math.cos(d/R)-Math.sin(originLat)*Math.sin(pointLat));
+				Math.sin(bearing) * Math.sin(d/OsmMercator.EARTH_RADIUS) * Math.cos(originLat),
+				Math.cos(d/OsmMercator.EARTH_RADIUS)-Math.sin(originLat)*Math.sin(pointLat));
 
-		return new LatLon(radToDeg(pointLat) , radToDeg(pointLon));
+		return new LatLon(Math.toDegrees(pointLat) , Math.toDegrees(pointLon));
 	}
 
 	public static double degreeMinutesSecondsToLatLon(double degrees, double minutes, double seconds) {
 		return degrees + (minutes/60.0) + (seconds/3600.0);
-	}
-
-	private static double degToRad(double x){
-        return x * Math.PI / 180.0;
-    }
-
-	private static double radToDeg(double x) {
-		return x /(Math.PI/180.0);
 	}
 
 }

@@ -30,12 +30,12 @@ import io.model.BIMtoOSMCatalog;
 import io.parser.data.FilteredRawBIMData;
 import io.parser.data.Point3D;
 import io.parser.data.PreparedBIMObject3D;
-import io.parser.data.helper.BIMtoOSMHelper;
-import io.parser.data.helper.IFCShapeDataExtractor;
-import io.parser.data.helper.IFCShapeRepresentationCatalog.IfcSpatialStructureElementTypes;
-import io.parser.data.helper.IFCShapeRepresentationCatalog.RepresentationIdentifier;
-import io.parser.data.helper.IFCShapeRepresentationIdentifier;
 import io.parser.data.ifc.IFCShapeRepresentationIdentity;
+import io.parser.data.ifc.IFCShapeRepresentationCatalog.IfcSpatialStructureElementTypes;
+import io.parser.data.ifc.IFCShapeRepresentationCatalog.RepresentationIdentifier;
+import io.parser.helper.BIMtoOSMHelper;
+import io.parser.helper.IFCShapeDataExtractor;
+import io.parser.helper.IFCShapeRepresentationIdentifier;
 import io.parser.math.ParserGeoMath;
 import io.parser.math.ParserMath;
 import model.TagCatalog;
@@ -201,45 +201,6 @@ public class BIMtoOSMParser {
 		}
 
 		return schema;
-	}
-
-	/**
-	 * Shows error dialog is file loading failed
-	 * @param filepath of ifc file
-	 * @param msg Error message
-	 */
-	private void showLoadingErrorView(String filepath, String msg) {
-		showErrorView(tr(msg));
-		Logging.info(this.getClass().getName() + ": " + filepath + " loading failed");
-	}
-
-	/**
-	 * Shows error dialog is file loading failed
-	 * @param filepath of IFC file
-	 * @param msg Error message
-	 * @param logInfo log info to console
-	 */
-	private void showParsingErrorView(String filepath, String msg, boolean logInfo) {
-		showErrorView(tr(msg));
-		if(logInfo) {
-			Logging.info(this.getClass().getName() + ": " + filepath + " parsing failed");
-		}
-	}
-
-	/**
-	 * Shows error dialog
-	 * @param msg Error message
-	 */
-	private void showErrorView(String msg) {
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				JOptionPane.showMessageDialog(MainApplication.getMainFrame(),
-						msg,
-	     			    "Error",
-	     			    JOptionPane.ERROR_MESSAGE);
-	         }
-	     });
 	}
 
 	/**
@@ -553,6 +514,11 @@ public class BIMtoOSMParser {
 		}
 	}
 
+	/**
+	 * Method get OSM tags describing BIM object
+	 * @param object to get OSM tags for
+	 * @return OSM Tags as array
+	 */
 	private ArrayList<Tag> getObjectTags(PreparedBIMObject3D object){
 		if(object.getType().name().contains("Slab")) {
 			return (ArrayList<Tag>) tagCatalog.getTags(TagCatalog.IndoorObject.ROOM);
@@ -573,6 +539,45 @@ public class BIMtoOSMParser {
 			return (ArrayList<Tag>) tagCatalog.getTags(TagCatalog.IndoorObject.STEPS);
 		}
 		return new ArrayList<>();
+	}
+
+	/**
+	 * Shows error dialog is file loading failed
+	 * @param filepath of ifc file
+	 * @param msg Error message
+	 */
+	private void showLoadingErrorView(String filepath, String msg) {
+		showErrorView(tr(msg));
+		Logging.info(this.getClass().getName() + ": " + filepath + " loading failed");
+	}
+
+	/**
+	 * Shows error dialog is file loading failed
+	 * @param filepath of IFC file
+	 * @param msg Error message
+	 * @param logInfo log info to console
+	 */
+	private void showParsingErrorView(String filepath, String msg, boolean logInfo) {
+		showErrorView(tr(msg));
+		if(logInfo) {
+			Logging.info(this.getClass().getName() + ": " + filepath + " parsing failed");
+		}
+	}
+
+	/**
+	 * Shows error dialog
+	 * @param msg Error message
+	 */
+	private void showErrorView(String msg) {
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				JOptionPane.showMessageDialog(MainApplication.getMainFrame(),
+						msg,
+	     			    "Error",
+	     			    JOptionPane.ERROR_MESSAGE);
+	         }
+	     });
 	}
 
 }

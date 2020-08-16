@@ -38,7 +38,7 @@ import org.openstreetmap.josm.tools.Logging;
 import io.model.ImportDataModel;
 import io.parser.BIMtoOSMParser;
 import io.renderer.ImportDataRenderer;
-import views.io.ImportBIMDataAction;
+import io.views.ImportBIMDataAction;
 
 /**
  * Import data controller class which provides the communication between the
