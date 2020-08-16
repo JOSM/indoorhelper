@@ -1,32 +1,32 @@
 // License: GPL. For details, see LICENSE file.
-package io.parser.data.helper;
+package io.parser.helper;
 
 import java.util.ArrayList;
 
 import org.openstreetmap.josm.tools.Logging;
 
 import io.model.BIMtoOSMCatalog.BIMObject;
-import io.parser.data.helper.IFCShapeRepresentationCatalog.AdvancedBrepRepresentationTypeItems;
-import io.parser.data.helper.IFCShapeRepresentationCatalog.AdvancedSweptSolidRepresentationTypeItems;
-import io.parser.data.helper.IFCShapeRepresentationCatalog.Axis2PlacementRepresentationTypeItems;
-import io.parser.data.helper.IFCShapeRepresentationCatalog.BoundingBoxRepresentationTypeItems;
-import io.parser.data.helper.IFCShapeRepresentationCatalog.BrepRepresentationTypeItems;
-import io.parser.data.helper.IFCShapeRepresentationCatalog.CSGRepresentationTypeItems;
-import io.parser.data.helper.IFCShapeRepresentationCatalog.ClippingRepresentationTypeItems;
-import io.parser.data.helper.IFCShapeRepresentationCatalog.CurveRepresentationTypeItems;
-import io.parser.data.helper.IFCShapeRepresentationCatalog.IfcBooleanOperandType;
-import io.parser.data.helper.IFCShapeRepresentationCatalog.IfcBoundedCurveTypes;
-import io.parser.data.helper.IFCShapeRepresentationCatalog.IfcRelVoidsElementTypes;
-import io.parser.data.helper.IFCShapeRepresentationCatalog.IfcSpatialStructureElementTypes;
-import io.parser.data.helper.IFCShapeRepresentationCatalog.LoopSubRepresentationTypeItems;
-import io.parser.data.helper.IFCShapeRepresentationCatalog.MappedRepresentatiobTypeItems;
-import io.parser.data.helper.IFCShapeRepresentationCatalog.ProfileDefRepresentationTypeItems;
-import io.parser.data.helper.IFCShapeRepresentationCatalog.RepresentationIdentifier;
-import io.parser.data.helper.IFCShapeRepresentationCatalog.RepresentationType;
-import io.parser.data.helper.IFCShapeRepresentationCatalog.SurfaceModelRepresentationTypeItems;
-import io.parser.data.helper.IFCShapeRepresentationCatalog.SweptSolidRepresentationTypeItems;
-import io.parser.data.helper.IFCShapeRepresentationCatalog.TessellationRepresentationTypeItems;
 import io.parser.data.ifc.IFCShapeRepresentationIdentity;
+import io.parser.data.ifc.IFCShapeRepresentationCatalog.AdvancedBrepRepresentationTypeItems;
+import io.parser.data.ifc.IFCShapeRepresentationCatalog.AdvancedSweptSolidRepresentationTypeItems;
+import io.parser.data.ifc.IFCShapeRepresentationCatalog.Axis2PlacementRepresentationTypeItems;
+import io.parser.data.ifc.IFCShapeRepresentationCatalog.BoundingBoxRepresentationTypeItems;
+import io.parser.data.ifc.IFCShapeRepresentationCatalog.BrepRepresentationTypeItems;
+import io.parser.data.ifc.IFCShapeRepresentationCatalog.CSGRepresentationTypeItems;
+import io.parser.data.ifc.IFCShapeRepresentationCatalog.ClippingRepresentationTypeItems;
+import io.parser.data.ifc.IFCShapeRepresentationCatalog.CurveRepresentationTypeItems;
+import io.parser.data.ifc.IFCShapeRepresentationCatalog.IfcBooleanOperandType;
+import io.parser.data.ifc.IFCShapeRepresentationCatalog.IfcBoundedCurveTypes;
+import io.parser.data.ifc.IFCShapeRepresentationCatalog.IfcRelVoidsElementTypes;
+import io.parser.data.ifc.IFCShapeRepresentationCatalog.IfcSpatialStructureElementTypes;
+import io.parser.data.ifc.IFCShapeRepresentationCatalog.LoopSubRepresentationTypeItems;
+import io.parser.data.ifc.IFCShapeRepresentationCatalog.MappedRepresentatiobTypeItems;
+import io.parser.data.ifc.IFCShapeRepresentationCatalog.ProfileDefRepresentationTypeItems;
+import io.parser.data.ifc.IFCShapeRepresentationCatalog.RepresentationIdentifier;
+import io.parser.data.ifc.IFCShapeRepresentationCatalog.RepresentationType;
+import io.parser.data.ifc.IFCShapeRepresentationCatalog.SurfaceModelRepresentationTypeItems;
+import io.parser.data.ifc.IFCShapeRepresentationCatalog.SweptSolidRepresentationTypeItems;
+import io.parser.data.ifc.IFCShapeRepresentationCatalog.TessellationRepresentationTypeItems;
 import nl.tue.buildingsmart.express.population.EntityInstance;
 import nl.tue.buildingsmart.express.population.ModelPopulation;
 

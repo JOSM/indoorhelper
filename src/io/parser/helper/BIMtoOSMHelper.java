@@ -1,5 +1,5 @@
 // License: GPL. For details, see LICENSE file.
-package io.parser.data.helper;
+package io.parser.helper;
 
 import java.util.ArrayList;
 import java.util.Vector;
@@ -10,9 +10,9 @@ import io.model.BIMtoOSMCatalog;
 import io.parser.data.FilteredRawBIMData;
 import io.parser.data.Point3D;
 import io.parser.data.PreparedBIMObject3D;
-import io.parser.data.helper.IFCShapeRepresentationCatalog.IfcSlabTypeEnum;
-import io.parser.data.helper.IFCShapeRepresentationCatalog.RepresentationIdentifier;
 import io.parser.data.ifc.IFCShapeRepresentationIdentity;
+import io.parser.data.ifc.IFCShapeRepresentationCatalog.IfcSlabTypeEnum;
+import io.parser.data.ifc.IFCShapeRepresentationCatalog.RepresentationIdentifier;
 import io.parser.math.ParserMath;
 import nl.tue.buildingsmart.express.population.EntityInstance;
 import nl.tue.buildingsmart.express.population.ModelPopulation;
@@ -129,6 +129,7 @@ public class BIMtoOSMHelper {
 	 * @return Prepared BIM objects
 	 */
 	public static ArrayList<PreparedBIMObject3D> prepareBIMObjects(ModelPopulation ifcModel, int BIMFileRootId, BIMtoOSMCatalog.BIMObject objectType, Vector<EntityInstance> BIMObjects){
+		// TODO improve object placement determination
 
 		ArrayList<PreparedBIMObject3D> preparedObjects = new ArrayList<>();
 
@@ -138,25 +139,25 @@ public class BIMtoOSMHelper {
 
 			// get rotation matrices of object
 			double[][] xRotMatrix = getXAxisRotationMatrix(BIMFileRootId, object);
-//			double[][] zRotMatrix = getZAxisRotationMatrix(ifcModel, BIMFileRootId, object);
+			double[][] zRotMatrix = getZAxisRotationMatrix(ifcModel, BIMFileRootId, object);
 
 			// get local points representing shape of object
 			ArrayList<Point3D> shapeDataOfObject = getShapeDataOfObject(ifcModel, object);
 
 			// create PreparedBIMObject3D and save
 			if(cartesianPlacementOfObject != null && (shapeDataOfObject != null && !shapeDataOfObject.isEmpty())) {
-				// z-axis rotation
-//				if(zRotMatrix != null) {
-//					for(Point3D point : shapeDataOfObject) {
-//						double[] pointAsVector = {point.getX(), point.getY(), point.getZ()};
-//						double[] rotatedPoint = ParserMath.rotate3DPoint(pointAsVector, zRotMatrix);
-//						point.setX(rotatedPoint[0]);
-//						point.setY(rotatedPoint[1]);
-//						point.setZ(rotatedPoint[2]);
-//					}
-//				}
+				// rotation about z-axis
+				if(zRotMatrix != null) {
+					for(Point3D point : shapeDataOfObject) {
+						double[] pointAsVector = {point.getX(), point.getY(), point.getZ()};
+						double[] rotatedPoint = ParserMath.rotate3DPoint(pointAsVector, zRotMatrix);
+						point.setX(rotatedPoint[0]);
+						point.setY(rotatedPoint[1]);
+						point.setZ(rotatedPoint[2]);
+					}
+				}
 
-				// x-axis rotation
+				// rotation about x-axis
 				for(Point3D point : shapeDataOfObject) {
 					if(point.equalsPoint3D(IFCShapeDataExtractor.defaultPoint))	continue;	// for workaround
 					double[] pointAsVector = {point.getX(), point.getY(), point.getZ()};
@@ -168,11 +169,11 @@ public class BIMtoOSMHelper {
 					}
 				}
 
-				// transform points to object placement origin
+				// translate points to object placement origin
 				for(Point3D point : shapeDataOfObject) {
 					if(point.equalsPoint3D(IFCShapeDataExtractor.defaultPoint))	continue;	// for workaround
-					point.setX(point.getX() + cartesianPlacementOfObject.getX());
-					point.setY(point.getY() + cartesianPlacementOfObject.getY());
+						point.setX(point.getX() + cartesianPlacementOfObject.getX());
+						point.setY(point.getY() + cartesianPlacementOfObject.getY());
 				}
 
 				// Check if data includes IFCShapeDataExtractor.defaultPoint. IFCShapeDataExtractor.defaultPoint got added
@@ -347,10 +348,6 @@ public class BIMtoOSMHelper {
 			}
 		}
 
-		// check if rotAngle greater than 6.28319 rad or smaller than -6.28319 rad
-		if(rotAngle > 6.28319)	rotAngle -= 6.28319;
-		if(rotAngle < -6.28319)	rotAngle += 6.28319;
-
 		// pack and return rotation matrix about x-axis
 		return ParserMath.getRotationMatrixAboutZAxis(rotAngle);
 	}
@@ -416,9 +413,6 @@ public class BIMtoOSMHelper {
 				parentZVector[2] = z;
 			}
 		}
-		// check if rotAngle greater than 6.28319 rad or smaller than -6.28319 rad
-		if(rotAngle > 6.28319)	rotAngle -= 6.28319;
-		if(rotAngle < -6.28319)	rotAngle += 6.28319;
 
 		// pack and return rotation matrix about z-axis
 		return ParserMath.getRotationMatrixAboutYAxis(rotAngle);

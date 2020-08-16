@@ -1,5 +1,5 @@
 // License: GPL. For details, see LICENSE file.
-package views.io;
+package io.views;
 
 import static org.openstreetmap.josm.tools.I18n.tr;
 

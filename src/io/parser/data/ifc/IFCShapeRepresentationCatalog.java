@@ -1,5 +1,5 @@
 // License: GPL. For details, see LICENSE file.
-package io.parser.data.helper;
+package io.parser.data.ifc;
 
 /**
  *

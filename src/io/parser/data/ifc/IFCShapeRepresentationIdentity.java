@@ -1,8 +1,8 @@
 // License: GPL. For details, see LICENSE file.
 package io.parser.data.ifc;
 
-import io.parser.data.helper.IFCShapeRepresentationCatalog.RepresentationIdentifier;
-import io.parser.data.helper.IFCShapeRepresentationCatalog.RepresentationType;
+import io.parser.data.ifc.IFCShapeRepresentationCatalog.RepresentationIdentifier;
+import io.parser.data.ifc.IFCShapeRepresentationCatalog.RepresentationType;
 import nl.tue.buildingsmart.express.population.EntityInstance;
 
 /**
