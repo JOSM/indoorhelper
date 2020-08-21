@@ -1,4 +1,4 @@
-// License: GPL. For details, see LICENSE file.
+// License: AGPL. For details, see LICENSE file.
 package controller;
 
 import static org.openstreetmap.josm.tools.I18n.tr;

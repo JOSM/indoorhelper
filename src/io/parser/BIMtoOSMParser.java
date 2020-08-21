@@ -1,4 +1,4 @@
-// License: GPL. For details, see LICENSE file.
+// License: AGPL. For details, see LICENSE file.
 package io.parser;
 
 import static org.openstreetmap.josm.tools.I18n.tr;
@@ -30,9 +30,9 @@ import io.model.BIMtoOSMCatalog;
 import io.parser.data.FilteredRawBIMData;
 import io.parser.data.Point3D;
 import io.parser.data.PreparedBIMObject3D;
-import io.parser.data.ifc.IFCShapeRepresentationIdentity;
 import io.parser.data.ifc.IFCShapeRepresentationCatalog.IfcSpatialStructureElementTypes;
 import io.parser.data.ifc.IFCShapeRepresentationCatalog.RepresentationIdentifier;
+import io.parser.data.ifc.IFCShapeRepresentationIdentity;
 import io.parser.helper.BIMtoOSMHelper;
 import io.parser.helper.IFCShapeDataExtractor;
 import io.parser.helper.IFCShapeRepresentationIdentifier;

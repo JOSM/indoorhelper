@@ -1,4 +1,4 @@
-// License: GPL. For details, see LICENSE file.
+// License: AGPL. For details, see LICENSE file.
 package org.openstreetmap.josm.plugins.indoorhelper;
 
 import java.io.File;

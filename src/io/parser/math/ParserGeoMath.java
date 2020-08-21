@@ -1,4 +1,4 @@
-// License: GPL. For details, see LICENSE file.
+// License: AGPL. For details, see LICENSE file.
 package io.parser.math;
 
 import org.openstreetmap.gui.jmapviewer.OsmMercator;
