@@ -1,4 +1,4 @@
-// License: GPL. For details, see LICENSE file.
+// License: AGPL. For details, see LICENSE file.
 package io.parser.math;
 
 /**
@@ -38,7 +38,7 @@ public class ParserMath {
 			a_abs = Math.sqrt(Math.pow(vector1[0], 2.0) + Math.pow(vector1[1], 2.0) + Math.pow(vector1[2], 2.0));
 			b_abs = Math.sqrt(Math.pow(vector2[0], 2.0) + Math.pow(vector2[1], 2.0) + Math.pow(vector2[2], 2.0));
 			r = ab / (a_abs * b_abs);
-			if(result2DWithSign < 0 && Math.acos(r) > 0)	return -(Math.acos(r));
+			if(result2DWithSign < 0 && Math.acos(r) > 0)	return -Math.acos(r);
 			return Math.acos(r);
 
 		}

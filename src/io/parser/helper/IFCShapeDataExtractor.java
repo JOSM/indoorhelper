@@ -1,4 +1,4 @@
-// License: GPL. For details, see LICENSE file.
+// License: AGPL. For details, see LICENSE file.
 package io.parser.helper;
 
 import java.util.ArrayList;
@@ -7,7 +7,6 @@ import java.util.Vector;
 import org.openstreetmap.josm.tools.Logging;
 
 import io.parser.data.Point3D;
-import io.parser.data.ifc.IFCShapeRepresentationIdentity;
 import io.parser.data.ifc.IFCShapeRepresentationCatalog.AdvancedBrepRepresentationTypeItems;
 import io.parser.data.ifc.IFCShapeRepresentationCatalog.AdvancedSweptSolidRepresentationTypeItems;
 import io.parser.data.ifc.IFCShapeRepresentationCatalog.BoundingBoxRepresentationTypeItems;
@@ -23,6 +22,7 @@ import io.parser.data.ifc.IFCShapeRepresentationCatalog.ProfileDefRepresentation
 import io.parser.data.ifc.IFCShapeRepresentationCatalog.SurfaceModelRepresentationTypeItems;
 import io.parser.data.ifc.IFCShapeRepresentationCatalog.SweptSolidRepresentationTypeItems;
 import io.parser.data.ifc.IFCShapeRepresentationCatalog.TessellationRepresentationTypeItems;
+import io.parser.data.ifc.IFCShapeRepresentationIdentity;
 import nl.tue.buildingsmart.express.population.EntityInstance;
 import nl.tue.buildingsmart.express.population.ModelPopulation;
 

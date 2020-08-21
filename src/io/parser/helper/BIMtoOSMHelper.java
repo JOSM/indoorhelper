@@ -1,4 +1,4 @@
-// License: GPL. For details, see LICENSE file.
+// License: AGPL. For details, see LICENSE file.
 package io.parser.helper;
 
 import java.util.ArrayList;
@@ -10,9 +10,9 @@ import io.model.BIMtoOSMCatalog;
 import io.parser.data.FilteredRawBIMData;
 import io.parser.data.Point3D;
 import io.parser.data.PreparedBIMObject3D;
-import io.parser.data.ifc.IFCShapeRepresentationIdentity;
 import io.parser.data.ifc.IFCShapeRepresentationCatalog.IfcSlabTypeEnum;
 import io.parser.data.ifc.IFCShapeRepresentationCatalog.RepresentationIdentifier;
+import io.parser.data.ifc.IFCShapeRepresentationIdentity;
 import io.parser.math.ParserMath;
 import nl.tue.buildingsmart.express.population.EntityInstance;
 import nl.tue.buildingsmart.express.population.ModelPopulation;

@@ -1,4 +1,4 @@
-// License: GPL. For details, see LICENSE file.
+// License: AGPL. For details, see LICENSE file.
 package unit.model;
 
 import static org.junit.Assert.assertEquals;
