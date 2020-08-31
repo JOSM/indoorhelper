@@ -134,7 +134,7 @@ public class ImportDataController implements ImportEventListener {
         JMultilineLabel iLabel = new JMultilineLabel(
                 tr("BIM importer is in beta version! \n You can help to improve the BIM import by reporting bugs or other issues. " +
                 		"For more details see the logfile: <i>C:/tmp/.josm/logfile_indoorhelper.log</i>"));
-        UrlLabel issueURL = new UrlLabel(Config.getUrls().getJOSMWebsite() + "/newticket", tr("Report issue..."));
+        UrlLabel issueURL = new UrlLabel(Config.getUrls().getJOSMWebsite() + "/newticket", tr("Report bug"));
         issueURL.setFont(font);
         iLabel.setFont(font);
         iLabel.setForeground(Color.BLACK);
