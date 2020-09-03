@@ -24,7 +24,7 @@ dependencies {
   testImplementation("org.awaitility:awaitility:4.0.2")
   compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
   compile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.25'
-  implementation 'org.opensourcebim:BuildingSMARTLibrary:1.0.9'
+  compile 'org.opensourcebim:BuildingSMARTLibrary:1.0.9'
 }
 
 archivesBaseName = "indoorhelper"
