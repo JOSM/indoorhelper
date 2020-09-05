@@ -1,7 +1,7 @@
 plugins {
   id "java"
   id "eclipse"
-  id("org.openstreetmap.josm").version("0.7.0")
+  id "org.openstreetmap.josm" version "0.7.0"
 }
 
 sourceCompatibility = 1.8
@@ -24,7 +24,7 @@ dependencies {
   testImplementation("org.awaitility:awaitility:4.0.2")
   compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
   compile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.25'
-  compile 'org.opensourcebim:BuildingSMARTLibrary:1.0.9'
+  packIntoJar("org.opensourcebim:BuildingSMARTLibrary:1.0.9")
 }
 
 archivesBaseName = "indoorhelper"
@@ -37,6 +37,7 @@ sourceSets {
       srcDirs = ["$projectDir"]
       include 'data/**'
       include 'images/**'
+      include 'resources/**'
       include 'README.md'
     }
   }

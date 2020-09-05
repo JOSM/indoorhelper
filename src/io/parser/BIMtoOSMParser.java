@@ -17,6 +17,7 @@ import java.util.Vector;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
+import org.openstreetmap.josm.data.Preferences;
 import org.openstreetmap.josm.data.coor.LatLon;
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.Tag;
@@ -53,8 +54,10 @@ public class BIMtoOSMParser {
 	private final String FLAG_IFC2X3_TC1 = "FILE_SCHEMA(('IFC2X3_TC1'))";
 	private final String FLAG_IFC2X3 = "FILE_SCHEMA(('IFC2X3'))";
 	private final String FLAG_IFC4 = "FILE_SCHEMA(('IFC4'))";
-	private final String resourcePathDir = System.getProperty("user.dir") + File.separator + "resources" + File.separator;
-	private String ifcSchemaFilePath = resourcePathDir + "IFC2X3_TC1.exp"; // default
+	private final String resourcePathDir = Preferences.main().getPluginsDirectory().toString() + "/indoorhelper/resources/";
+	private final String IFC2X3_TC1_Schema = "IFC2X3_TC1.exp";
+	private final String IFC4_Schema = "IFC4.exp";
+	private String ifcSchemaFilePath = resourcePathDir + IFC2X3_TC1_Schema; // default
 
 	private ImportEventListener importListener;
 	private FileInputStream inputfs = null;
@@ -139,7 +142,7 @@ public class BIMtoOSMParser {
 				return false;
 			}
 			if(usedIfcSchema.equals(FLAG_IFC4)) {
-				ifcSchemaFilePath = resourcePathDir + "IFC4.exp";
+				ifcSchemaFilePath = resourcePathDir + IFC4_Schema;
 			}
 
 			// load IFC file

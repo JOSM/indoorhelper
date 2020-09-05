@@ -10,9 +10,14 @@ import java.awt.Font;
 import java.awt.GridBagLayout;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.jar.JarFile;
 import java.util.logging.FileHandler;
 import java.util.logging.SimpleFormatter;
+import java.util.zip.ZipEntry;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -23,6 +28,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 
 import org.openstreetmap.josm.actions.JosmAction;
+import org.openstreetmap.josm.data.Preferences;
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.gui.MainApplication;
@@ -72,6 +78,13 @@ public class ImportDataController implements ImportEventListener {
 		} catch (SecurityException | IOException e) {
 			Logging.info(e.getMessage());
 		}
+
+		// export resource files from jar to file system used by BuildingSMARTLibrary
+		try {
+			exportPluginResource();
+		} catch (Exception e) {
+			Logging.info(e.getMessage());
+		}
 	}
 
 	@Override
@@ -100,7 +113,6 @@ public class ImportDataController implements ImportEventListener {
 	@Override
 	public void onDataParsed(ArrayList<Way> ways, ArrayList<Node> nodes) {
 		model.setImportData(ways, nodes);
-
 		String layerName = String.format("BIMObject%2d", MainApplication.getLayerManager().getLayers().size());
 		if(importedFilepath != null) {
 			String[] parts = importedFilepath.split(File.separator.equals ("\\")? "\\\\": "/");
@@ -158,6 +170,27 @@ public class ImportDataController implements ImportEventListener {
         infoPanel.add(closeButton, GBC.std(3, 1).span(1, 2).anchor(GBC.EAST));
         MapFrame map = MainApplication.getMap();
         if(map != null)	map.addTopPanel(infoPanel);
+	}
+
+	/**
+	 * Export resources embedded in jar into file system
+	 * @throws Exception
+	 */
+	private void exportPluginResource() throws Exception{
+		File jarFile = new File(ImportDataController.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
+		String jarPath = Preferences.main().getPluginsDirectory().toString();
+		if(jarFile.isFile()) {
+			Logging.info("Copying resource files from jar to file system");
+		    JarFile jar = new JarFile(jarFile);
+		    ZipEntry ze1 = jar.getEntry("resources/IFC2X3_TC1.exp");
+		    ZipEntry ze2 = jar.getEntry("resources/IFC4.exp");
+		    InputStream is1 = jar.getInputStream(ze1);
+		    InputStream is2 = jar.getInputStream(ze2);
+		    new File(jarPath + "/indoorhelper/resources").mkdirs();
+		    Files.copy(is1, Paths.get(jarPath + "/indoorhelper/resources/IFC2X3_TC1.exp"));
+		    Files.copy(is2, Paths.get(jarPath + "/indoorhelper/resources/IFC4.exp"));
+		    jar.close();
+		}
 	}
 
 }
