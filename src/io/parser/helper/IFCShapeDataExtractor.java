@@ -2,27 +2,28 @@
 package io.parser.helper;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
+import io.parser.data.IFCShapeRepresentationIdentity;
 import org.openstreetmap.josm.tools.Logging;
 
 import io.parser.data.Point3D;
-import io.parser.data.ifc.IFCShapeRepresentationCatalog.AdvancedBrepRepresentationTypeItems;
-import io.parser.data.ifc.IFCShapeRepresentationCatalog.AdvancedSweptSolidRepresentationTypeItems;
-import io.parser.data.ifc.IFCShapeRepresentationCatalog.BoundingBoxRepresentationTypeItems;
-import io.parser.data.ifc.IFCShapeRepresentationCatalog.BrepRepresentationTypeItems;
-import io.parser.data.ifc.IFCShapeRepresentationCatalog.CSGRepresentationTypeItems;
-import io.parser.data.ifc.IFCShapeRepresentationCatalog.ClippingRepresentationTypeItems;
-import io.parser.data.ifc.IFCShapeRepresentationCatalog.CurveRepresentationTypeItems;
-import io.parser.data.ifc.IFCShapeRepresentationCatalog.IfcBooleanOperandType;
-import io.parser.data.ifc.IFCShapeRepresentationCatalog.IfcBoundedCurveTypes;
-import io.parser.data.ifc.IFCShapeRepresentationCatalog.LoopSubRepresentationTypeItems;
-import io.parser.data.ifc.IFCShapeRepresentationCatalog.MappedRepresentatiobTypeItems;
-import io.parser.data.ifc.IFCShapeRepresentationCatalog.ProfileDefRepresentationTypeItems;
-import io.parser.data.ifc.IFCShapeRepresentationCatalog.SurfaceModelRepresentationTypeItems;
-import io.parser.data.ifc.IFCShapeRepresentationCatalog.SweptSolidRepresentationTypeItems;
-import io.parser.data.ifc.IFCShapeRepresentationCatalog.TessellationRepresentationTypeItems;
-import io.parser.data.ifc.IFCShapeRepresentationIdentity;
+import io.parser.data.IFCShapeRepresentationCatalog.AdvancedBrepRepresentationTypeItems;
+import io.parser.data.IFCShapeRepresentationCatalog.AdvancedSweptSolidRepresentationTypeItems;
+import io.parser.data.IFCShapeRepresentationCatalog.BoundingBoxRepresentationTypeItems;
+import io.parser.data.IFCShapeRepresentationCatalog.BrepRepresentationTypeItems;
+import io.parser.data.IFCShapeRepresentationCatalog.CSGRepresentationTypeItems;
+import io.parser.data.IFCShapeRepresentationCatalog.ClippingRepresentationTypeItems;
+import io.parser.data.IFCShapeRepresentationCatalog.CurveRepresentationTypeItems;
+import io.parser.data.IFCShapeRepresentationCatalog.IfcBooleanOperandType;
+import io.parser.data.IFCShapeRepresentationCatalog.IfcBoundedCurveTypes;
+import io.parser.data.IFCShapeRepresentationCatalog.LoopSubRepresentationTypeItems;
+import io.parser.data.IFCShapeRepresentationCatalog.MappedRepresentatiobTypeItems;
+import io.parser.data.IFCShapeRepresentationCatalog.ProfileDefRepresentationTypeItems;
+import io.parser.data.IFCShapeRepresentationCatalog.SurfaceModelRepresentationTypeItems;
+import io.parser.data.IFCShapeRepresentationCatalog.SweptSolidRepresentationTypeItems;
+import io.parser.data.IFCShapeRepresentationCatalog.TessellationRepresentationTypeItems;
 import nl.tue.buildingsmart.express.population.EntityInstance;
 import nl.tue.buildingsmart.express.population.ModelPopulation;
 
@@ -33,7 +34,7 @@ import nl.tue.buildingsmart.express.population.ModelPopulation;
  */
 public class IFCShapeDataExtractor {
 
-	public static Point3D defaultPoint = new Point3D(-99.0, -99.0, -99.0);
+	public static final Point3D defaultPoint = new Point3D(-99.0, -99.0, -99.0);
 
 	/**
 	 * This type defines the three Boolean operators used in the definition of CSG solids.
@@ -51,7 +52,7 @@ public class IFCShapeDataExtractor {
 	 * @param bodyRepresentation representation of body
 	 * @return List of points representing object shape or null if object type not supported
 	 */
-	public static ArrayList<Point3D> getDataFromBodyRepresentation(ModelPopulation ifcModel, IFCShapeRepresentationIdentity bodyRepresentation) {
+	public static List<Point3D> getDataFromBodyRepresentation(ModelPopulation ifcModel, IFCShapeRepresentationIdentity bodyRepresentation) {
 		ArrayList<Point3D> shapeRep = new ArrayList<>();
 
 		// get IFCOBJECT and REPRESENTATIONIDENTIFIER
@@ -79,7 +80,7 @@ public class IFCShapeDataExtractor {
 			else if(repItemType.equals(BrepRepresentationTypeItems.IfcFacetedBrep.name())) {
 				ArrayList<Point3D> shapeData = getShapeDataFromIfcFacetedBrep(ifcModel, item);
 				// check if entity includes(floor-)openings and handle them
-				// shapeDataWithOpeningHandling is null, if no openings exists or type of opening not supported
+				// shapeDataWithOpeningHandling will be null, if no openings exists or type of opening not supported
 				ArrayList<Point3D> shapeDataWithOpeningHandling = handleOpeningsInEntityShape(ifcModel, shapeData, bodyRepresentation.getRootObjectEntity());
 				if(shapeDataWithOpeningHandling != null)	shapeRep.addAll(shapeDataWithOpeningHandling);
 				else if(shapeData != null) shapeRep.addAll(shapeData);
@@ -99,7 +100,7 @@ public class IFCShapeDataExtractor {
 			else if(repItemType.equals(ClippingRepresentationTypeItems.IfcBooleanClippingResult.name())) {
 				ArrayList<Point3D> shapeData = getShapeDataFromIfcBooleanResult(ifcModel, item, IfcBooleanOperator.DIFFERENCE);
 				// check if entity includes(floor-)openings and handle them
-				// shapeDataWithOpeningHandling is null, if no openings exists or type of opening not supported
+				// shapeDataWithOpeningHandling will be null, if no openings exists or type of opening not supported
 				ArrayList<Point3D> shapeDataWithOpeningHandling = handleOpeningsInEntityShape(ifcModel, shapeData, bodyRepresentation.getRootObjectEntity());
 				if(shapeDataWithOpeningHandling != null)	shapeRep.addAll(shapeDataWithOpeningHandling);
 				else if(shapeData != null) shapeRep.addAll(shapeData);
@@ -116,7 +117,7 @@ public class IFCShapeDataExtractor {
 			else if(repItemType.equals(SweptSolidRepresentationTypeItems.IfcExtrudedAreaSolid.name())) {
 				ArrayList<Point3D> shapeData = getShapeDataFromIfcExtrudedAreaSolid(ifcModel, item);
 				// check if entity includes(floor-)openings and handle them
-				// shapeDataWithOpeningHandling is null, if no openings exists or type of opening not supported
+				// shapeDataWithOpeningHandling will be null, if no openings exists or type of opening not supported
 				ArrayList<Point3D> shapeDataWithOpeningHandling = handleOpeningsInEntityShape(ifcModel, shapeData, bodyRepresentation.getRootObjectEntity());
 				if(shapeDataWithOpeningHandling != null)	shapeRep.addAll(shapeDataWithOpeningHandling);
 				else if(shapeData != null) shapeRep.addAll(shapeData);
@@ -141,7 +142,7 @@ public class IFCShapeDataExtractor {
 	 * @param boxRepresentation representation of box
 	 * @return List of points representing object shape or null if object type not supported
 	 */
-	public static ArrayList<Point3D> getDataFromBoxRepresentation(ModelPopulation ifcModel, IFCShapeRepresentationIdentity boxRepresentation) {
+	public static List<Point3D> getDataFromBoxRepresentation(ModelPopulation ifcModel, IFCShapeRepresentationIdentity boxRepresentation) {
 		ArrayList<Point3D> shapeRep = new ArrayList<>();
 
 		// get IFCObject and RepresentationIdentifier
@@ -160,6 +161,7 @@ public class IFCShapeDataExtractor {
 				// get cartesian point of bounding box
 				EntityInstance cartesianCorner = item.getAttributeValueBNasEntityInstance("Corner");
 				Point3D cPointAsPoint3D	= IfcCartesianCoordinateToPoint3D(cartesianCorner);
+				if(cPointAsPoint3D == null) return null;
 				double xDim = prepareDoubleString((String)item.getAttributeValueBN("XDim"));
 				double yDim = prepareDoubleString((String)item.getAttributeValueBN("YDim"));
 				// get points of shape
@@ -238,15 +240,11 @@ public class IFCShapeDataExtractor {
 
 		// get IFCFACEBOUNDs of every IFCFACE
 		ArrayList<EntityInstance> faceBoundsOfClosedShell = new ArrayList<>();
-		facesOfClosedShell.forEach(face->{
-			faceBoundsOfClosedShell.addAll(face.getAttributeValueBNasEntityInstanceList("Bounds"));
-		});
+		facesOfClosedShell.forEach(face-> faceBoundsOfClosedShell.addAll(face.getAttributeValueBNasEntityInstanceList("Bounds")));
 
 		// get IFCLOOPs of every IFCFACEBOUND
 		ArrayList<EntityInstance> loopsOfClosedShell = new ArrayList<>();
-		faceBoundsOfClosedShell.forEach(bound->{
-			loopsOfClosedShell.addAll(bound.getAttributeValueBNasEntityInstanceList("Bound"));
-		});
+		faceBoundsOfClosedShell.forEach(bound-> loopsOfClosedShell.addAll(bound.getAttributeValueBNasEntityInstanceList("Bound")));
 
 		// collect points of IFCLOOPs
 		ArrayList<Point3D> shapePoints = new ArrayList<>();
@@ -430,11 +428,10 @@ public class IFCShapeDataExtractor {
 		String localPolygonBoundaryType = IFCShapeRepresentationIdentifier.getIfcBoundedCurveType(ifcModel, localPolygonBoundary);
 
 		// get coordinates of boundary
+		assert localPolygonBoundaryType != null;
 		if(localPolygonBoundaryType.equals(IfcBoundedCurveTypes.IfcPolyline.name())) {
 			ArrayList<Point3D> pointsOfPolyline = getCoordinatesFromIfcPolyline(localPolygonBoundary);
-			pointsOfPolyline.forEach(point->{
-				point = new Point3D(locationPoint3D.getX()+ point.getX(), locationPoint3D.getY() + point.getY(), 0.0);
-			});
+			pointsOfPolyline.forEach(point-> point = new Point3D(locationPoint3D.getX()+ point.getX(), locationPoint3D.getY() + point.getY(), 0.0));
 			return pointsOfPolyline;
 		}
 
@@ -491,9 +488,7 @@ public class IFCShapeDataExtractor {
 				if(IFCShapeRepresentationIdentifier.isIfcPolyline(ifcModel, outerCurve)) {
 					// extract coordinates
 					ArrayList<Point3D> pointsOfPolyline = getCoordinatesFromIfcPolyline(outerCurve);
-					pointsOfPolyline.forEach(point ->{
-						point = new Point3D(locationPoint3D.getX()+ point.getX(), locationPoint3D.getY() + point.getY(), 0.0);
-					});
+					pointsOfPolyline.forEach(point -> point = new Point3D(locationPoint3D.getX()+ point.getX(), locationPoint3D.getY() + point.getY(), 0.0));
 					return pointsOfPolyline;
 				}
 			}
@@ -517,6 +512,7 @@ public class IFCShapeDataExtractor {
 		ArrayList<Point3D> cartesianPointsOfSArea = new ArrayList<>();
 		points.forEach(point ->{
 			Point3D pointAsPoint3D = IfcCartesianCoordinateToPoint3D(point);
+			assert pointAsPoint3D != null;
 			cartesianPointsOfSArea.add(new Point3D(pointAsPoint3D.getX(),pointAsPoint3D.getY(), 0.0));
 		});
 		return cartesianPointsOfSArea;
@@ -543,9 +539,9 @@ public class IFCShapeDataExtractor {
 
 		if(IFCShapeRepresentationIdentifier.isIfcOpeningElement(ifcModel, openingElement)) {
 			// get shape data of RelatedOpeningElement and RelatingBuildingObject
-			ArrayList<Point3D> shapeDataOfRelatedOpeningElement = BIMtoOSMHelper.getShapeDataOfObject(ifcModel, openingElement);
+			List<Point3D> shapeDataOfRelatedOpeningElement = BIMtoOSMHelper.getShapeDataOfObject(ifcModel, openingElement);
 			// subtract points of shapeDataOfRelatinBuildingElement from shapeDataOfRelatinBuildingElement
-			return getShapeDataFromIfcFeatureElementSubtraction(shapeDataOfEntity, shapeDataOfRelatedOpeningElement);
+			return getShapeDataFromIfcFeatureElementSubtraction(shapeDataOfEntity, (ArrayList<Point3D>)shapeDataOfRelatedOpeningElement);
 		}
 
 		// IfcVoidingFeature as opening element is not supported right now
@@ -579,7 +575,7 @@ public class IFCShapeDataExtractor {
 	 * @return double representing double
 	 */
 	public static double prepareDoubleString(String doubleString) {
-		if(doubleString == null)	return Double.NaN;;
+		if(doubleString == null)	return Double.NaN;
 		if(doubleString.endsWith(".")) {
 			doubleString = doubleString + "0";
 		}

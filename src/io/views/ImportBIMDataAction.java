@@ -21,7 +21,7 @@ import io.controller.ImportEventListener;
 @SuppressWarnings("serial")
 public class ImportBIMDataAction extends JosmAction {
 
-	ImportEventListener importListener;
+	private ImportEventListener importListener;
 
 	public ImportBIMDataAction(ImportEventListener listener){
 		super(tr("Import BIM File"), "dialogs/bim_small", null, null, false);

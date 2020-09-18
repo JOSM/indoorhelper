@@ -96,11 +96,7 @@ public class IndoorLevel {
     }
 
     public boolean hasEmptyName() {
-        if (this.nameTag == null) {
-            return true;
-        } else {
-            return false;
-        }
+        return this.nameTag == null;
     }
 
     public static boolean isPartOfWorkingLevel(String vals, int level) {

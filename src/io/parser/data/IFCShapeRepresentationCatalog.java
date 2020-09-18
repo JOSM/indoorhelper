@@ -1,5 +1,5 @@
 // License: AGPL. For details, see LICENSE file.
-package io.parser.data.ifc;
+package io.parser.data;
 
 /**
  *

@@ -54,98 +54,94 @@ import io.views.ImportBIMDataAction;
  */
 public class ImportDataController implements ImportEventListener {
 
-	private final ImportDataModel model;
-	private JosmAction importBIMAction;
-	private BIMtoOSMParser parser;
+    private final ImportDataModel model;
+    private BIMtoOSMParser parser;
 
-	private JProgressBar progressBar;
-	private JFrame progressFrame;
+    private JFrame progressFrame;
 
-	private String importedFilepath;
+    private String importedFilepath;
 
-	public ImportDataController() {
-		model = new ImportDataModel();
-		parser = new BIMtoOSMParser(this);
-		importBIMAction = new ImportBIMDataAction(this);
-		MainMenu.add(MainApplication.getMenu().fileMenu, importBIMAction, false, 21);
-		initProgressProcess();
+    public ImportDataController() {
+        model = new ImportDataModel();
+        parser = new BIMtoOSMParser(this);
+        JosmAction importBIMAction = new ImportBIMDataAction(this);
+        MainMenu.add(MainApplication.getMenu().fileMenu, importBIMAction, false, 21);
+        initProgressProcess();
 
-		// add log file handler
-		try {
-			FileHandler fh = new FileHandler("C:/tmp/.josm/logfile_indoorhelper.log");
-	        fh.setFormatter(new SimpleFormatter());
-			Logging.getLogger().addHandler(fh);
-		} catch (SecurityException | IOException e) {
-			Logging.info(e.getMessage());
-		}
+        // add log file handler
+        try {
+            FileHandler fh = new FileHandler("C:/tmp/.josm/logfile_indoorhelper.log");
+            fh.setFormatter(new SimpleFormatter());
+            Logging.getLogger().addHandler(fh);
+        } catch (SecurityException | IOException e) {
+            Logging.info(e.getMessage());
+        }
 
-		// export resource files from jar to file system used by BuildingSMARTLibrary
-		try {
-			exportPluginResource();
-		} catch (Exception e) {
-			Logging.info(e.getMessage());
-		}
-	}
+        // export resource files from jar to file system used by BuildingSMARTLibrary
+        try {
+            exportPluginResource();
+        } catch (Exception e) {
+            Logging.info(e.getMessage());
+        }
+    }
 
-	@Override
-	public void onBIMImport(String filepath) {
-		importBIMData(filepath);
-	}
+    @Override
+    public void onBIMImport(String filepath) {
+        importBIMData(filepath);
+    }
 
-	/**
-	 * Method handles parsing of import data.
-	 * @param filepath Full path of import file
-	 */
-	private void importBIMData(String filepath) {
-		addInfoLabel();
-		importedFilepath = filepath;
-		progressFrame.setVisible(true);
-		// parse data, parse on extra thread to show progress bar while parsing
-		new Thread(new Runnable() {
-			@Override
-	        public void run() {
-				parser.parse(filepath);
-			 	progressFrame.setVisible(false);
-			}
-		}).start();
-	}
+    /**
+     * Method handles parsing of import data.
+     *
+     * @param filepath Full path of import file
+     */
+    private void importBIMData(String filepath) {
+        addInfoLabel();
+        importedFilepath = filepath;
+        progressFrame.setVisible(true);
+        // parse data, parse on extra thread to show progress bar while parsing
+        new Thread(() -> {
+            parser.parse(filepath);
+            progressFrame.setVisible(false);
+        }).start();
+    }
 
-	@Override
-	public void onDataParsed(ArrayList<Way> ways, ArrayList<Node> nodes) {
-		model.setImportData(ways, nodes);
-		String layerName = String.format("BIMObject%2d", MainApplication.getLayerManager().getLayers().size());
-		if(importedFilepath != null) {
-			String[] parts = importedFilepath.split(File.separator.equals ("\\")? "\\\\": "/");
-			layerName = parts[parts.length-1];
-		}
-		ImportDataRenderer.renderDataOnNewLayer(ways, nodes, layerName);
-	}
+    @Override
+    public void onDataParsed(ArrayList<Way> ways, ArrayList<Node> nodes) {
+        model.setImportData(ways, nodes);
+        String layerName = String.format("BIMObject%2d", MainApplication.getLayerManager().getLayers().size());
+        if (importedFilepath != null) {
+            String[] parts = importedFilepath.split(File.separator.equals("\\") ? "\\\\" : "/");
+            layerName = parts[parts.length - 1];
+        }
+        ImportDataRenderer.renderDataOnNewLayer(ways, nodes, layerName);
+    }
 
-	/**
-	 * Initializes progress frame and progress bar used while loading file
-	 */
-	private void initProgressProcess() {
-    	progressBar = new JProgressBar( 0, 100 );
-		progressBar.setIndeterminate(true);
-		progressBar.setStringPainted(true);
-		progressBar.setString("loading file");
-		progressFrame = new JFrame();
-		progressFrame.add(progressBar, BorderLayout.PAGE_START);
-		progressFrame.setUndecorated(true);
-		progressBar.setStringPainted(true);
-	    progressFrame.setLocationRelativeTo(MainApplication.getMainFrame());
-	    progressFrame.pack();
-	}
+    /**
+     * Initializes progress frame and progress bar used while loading file
+     */
+    private void initProgressProcess() {
+        JProgressBar progressBar = new JProgressBar(0, 100);
+        progressBar.setIndeterminate(true);
+        progressBar.setStringPainted(true);
+        progressBar.setString("loading file");
+        progressFrame = new JFrame();
+        progressFrame.add(progressBar, BorderLayout.PAGE_START);
+        progressFrame.setUndecorated(true);
+        progressBar.setStringPainted(true);
+        progressFrame.setLocationRelativeTo(MainApplication.getMainFrame());
+        progressFrame.pack();
+    }
 
-	/**
-	 * Shows info panel at top
-	 */
-	private void addInfoLabel() {
-		JPanel infoPanel = new JPanel();
-		Font font = infoPanel.getFont().deriveFont(Font.PLAIN, 14.0f);
+    /**
+     * Shows info panel at top
+     */
+    private void addInfoLabel() {
+        JPanel infoPanel = new JPanel();
+        Font font = infoPanel.getFont().deriveFont(Font.PLAIN, 14.0f);
         JMultilineLabel iLabel = new JMultilineLabel(
                 tr("BIM importer is in beta version! \n You can help to improve the BIM import by reporting bugs or other issues. " +
-                		"For more details see the logfile: <i>C:/tmp/.josm/logfile_indoorhelper.log</i>"));
+                        "For more details see the logfile: <i>C:/tmp/.josm/logfile_indoorhelper.log</i>"));
         UrlLabel issueURL = new UrlLabel(Config.getUrls().getJOSMWebsite() + "/newticket", tr("Report bug"));
         issueURL.setFont(font);
         iLabel.setFont(font);
@@ -164,33 +160,34 @@ public class ImportDataController implements ImportEventListener {
         closeButton.setToolTipText(tr("Hide this message"));
         closeButton.addActionListener(e -> {
             if (MainApplication.isDisplayingMapView()) {
-            	infoPanel.setVisible(false);
+                infoPanel.setVisible(false);
             }
         });
         infoPanel.add(closeButton, GBC.std(3, 1).span(1, 2).anchor(GBC.EAST));
         MapFrame map = MainApplication.getMap();
-        if(map != null)	map.addTopPanel(infoPanel);
-	}
+        if (map != null) map.addTopPanel(infoPanel);
+    }
 
-	/**
-	 * Export resources embedded in jar into file system
-	 * @throws Exception
-	 */
-	private void exportPluginResource() throws Exception{
-		File jarFile = new File(ImportDataController.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
-		String jarPath = Preferences.main().getPluginsDirectory().toString();
-		if(jarFile.isFile()) {
-			Logging.info("Copying resource files from jar to file system");
-		    JarFile jar = new JarFile(jarFile);
-		    ZipEntry ze1 = jar.getEntry("resources/IFC2X3_TC1.exp");
-		    ZipEntry ze2 = jar.getEntry("resources/IFC4.exp");
-		    InputStream is1 = jar.getInputStream(ze1);
-		    InputStream is2 = jar.getInputStream(ze2);
-		    new File(jarPath + "/indoorhelper/resources").mkdirs();
-		    Files.copy(is1, Paths.get(jarPath + "/indoorhelper/resources/IFC2X3_TC1.exp"));
-		    Files.copy(is2, Paths.get(jarPath + "/indoorhelper/resources/IFC4.exp"));
-		    jar.close();
-		}
-	}
+    /**
+     * Export resources embedded in jar into file system
+     *
+     * @throws Exception
+     */
+    private void exportPluginResource() throws Exception {
+        File jarFile = new File(ImportDataController.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
+        String jarPath = Preferences.main().getPluginsDirectory().toString();
+        if (jarFile.isFile()) {
+            Logging.info("Copying resource files from jar to file system");
+            JarFile jar = new JarFile(jarFile);
+            ZipEntry ze1 = jar.getEntry("resources/IFC2X3_TC1.exp");
+            ZipEntry ze2 = jar.getEntry("resources/IFC4.exp");
+            InputStream is1 = jar.getInputStream(ze1);
+            InputStream is2 = jar.getInputStream(ze2);
+            new File(jarPath + "/indoorhelper/resources").mkdirs();
+            Files.copy(is1, Paths.get(jarPath + "/indoorhelper/resources/IFC2X3_TC1.exp"));
+            Files.copy(is2, Paths.get(jarPath + "/indoorhelper/resources/IFC4.exp"));
+            jar.close();
+        }
+    }
 
 }

@@ -1,12 +1,12 @@
 // License: AGPL. For details, see LICENSE file.
-package io.parser.data.ifc;
+package io.parser.data;
 
-import io.parser.data.ifc.IFCShapeRepresentationCatalog.RepresentationIdentifier;
-import io.parser.data.ifc.IFCShapeRepresentationCatalog.RepresentationType;
+import io.parser.data.IFCShapeRepresentationCatalog.RepresentationIdentifier;
+import io.parser.data.IFCShapeRepresentationCatalog.RepresentationType;
 import nl.tue.buildingsmart.express.population.EntityInstance;
 
 /**
- * Class representing identifier and type on an IFCSHAPEREPRESENTATION
+ * Class representing identifier and type of IFCSHAPEREPRESENTATION
  * @author rebsc
  *
  */
@@ -55,9 +55,8 @@ public class IFCShapeRepresentationIdentity {
 	}
 
 	public boolean isFilled() {
-		if(this.identifier != null && this.type != null) return true;
-		return false;
-	}
+        return this.identifier != null && this.type != null;
+    }
 
 	public EntityInstance getRepresentationObjectEntity() {
 		return representationObjectEntity;
