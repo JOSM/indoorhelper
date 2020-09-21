@@ -1,13 +1,11 @@
 // License: AGPL. For details, see LICENSE file.
 package io.parser.data;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import io.model.BIMtoOSMCatalog;
 import nl.tue.buildingsmart.express.population.EntityInstance;
 import org.openstreetmap.josm.data.coor.LatLon;
 
-import io.model.BIMtoOSMCatalog;
+import java.util.List;
 
 /**
  * Class holding OSM relevant data of 3D BIM object
@@ -34,20 +32,18 @@ public class BIMObject3D {
         this.type = type;
     }
 
-	public BIMObject3D(
-	        int id,
+    public BIMObject3D(
+            int id,
             BIMtoOSMCatalog.BIMObject type,
             Point3D cartesianCorner,
-            List<Point3D> shapeCoordinates)
-
-    {
+            List<Point3D> shapeCoordinates) {
         this.objectId = id;
-		this.type = type;
-		this.cartesianPlacement = cartesianCorner;
-		this.geodeticPlacement = null;
-		this.cartesianShapeCoordinates = shapeCoordinates;
-		this.geodeticShapeCoordinates = null;
-	}
+        this.type = type;
+        this.cartesianPlacement = cartesianCorner;
+        this.geodeticPlacement = null;
+        this.cartesianShapeCoordinates = shapeCoordinates;
+        this.geodeticShapeCoordinates = null;
+    }
 
     public BIMtoOSMCatalog.BIMObject getType() {
         return type;

@@ -1,32 +1,10 @@
 // License: AGPL. For details, see LICENSE file.
 package io.controller;
 
-import static org.openstreetmap.josm.tools.I18n.tr;
-
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Font;
-import java.awt.GridBagLayout;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.jar.JarFile;
-import java.util.logging.FileHandler;
-import java.util.logging.SimpleFormatter;
-import java.util.zip.ZipEntry;
-
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JProgressBar;
-import javax.swing.border.CompoundBorder;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.EtchedBorder;
-
+import io.model.ImportDataModel;
+import io.parser.BIMtoOSMParser;
+import io.renderer.ImportDataRenderer;
+import io.views.ImportBIMDataAction;
 import org.openstreetmap.josm.actions.JosmAction;
 import org.openstreetmap.josm.data.Preferences;
 import org.openstreetmap.josm.data.osm.Node;
@@ -41,10 +19,24 @@ import org.openstreetmap.josm.tools.GBC;
 import org.openstreetmap.josm.tools.ImageProvider;
 import org.openstreetmap.josm.tools.Logging;
 
-import io.model.ImportDataModel;
-import io.parser.BIMtoOSMParser;
-import io.renderer.ImportDataRenderer;
-import io.views.ImportBIMDataAction;
+import javax.swing.*;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.EtchedBorder;
+import java.awt.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.jar.JarFile;
+import java.util.logging.FileHandler;
+import java.util.logging.SimpleFormatter;
+import java.util.zip.ZipEntry;
+
+import static java.awt.GridBagConstraints.EAST;
+import static org.openstreetmap.josm.tools.I18n.tr;
 
 /**
  * Import data controller class which provides the communication between the
@@ -55,7 +47,7 @@ import io.views.ImportBIMDataAction;
 public class ImportDataController implements ImportEventListener {
 
     private final ImportDataModel model;
-    private BIMtoOSMParser parser;
+    private final BIMtoOSMParser parser;
 
     private JFrame progressFrame;
 
@@ -163,7 +155,7 @@ public class ImportDataController implements ImportEventListener {
                 infoPanel.setVisible(false);
             }
         });
-        infoPanel.add(closeButton, GBC.std(3, 1).span(1, 2).anchor(GBC.EAST));
+        infoPanel.add(closeButton, GBC.std(3, 1).span(1, 2).anchor(EAST));
         MapFrame map = MainApplication.getMap();
         if (map != null) map.addTopPanel(infoPanel);
     }
@@ -174,19 +166,19 @@ public class ImportDataController implements ImportEventListener {
      * @throws Exception
      */
     private void exportPluginResource() throws Exception {
-        File jarFile = new File(ImportDataController.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
+        File jarFile = new File(Preferences.main().getPluginsDirectory().toURI().getPath() + "/indoorhelper.jar");
         String jarPath = Preferences.main().getPluginsDirectory().toString();
         if (jarFile.isFile()) {
             Logging.info("Copying resource files from jar to file system");
-            JarFile jar = new JarFile(jarFile);
-            ZipEntry ze1 = jar.getEntry("resources/IFC2X3_TC1.exp");
-            ZipEntry ze2 = jar.getEntry("resources/IFC4.exp");
-            InputStream is1 = jar.getInputStream(ze1);
-            InputStream is2 = jar.getInputStream(ze2);
-            new File(jarPath + "/indoorhelper/resources").mkdirs();
-            Files.copy(is1, Paths.get(jarPath + "/indoorhelper/resources/IFC2X3_TC1.exp"));
-            Files.copy(is2, Paths.get(jarPath + "/indoorhelper/resources/IFC4.exp"));
-            jar.close();
+            try (JarFile jar = new JarFile(jarFile)) {
+                ZipEntry ze1 = jar.getEntry("resources/IFC2X3_TC1.exp");
+                ZipEntry ze2 = jar.getEntry("resources/IFC4.exp");
+                InputStream is1 = jar.getInputStream(ze1);
+                InputStream is2 = jar.getInputStream(ze2);
+                new File(jarPath + "/indoorhelper/resources").mkdirs();
+                Files.copy(is1, Paths.get(jarPath + "/indoorhelper/resources/IFC2X3_TC1.exp"));
+                Files.copy(is2, Paths.get(jarPath + "/indoorhelper/resources/IFC4.exp"));
+            }
         }
     }
 
