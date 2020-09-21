@@ -1,31 +1,9 @@
 // License: AGPL. For details, see LICENSE file.
 package io.parser;
 
-import static org.openstreetmap.josm.tools.I18n.tr;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Paths;
-import java.util.*;
-
-import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
-
-import io.parser.data.*;
-import org.openstreetmap.josm.data.Preferences;
-import org.openstreetmap.josm.data.coor.LatLon;
-import org.openstreetmap.josm.data.osm.Node;
-import org.openstreetmap.josm.data.osm.Tag;
-import org.openstreetmap.josm.data.osm.Way;
-import org.openstreetmap.josm.gui.MainApplication;
-import org.openstreetmap.josm.tools.Logging;
-import org.openstreetmap.josm.tools.Pair;
-
 import io.controller.ImportEventListener;
 import io.model.BIMtoOSMCatalog;
+import io.parser.data.*;
 import io.parser.data.IFCShapeRepresentationCatalog.IfcSpatialStructureElementTypes;
 import io.parser.data.IFCShapeRepresentationCatalog.RepresentationIdentifier;
 import io.parser.helper.BIMtoOSMHelper;
@@ -36,6 +14,25 @@ import io.parser.math.ParserMath;
 import model.TagCatalog;
 import nl.tue.buildingsmart.express.population.EntityInstance;
 import nl.tue.buildingsmart.express.population.ModelPopulation;
+import org.openstreetmap.josm.data.Preferences;
+import org.openstreetmap.josm.data.coor.LatLon;
+import org.openstreetmap.josm.data.osm.Node;
+import org.openstreetmap.josm.data.osm.Tag;
+import org.openstreetmap.josm.data.osm.Way;
+import org.openstreetmap.josm.gui.MainApplication;
+import org.openstreetmap.josm.tools.Logging;
+import org.openstreetmap.josm.tools.Pair;
+
+import javax.swing.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
+import java.util.*;
+
+import static org.openstreetmap.josm.tools.I18n.tr;
 
 /**
  * Parser for BIM data. Extracts major BIM elements and transforms coordinates into OSM convenient format
@@ -386,7 +383,7 @@ public class BIMtoOSMParser {
                 EntityInstance bb = boxRepresentation.getRepresentationObjectEntity();
                 EntityInstance bbItem = bb.getAttributeValueBNasEntityInstanceList("Items").get(0);
                 EntityInstance cartesianCorner = bbItem.getAttributeValueBNasEntityInstance("Corner");
-                ifcSiteOffset = IFCShapeDataExtractor.IfcCartesianCoordinateToPoint3D(cartesianCorner);
+                ifcSiteOffset = IFCShapeDataExtractor.ifcCartesianCoordinateToPoint3D(cartesianCorner);
             }
         }
 

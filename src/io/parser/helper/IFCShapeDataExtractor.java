@@ -55,10 +55,13 @@ public class IFCShapeDataExtractor {
             // handle types
             if (repItemType.equals(AdvancedBrepRepresentationTypeItems.IfcAdvancedBrep.name())) {
                 // TODO extract data
+                logNotSupportedRepresentationTypeInfo(repItemType);
             } else if (repItemType.equals(AdvancedSweptSolidRepresentationTypeItems.IfcSweptDiskSolid.name())) {
                 // TODO extract data
+                logNotSupportedRepresentationTypeInfo(repItemType);
             } else if (repItemType.equals(AdvancedSweptSolidRepresentationTypeItems.IfcSweptDiskSolidPolygonal.name())) {
                 // TODO extract data
+                logNotSupportedRepresentationTypeInfo(repItemType);
             } else if (repItemType.equals(BrepRepresentationTypeItems.IfcFacetedBrep.name())) {
                 ArrayList<Point3D> shapeData = getShapeDataFromIfcFacetedBrep(ifcModel, item);
                 // check if entity includes(floor-)openings and handle them
@@ -68,13 +71,16 @@ public class IFCShapeDataExtractor {
                 else if (shapeData != null) shapeRep.addAll(shapeData);
             } else if (repItemType.equals(CSGRepresentationTypeItems.IfcBooleanResult.name())) {
                 // TODO extract data
-
+                logNotSupportedRepresentationTypeInfo(repItemType);
             } else if (repItemType.equals(CSGRepresentationTypeItems.IfcCsgSolid.name())) {
                 // TODO extract data
+                logNotSupportedRepresentationTypeInfo(repItemType);
             } else if (repItemType.equals(CSGRepresentationTypeItems.IfcPrimitive3D.name())) {
                 // TODO extract data
+                logNotSupportedRepresentationTypeInfo(repItemType);
             } else if (repItemType.equals(TessellationRepresentationTypeItems.IfcTessellatedFaceSet.name())) {
                 // TODO extract data
+                logNotSupportedRepresentationTypeInfo(repItemType);
             } else if (repItemType.equals(ClippingRepresentationTypeItems.IfcBooleanClippingResult.name())) {
                 ArrayList<Point3D> shapeData = getShapeDataFromIfcBooleanResult(ifcModel, item, IfcBooleanOperator.DIFFERENCE);
                 // check if entity includes(floor-)openings and handle them
@@ -84,10 +90,13 @@ public class IFCShapeDataExtractor {
                 else if (shapeData != null) shapeRep.addAll(shapeData);
             } else if (repItemType.equals(SurfaceModelRepresentationTypeItems.IfcTessellatedItem.name())) {
                 // TODO extract data
+                logNotSupportedRepresentationTypeInfo(repItemType);
             } else if (repItemType.equals(SurfaceModelRepresentationTypeItems.IfcShellBasedSurfaceModel.name())) {
                 // TODO extract data
+                logNotSupportedRepresentationTypeInfo(repItemType);
             } else if (repItemType.equals(SurfaceModelRepresentationTypeItems.IfcFaceBasedSurfaceModel.name())) {
                 // TODO extract data
+                logNotSupportedRepresentationTypeInfo(repItemType);
             } else if (repItemType.equals(SweptSolidRepresentationTypeItems.IfcExtrudedAreaSolid.name())) {
                 ArrayList<Point3D> shapeData = getShapeDataFromIfcExtrudedAreaSolid(ifcModel, item);
                 // check if entity includes(floor-)openings and handle them
@@ -97,10 +106,12 @@ public class IFCShapeDataExtractor {
                 else if (shapeData != null) shapeRep.addAll(shapeData);
             } else if (repItemType.equals(SweptSolidRepresentationTypeItems.IfcRevolvedAreaSolid.name())) {
                 // TODO extract data
+                logNotSupportedRepresentationTypeInfo(repItemType);
             } else if (repItemType.equals(MappedRepresentatiobTypeItems.IfcMappedItem.name())) {
                 // TODO extract data
+                logNotSupportedRepresentationTypeInfo(repItemType);
             } else {
-                Logging.info(IFCShapeDataExtractor.class.getName() + ": " + repItemType + " is not supported right now");
+                logNotSupportedRepresentationTypeInfo(repItemType);
             }
         }
 
@@ -132,7 +143,7 @@ public class IFCShapeDataExtractor {
             if (repItemType.equals(BoundingBoxRepresentationTypeItems.IfcBoundingBox.name())) {
                 // get cartesian point of bounding box
                 EntityInstance cartesianCorner = item.getAttributeValueBNasEntityInstance("Corner");
-                Point3D cPointAsPoint3D = IfcCartesianCoordinateToPoint3D(cartesianCorner);
+                Point3D cPointAsPoint3D = ifcCartesianCoordinateToPoint3D(cartesianCorner);
                 if (cPointAsPoint3D == null) return null;
                 double xDim = prepareDoubleString((String) item.getAttributeValueBN("XDim"));
                 double yDim = prepareDoubleString((String) item.getAttributeValueBN("YDim"));
@@ -145,7 +156,7 @@ public class IFCShapeDataExtractor {
                 cartesianPointsOfBB.add(new Point3D(cPointAsPoint3D.getX(), cPointAsPoint3D.getY(), cPointAsPoint3D.getZ()));
                 shapeRep.addAll(cartesianPointsOfBB);
             } else {
-                Logging.info(IFCShapeDataExtractor.class.getName() + ": " + repItemType + " is not supported right now");
+                logNotSupportedRepresentationTypeInfo(repItemType);
             }
         }
 
@@ -176,10 +187,12 @@ public class IFCShapeDataExtractor {
 
             if (repItemType.equals(CurveRepresentationTypeItems.IfcBoundedCurve.name())) {
                 // TODO extract data
+                logNotSupportedRepresentationTypeInfo(repItemType);
             } else if (repItemType.equals(CurveRepresentationTypeItems.IfcPolyline.name())) {
                 // TODO extract data
+                logNotSupportedRepresentationTypeInfo(repItemType);
             } else {
-                Logging.info(IFCShapeDataExtractor.class.getName() + ": " + repItemType + " is not supported right now");
+                logNotSupportedRepresentationTypeInfo(repItemType);
             }
         }
 
@@ -247,7 +260,7 @@ public class IFCShapeDataExtractor {
             // get all IFCCARTESIANPOINTs
             ArrayList<Point3D> cartesianPointsOfClosedShell = new ArrayList<>();
             for (EntityInstance cPoint : loop.getAttributeValueBNasEntityInstanceList("Polygon")) {
-                Point3D cPointAsPoint3D = IfcCartesianCoordinateToPoint3D(cPoint);
+                Point3D cPointAsPoint3D = ifcCartesianCoordinateToPoint3D(cPoint);
                 if (cPointAsPoint3D == null) return null;
                 cartesianPointsOfClosedShell.add(cPointAsPoint3D);
             }
@@ -255,8 +268,7 @@ public class IFCShapeDataExtractor {
         }
 
         // other loop types are not supported right now
-        Logging.info(IFCShapeDataExtractor.class.getName() + ": " + loopType + " is not supported right now");
-
+        logNotSupportedRepresentationTypeInfo(loopType);
         return null;
     }
 
@@ -294,12 +306,14 @@ public class IFCShapeDataExtractor {
         }
         if (operator.equals(IfcBooleanOperator.INTERSECTION)) {
             // TODO implement
+            logNotSupportedRepresentationTypeInfo(operator.name());
         }
         if (operator.equals(IfcBooleanOperator.UNION)) {
             // TODO implement
+            logNotSupportedRepresentationTypeInfo(operator.name());
         }
 
-        Logging.info(IFCShapeDataExtractor.class.getName() + ": " + operator.name() + " is not supported right now");
+        logNotSupportedRepresentationTypeInfo(operator.name());
         return null;
     }
 
@@ -318,9 +332,11 @@ public class IFCShapeDataExtractor {
 
         if (operandType.equals(IfcBooleanOperandType.IfcSolidModel.name())) {
             // TODO implement
+            logNotSupportedRepresentationTypeInfo(operandType);
         }
         if (operandType.equals(IfcBooleanOperandType.IfcHalfSpaceSolid.name())) {
             // TODO implement
+            logNotSupportedRepresentationTypeInfo(operandType);
         }
         if (operandType.equals(IfcBooleanOperandType.IfcPolygonalBoundedHalfSpace.name())) {
             return getShapeDataFromIfcPolygonalBoundedHalfSpace(ifcModel, operand);
@@ -339,6 +355,7 @@ public class IFCShapeDataExtractor {
         }
         if (operandType.equals(IfcBooleanOperandType.IfcCsgPrimitive3D.name())) {
             // TODO implement
+            logNotSupportedRepresentationTypeInfo(operandType);
         }
         if (operandType.equals(SweptSolidRepresentationTypeItems.IfcExtrudedAreaSolid.name())) {
             return getShapeDataFromIfcExtrudedAreaSolid(ifcModel, operand);
@@ -348,7 +365,7 @@ public class IFCShapeDataExtractor {
         }
 
         // other types are not supported right now
-        Logging.info(IFCShapeDataExtractor.class.getName() + ": " + operandType + " is not supported right now");
+        logNotSupportedRepresentationTypeInfo(operandType);
         return null;
     }
 
@@ -394,7 +411,7 @@ public class IFCShapeDataExtractor {
         // get local origin position
         EntityInstance localSystemPosition = polygon.getAttributeValueBNasEntityInstance("Position");
         EntityInstance locationPoint = localSystemPosition.getAttributeValueBNasEntityInstance("Location");
-        Point3D locationPoint3D = IfcCartesianCoordinateToPoint3D(locationPoint);
+        Point3D locationPoint3D = ifcCartesianCoordinateToPoint3D(locationPoint);
         if (locationPoint3D == null) return null;
 
         // get boundary
@@ -410,7 +427,7 @@ public class IFCShapeDataExtractor {
         }
 
         // other types are not supported right now
-        Logging.info(IFCShapeDataExtractor.class.getName() + ": " + localPolygonBoundaryType + " is not supported right now");
+        logNotSupportedRepresentationTypeInfo(localPolygonBoundaryType);
         return null;
     }
 
@@ -427,7 +444,7 @@ public class IFCShapeDataExtractor {
         EntityInstance axisPlacement = extrudedArea.getAttributeValueBNasEntityInstance("Position");
         EntityInstance locationPoint = axisPlacement.getAttributeValueBNasEntityInstance("Location");
         //object axis origin
-        Point3D locationPoint3D = IfcCartesianCoordinateToPoint3D(locationPoint);
+        Point3D locationPoint3D = ifcCartesianCoordinateToPoint3D(locationPoint);
         if (locationPoint3D == null) return null;
 
         // get IFCPROFILEDEF attribute
@@ -468,12 +485,13 @@ public class IFCShapeDataExtractor {
                 }
             }
             if (profileType.equals(".CURVE.")) {
-                // not supported right now
+                // TODO implement
+                logNotSupportedRepresentationTypeInfo(sweptAreaType);
             }
         }
 
         // other types are not supported right now
-        Logging.info(IFCShapeDataExtractor.class.getName() + ": " + sweptAreaType + " is not supported right now");
+        logNotSupportedRepresentationTypeInfo(sweptAreaType);
         return null;
     }
 
@@ -487,7 +505,7 @@ public class IFCShapeDataExtractor {
         ArrayList<EntityInstance> points = polyline.getAttributeValueBNasEntityInstanceList("Points");
         ArrayList<Point3D> cartesianPointsOfSArea = new ArrayList<>();
         points.forEach(point -> {
-            Point3D pointAsPoint3D = IfcCartesianCoordinateToPoint3D(point);
+            Point3D pointAsPoint3D = ifcCartesianCoordinateToPoint3D(point);
             assert pointAsPoint3D != null;
             cartesianPointsOfSArea.add(new Point3D(pointAsPoint3D.getX(), pointAsPoint3D.getY(), 0.0));
         });
@@ -523,7 +541,6 @@ public class IFCShapeDataExtractor {
 
         // IfcVoidingFeature as opening element is not supported right now
         Logging.info(IFCShapeDataExtractor.class.getName() + ": IfcVoidingFeature is not supported right now");
-
         return null;
     }
 
@@ -533,7 +550,7 @@ public class IFCShapeDataExtractor {
      * @param cartesianCoordinate to transform
      * @return coordinate as Point3D
      */
-    public static Point3D IfcCartesianCoordinateToPoint3D(EntityInstance cartesianCoordinate) {
+    public static Point3D ifcCartesianCoordinateToPoint3D(EntityInstance cartesianCoordinate) {
         @SuppressWarnings("unchecked")
         Vector<String> objectCoords = (Vector<String>) cartesianCoordinate.getAttributeValueBN("Coordinates");
         if (objectCoords.isEmpty()) return null;
@@ -564,6 +581,14 @@ public class IFCShapeDataExtractor {
             Logging.error(e.getMessage());
             return Double.NaN;
         }
+    }
+
+    /**
+     * Logs info if representation type is not supported.
+     * @param representationItemType representation item as string
+     */
+    private static void logNotSupportedRepresentationTypeInfo(String representationItemType){
+        Logging.info(IFCShapeDataExtractor.class.getName() + ": " + representationItemType + " is not supported right now");
     }
 
 }
