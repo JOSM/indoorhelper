@@ -1,34 +1,14 @@
 // License: AGPL. For details, see LICENSE file.
 package io.parser.helper;
 
-import java.util.ArrayList;
-
-import io.parser.data.IFCShapeRepresentationIdentity;
-import org.openstreetmap.josm.tools.Logging;
-
 import io.model.BIMtoOSMCatalog.BIMObject;
-import io.parser.data.IFCShapeRepresentationCatalog.AdvancedBrepRepresentationTypeItems;
-import io.parser.data.IFCShapeRepresentationCatalog.AdvancedSweptSolidRepresentationTypeItems;
-import io.parser.data.IFCShapeRepresentationCatalog.Axis2PlacementRepresentationTypeItems;
-import io.parser.data.IFCShapeRepresentationCatalog.BoundingBoxRepresentationTypeItems;
-import io.parser.data.IFCShapeRepresentationCatalog.BrepRepresentationTypeItems;
-import io.parser.data.IFCShapeRepresentationCatalog.CSGRepresentationTypeItems;
-import io.parser.data.IFCShapeRepresentationCatalog.ClippingRepresentationTypeItems;
-import io.parser.data.IFCShapeRepresentationCatalog.CurveRepresentationTypeItems;
-import io.parser.data.IFCShapeRepresentationCatalog.IfcBooleanOperandType;
-import io.parser.data.IFCShapeRepresentationCatalog.IfcBoundedCurveTypes;
-import io.parser.data.IFCShapeRepresentationCatalog.IfcRelVoidsElementTypes;
-import io.parser.data.IFCShapeRepresentationCatalog.IfcSpatialStructureElementTypes;
-import io.parser.data.IFCShapeRepresentationCatalog.LoopSubRepresentationTypeItems;
-import io.parser.data.IFCShapeRepresentationCatalog.MappedRepresentatiobTypeItems;
-import io.parser.data.IFCShapeRepresentationCatalog.ProfileDefRepresentationTypeItems;
-import io.parser.data.IFCShapeRepresentationCatalog.RepresentationIdentifier;
-import io.parser.data.IFCShapeRepresentationCatalog.RepresentationType;
-import io.parser.data.IFCShapeRepresentationCatalog.SurfaceModelRepresentationTypeItems;
-import io.parser.data.IFCShapeRepresentationCatalog.SweptSolidRepresentationTypeItems;
-import io.parser.data.IFCShapeRepresentationCatalog.TessellationRepresentationTypeItems;
+import io.parser.data.IFCShapeRepresentationCatalog.*;
+import io.parser.data.IFCShapeRepresentationIdentity;
 import nl.tue.buildingsmart.express.population.EntityInstance;
 import nl.tue.buildingsmart.express.population.ModelPopulation;
+import org.openstreetmap.josm.tools.Logging;
+
+import java.util.ArrayList;
 
 /**
  * Class to identify the type on an IFCSHAPEREPRESENTATION object
@@ -503,32 +483,74 @@ public class IFCShapeRepresentationIdentifier {
      * @param entity   to get type of
      * @return type of IFCBOUNDEDCURVE
      */
-    public static String getIfcBoundedCurveType(ModelPopulation ifcModel, EntityInstance entity) {
+    public static String getIfcCurveType(ModelPopulation ifcModel, EntityInstance entity) {
         // here IFCCOMPOSITECURVE, IFCPOLYLINE, IFCTRIMMEDCURVE, IFCBSPLINECURVE allowed
 
         ArrayList<EntityInstance> compositeCurves = new ArrayList<>();
-        for (String flag : getIdentifierTags(IfcBoundedCurveTypes.IfcCompositeCurve.name())) {
+        for (String flag : getIdentifierTags(CurveRepresentationTypeItems.IfcCompositeCurve.name())) {
             compositeCurves.addAll(ifcModel.getInstancesOfType(flag));
         }
-        if (compositeCurves.contains(entity)) return IfcBoundedCurveTypes.IfcCompositeCurve.name();
+        if (compositeCurves.contains(entity)) return CurveRepresentationTypeItems.IfcCompositeCurve.name();
 
         ArrayList<EntityInstance> polylines = new ArrayList<>();
-        for (String flag : getIdentifierTags(IfcBoundedCurveTypes.IfcPolyline.name())) {
+        for (String flag : getIdentifierTags(CurveRepresentationTypeItems.IfcPolyline.name())) {
             polylines.addAll(ifcModel.getInstancesOfType(flag));
         }
-        if (polylines.contains(entity)) return IfcBoundedCurveTypes.IfcPolyline.name();
+        if (polylines.contains(entity)) return CurveRepresentationTypeItems.IfcPolyline.name();
 
         ArrayList<EntityInstance> trimmedCurves = new ArrayList<>();
-        for (String flag : getIdentifierTags(IfcBoundedCurveTypes.IfcTrimmedCurve.name())) {
+        for (String flag : getIdentifierTags(CurveRepresentationTypeItems.IfcTrimmedCurve.name())) {
             trimmedCurves.addAll(ifcModel.getInstancesOfType(flag));
         }
-        if (trimmedCurves.contains(entity)) return IfcBoundedCurveTypes.IfcTrimmedCurve.name();
+        if (trimmedCurves.contains(entity)) return CurveRepresentationTypeItems.IfcTrimmedCurve.name();
 
         ArrayList<EntityInstance> bSplineCurves = new ArrayList<>();
-        for (String flag : getIdentifierTags(IfcBoundedCurveTypes.IfcBSplineCurve.name())) {
+        for (String flag : getIdentifierTags(CurveRepresentationTypeItems.IfcBSplineCurve.name())) {
             bSplineCurves.addAll(ifcModel.getInstancesOfType(flag));
         }
-        if (bSplineCurves.contains(entity)) return IfcBoundedCurveTypes.IfcBSplineCurve.name();
+        if (bSplineCurves.contains(entity)) return CurveRepresentationTypeItems.IfcBSplineCurve.name();
+
+        ArrayList<EntityInstance> conicCurves = new ArrayList<>();
+        for (String flag : getIdentifierTags(CurveRepresentationTypeItems.IfcConic.name())) {
+            conicCurves.addAll(ifcModel.getInstancesOfType(flag));
+        }
+        if (conicCurves.contains(entity)) return CurveRepresentationTypeItems.IfcConic.name();
+
+        ArrayList<EntityInstance> circleCurves = new ArrayList<>();
+        for (String flag : getIdentifierTags(CurveRepresentationTypeItems.IfcCircle.name())) {
+            circleCurves.addAll(ifcModel.getInstancesOfType(flag));
+        }
+        if (circleCurves.contains(entity)) return CurveRepresentationTypeItems.IfcCircle.name();
+
+        ArrayList<EntityInstance> ellCurves = new ArrayList<>();
+        for (String flag : getIdentifierTags(CurveRepresentationTypeItems.IfcEllipse.name())) {
+            ellCurves.addAll(ifcModel.getInstancesOfType(flag));
+        }
+        if (ellCurves.contains(entity)) return CurveRepresentationTypeItems.IfcEllipse.name();
+
+        ArrayList<EntityInstance> lineCurves = new ArrayList<>();
+        for (String flag : getIdentifierTags(CurveRepresentationTypeItems.IfcLine.name())) {
+            lineCurves.addAll(ifcModel.getInstancesOfType(flag));
+        }
+        if (lineCurves.contains(entity)) return CurveRepresentationTypeItems.IfcLine.name();
+
+        ArrayList<EntityInstance> offsetCurves = new ArrayList<>();
+        for (String flag : getIdentifierTags(CurveRepresentationTypeItems.IfcOffsetCurve2D.name())) {
+            offsetCurves.addAll(ifcModel.getInstancesOfType(flag));
+        }
+        if (offsetCurves.contains(entity)) return CurveRepresentationTypeItems.IfcOffsetCurve2D.name();
+
+        ArrayList<EntityInstance> offsetCurves3D = new ArrayList<>();
+        for (String flag : getIdentifierTags(CurveRepresentationTypeItems.IfcOffsetCurve3D.name())) {
+            offsetCurves3D.addAll(ifcModel.getInstancesOfType(flag));
+        }
+        if (offsetCurves3D.contains(entity)) return CurveRepresentationTypeItems.IfcOffsetCurve3D.name();
+
+        ArrayList<EntityInstance> indexesCurves = new ArrayList<>();
+        for (String flag : getIdentifierTags(CurveRepresentationTypeItems.IfcIndexedPolyCurve.name())) {
+            indexesCurves.addAll(ifcModel.getInstancesOfType(flag));
+        }
+        if (indexesCurves.contains(entity)) return CurveRepresentationTypeItems.IfcIndexedPolyCurve.name();
 
         Logging.info(IFCShapeRepresentationIdentifier.class.getName() + ": " + entity.getEntityDefinition() + " is not supported as IfcBoundedCurveType");
         return null;
@@ -571,6 +593,39 @@ public class IFCShapeRepresentationIdentifier {
     }
 
     /**
+     * Checks if entity is part of IFCRELVOIDSELEMENT, if yes than returns IFCRELVOIDSELEMENT, else null
+     *
+     * @param ifcModel ifc model
+     * @param entity   to get IFCRELVOIDSELEMENT for
+     * @return if entity part of an IFCRELVOIDSELEMENT the EntityInstance if IFCRELVOIDSELEMENT, else null
+     */
+    public static EntityInstance getRelVoidsElementOfEntity(ModelPopulation ifcModel, EntityInstance entity) {
+        ArrayList<EntityInstance> relVoidsElements = new ArrayList<>();
+        for (String flag : getIdentifierTags(BIMObject.IfcRelVoidsElement.name())) {
+            relVoidsElements.addAll(ifcModel.getInstancesOfType(flag));
+        }
+        for (EntityInstance relVoidsElement : relVoidsElements) {
+            int relatingBuildingElementId = relVoidsElement.getAttributeValueBNasEntityInstance("RelatingBuildingElement").getId();
+            if (relatingBuildingElementId == entity.getId()) return relVoidsElement;
+        }
+        return null;
+    }
+
+    /**
+     * Returns array of strings including identifier in origin version, uppercase and lowercase
+     *
+     * @param identifier string
+     * @return array with versions of identifier
+     */
+    private static ArrayList<String> getIdentifierTags(String identifier) {
+        ArrayList<String> idents = new ArrayList<>();
+        idents.add(identifier);
+        idents.add(identifier.toLowerCase());
+        idents.add(identifier.toUpperCase());
+        return idents;
+    }
+
+    /**
      * Checks if entity is of type IFCPOLYLINE
      *
      * @param ifcModel ifc model
@@ -583,6 +638,51 @@ public class IFCShapeRepresentationIdentifier {
             polylines.addAll(ifcModel.getInstancesOfType(flag));
         }
         return polylines.contains(entity);
+    }
+
+    /**
+     * Checks if entity is of type IFCCOMPOSITECURVE
+     *
+     * @param ifcModel ifc model
+     * @param entity   to check type of
+     * @return true if IFCCOMPOSITECURVE, else false
+     */
+    public static boolean isIfcCompositeCurve(ModelPopulation ifcModel, EntityInstance entity) {
+        ArrayList<EntityInstance> cCurves = new ArrayList<>();
+        for (String flag : getIdentifierTags(CurveRepresentationTypeItems.IfcCompositeCurve.name())) {
+            cCurves.addAll(ifcModel.getInstancesOfType(flag));
+        }
+        return cCurves.contains(entity);
+    }
+
+    /**
+     * Checks if entity is of type IFCTRIMMEDCURVE
+     *
+     * @param ifcModel ifc model
+     * @param entity   to check type of
+     * @return true if IFCTRIMMEDCURVE, else false
+     */
+    public static boolean isIfcTrimmedCurve(ModelPopulation ifcModel, EntityInstance entity) {
+        ArrayList<EntityInstance> tCurves = new ArrayList<>();
+        for (String flag : getIdentifierTags(CurveRepresentationTypeItems.IfcTrimmedCurve.name())) {
+            tCurves.addAll(ifcModel.getInstancesOfType(flag));
+        }
+        return tCurves.contains(entity);
+    }
+
+    /**
+     * Checks if entity is of type IFCCIRCLE
+     *
+     * @param ifcModel ifc model
+     * @param entity   to check type of
+     * @return true if IFCCIRCLE, else false
+     */
+    public static boolean isIfcCircle(ModelPopulation ifcModel, EntityInstance entity) {
+        ArrayList<EntityInstance> cCurves = new ArrayList<>();
+        for (String flag : getIdentifierTags(CurveRepresentationTypeItems.IfcCircle.name())) {
+            cCurves.addAll(ifcModel.getInstancesOfType(flag));
+        }
+        return cCurves.contains(entity);
     }
 
     /**
@@ -665,25 +765,6 @@ public class IFCShapeRepresentationIdentifier {
     }
 
     /**
-     * Checks if entity is part of IFCRELVOIDSELEMENT, if yes than returns IFCRELVOIDSELEMENT, else null
-     *
-     * @param ifcModel ifc model
-     * @param entity   to get IFCRELVOIDSELEMENT for
-     * @return if entity part of an IFCRELVOIDSELEMENT the EntityInstance if IFCRELVOIDSELEMENT, else null
-     */
-    public static EntityInstance getRelVoidsElementOfEntity(ModelPopulation ifcModel, EntityInstance entity) {
-        ArrayList<EntityInstance> relVoidsElements = new ArrayList<>();
-        for (String flag : getIdentifierTags(BIMObject.IfcRelVoidsElement.name())) {
-            relVoidsElements.addAll(ifcModel.getInstancesOfType(flag));
-        }
-        for (EntityInstance relVoidsElement : relVoidsElements) {
-            int relatingBuildingElementId = relVoidsElement.getAttributeValueBNasEntityInstance("RelatingBuildingElement").getId();
-            if (relatingBuildingElementId == entity.getId()) return relVoidsElement;
-        }
-        return null;
-    }
-
-    /**
      * Removes unnecessary chars from representation attribute string
      *
      * @param attribute representation attribute (REPRESENTATIONIDENTIFIER, REPRESENTATIONTYPE)
@@ -691,20 +772,6 @@ public class IFCShapeRepresentationIdentifier {
      */
     private static String prepareRepresentationAttribute(String attribute) {
         return attribute.substring(1, attribute.length() - 1);
-    }
-
-    /**
-     * Returns array of strings including identifier in origin version, uppercase and lowercase
-     *
-     * @param identifier string
-     * @return array with versions of identifier
-     */
-    private static ArrayList<String> getIdentifierTags(String identifier) {
-        ArrayList<String> idents = new ArrayList<>();
-        idents.add(identifier);
-        idents.add(identifier.toLowerCase());
-        idents.add(identifier.toUpperCase());
-        return idents;
     }
 
 }

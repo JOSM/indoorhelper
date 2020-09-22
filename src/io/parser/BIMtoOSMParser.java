@@ -219,7 +219,7 @@ public class BIMtoOSMParser {
                 tmpNodes.add(n);
             }
 
-            if (tmpNodes.isEmpty()) continue;
+            if (tmpNodes.size() < 2) continue;
 
             if (tmpNodes.get(0).lat() == tmpNodes.get(tmpNodes.size() - 1).lat() && tmpNodes.get(0).lon() == tmpNodes.get(tmpNodes.size() - 1).lon()) {
                 tmpNodes.remove(tmpNodes.size() - 1);
