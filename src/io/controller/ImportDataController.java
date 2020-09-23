@@ -50,8 +50,8 @@ public class ImportDataController implements ImportEventListener {
     private final BIMtoOSMParser parser;
 
     private JFrame progressFrame;
-
     private String importedFilepath;
+    private final String pluginDir = Preferences.main().getPluginsDirectory().toString();
 
     public ImportDataController() {
         model = new ImportDataModel();
@@ -62,14 +62,14 @@ public class ImportDataController implements ImportEventListener {
 
         // add log file handler
         try {
-            FileHandler fh = new FileHandler("C:/tmp/.josm/logfile_indoorhelper.log");
+            FileHandler fh = new FileHandler(pluginDir + "/indoorhelper/logfile_indoorhelper.log");
             fh.setFormatter(new SimpleFormatter());
             Logging.getLogger().addHandler(fh);
         } catch (SecurityException | IOException e) {
             Logging.info(e.getMessage());
         }
 
-        // export resource files from jar to file system used by BuildingSMARTLibrary
+        // export resource files used by BuildingSMARTLibrary from jar to file system
         try {
             exportPluginResource();
         } catch (Exception e) {
@@ -133,7 +133,7 @@ public class ImportDataController implements ImportEventListener {
         Font font = infoPanel.getFont().deriveFont(Font.PLAIN, 14.0f);
         JMultilineLabel iLabel = new JMultilineLabel(
                 tr("BIM importer is in beta version! \n You can help to improve the BIM import by reporting bugs or other issues. " +
-                        "For more details see the logfile: <i>C:/tmp/.josm/logfile_indoorhelper.log</i>"));
+                        "For more details see logfile: <i>" + pluginDir + "/indoorhelper/logfile_indoorhelper.log\"</i>"));
         UrlLabel issueURL = new UrlLabel(Config.getUrls().getJOSMWebsite() + "/newticket", tr("Report bug"));
         issueURL.setFont(font);
         iLabel.setFont(font);
@@ -167,7 +167,6 @@ public class ImportDataController implements ImportEventListener {
      */
     private void exportPluginResource() throws Exception {
         File jarFile = new File(Preferences.main().getPluginsDirectory().toURI().getPath() + "/indoorhelper.jar");
-        String jarPath = Preferences.main().getPluginsDirectory().toString();
         if (jarFile.isFile()) {
             Logging.info("Copying resource files from jar to file system");
             try (JarFile jar = new JarFile(jarFile)) {
@@ -175,9 +174,9 @@ public class ImportDataController implements ImportEventListener {
                 ZipEntry ze2 = jar.getEntry("resources/IFC4.exp");
                 InputStream is1 = jar.getInputStream(ze1);
                 InputStream is2 = jar.getInputStream(ze2);
-                new File(jarPath + "/indoorhelper/resources").mkdirs();
-                Files.copy(is1, Paths.get(jarPath + "/indoorhelper/resources/IFC2X3_TC1.exp"));
-                Files.copy(is2, Paths.get(jarPath + "/indoorhelper/resources/IFC4.exp"));
+                new File(pluginDir + "/indoorhelper/resources").mkdirs();
+                Files.copy(is1, Paths.get(pluginDir + "/indoorhelper/resources/IFC2X3_TC1.exp"));
+                Files.copy(is2, Paths.get(pluginDir + "/indoorhelper/resources/IFC4.exp"));
             }
         }
     }
