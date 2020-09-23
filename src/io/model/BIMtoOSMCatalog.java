@@ -4,51 +4,12 @@ package io.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.openstreetmap.josm.data.osm.Tag;
-
 /**
  * Class holding information of BIM to OSM translation schema
  *
  * @author rebsc
  */
 public class BIMtoOSMCatalog {
-
-    /**
-     * Method to get related OSM tag of BIM object
-     *
-     * @param o BIMobject
-     * @return OSM tags of BIM object as list
-     */
-    public List<Tag> getOSMTags(BIMObject o) {
-
-        List<Tag> tagList = new ArrayList<>();
-
-        String indoorFlag = "indoor";
-
-        switch (o) {
-            case IfcSlab:
-            case IfcSlabStandardCase:
-            case IfcSlabElementedCase:
-            case IfcColumn:
-                tagList.add(new Tag(indoorFlag, "area"));
-                return tagList;
-            case IfcWall:
-            case IfcWallStandardCase:
-            case IfcWallElementedCase:
-                tagList.add(new Tag(indoorFlag, "wall"));
-                return tagList;
-            case IfcDoor:
-            case IfcDoorStandardCase:
-                tagList.add(new Tag("door", "yes"));
-                return tagList;
-            case IfcStair:
-                tagList.add(new Tag("highway", "steps"));
-                return tagList;
-            default:
-                return tagList;
-        }
-    }
-
     /**
      * Returns all BIM tags representing a wall.
      *
@@ -57,14 +18,8 @@ public class BIMtoOSMCatalog {
     public static List<String> getWallTags() {
         ArrayList<String> wallTags = new ArrayList<>();
         wallTags.add(BIMObject.IfcWall.toString());
-        wallTags.add(BIMObject.IfcWall.toString().toUpperCase());
-        wallTags.add(BIMObject.IfcWall.toString().toLowerCase());
         wallTags.add(BIMObject.IfcWallStandardCase.toString());
-        wallTags.add(BIMObject.IfcWallStandardCase.toString().toUpperCase());
-        wallTags.add(BIMObject.IfcWallStandardCase.toString().toLowerCase());
         wallTags.add(BIMObject.IfcWallElementedCase.toString());
-        wallTags.add(BIMObject.IfcWallElementedCase.toString().toUpperCase());
-        wallTags.add(BIMObject.IfcWallElementedCase.toString().toLowerCase());
         return wallTags;
     }
 
@@ -76,14 +31,8 @@ public class BIMtoOSMCatalog {
     public static List<String> getAreaTags() {
         ArrayList<String> areaTags = new ArrayList<>();
         areaTags.add(BIMObject.IfcSlab.toString());
-        areaTags.add(BIMObject.IfcSlab.toString().toUpperCase());
-        areaTags.add(BIMObject.IfcSlab.toString().toLowerCase());
         areaTags.add(BIMObject.IfcSlabStandardCase.toString());
-        areaTags.add(BIMObject.IfcSlabStandardCase.toString().toUpperCase());
-        areaTags.add(BIMObject.IfcSlabStandardCase.toString().toLowerCase());
         areaTags.add(BIMObject.IfcSlabElementedCase.toString());
-        areaTags.add(BIMObject.IfcSlabElementedCase.toString().toUpperCase());
-        areaTags.add(BIMObject.IfcSlabElementedCase.toString().toLowerCase());
         return areaTags;
     }
 
@@ -95,8 +44,6 @@ public class BIMtoOSMCatalog {
     public static List<String> getColumnTags() {
         ArrayList<String> colTags = new ArrayList<>();
         colTags.add(BIMObject.IfcColumn.toString());
-        colTags.add(BIMObject.IfcColumn.toString().toUpperCase());
-        colTags.add(BIMObject.IfcColumn.toString().toLowerCase());
         return colTags;
     }
 
@@ -108,11 +55,7 @@ public class BIMtoOSMCatalog {
     public static List<String> getDoorTags() {
         ArrayList<String> doorTags = new ArrayList<>();
         doorTags.add(BIMObject.IfcDoor.toString());
-        doorTags.add(BIMObject.IfcDoor.toString().toUpperCase());
-        doorTags.add(BIMObject.IfcDoor.toString().toLowerCase());
         doorTags.add(BIMObject.IfcDoorStandardCase.toString());
-        doorTags.add(BIMObject.IfcDoorStandardCase.toString().toUpperCase());
-        doorTags.add(BIMObject.IfcDoorStandardCase.toString().toLowerCase());
         return doorTags;
     }
 
@@ -124,8 +67,6 @@ public class BIMtoOSMCatalog {
     public static List<String> getWindowTags() {
         ArrayList<String> stairTags = new ArrayList<>();
         stairTags.add(BIMObject.IfcWindow.toString());
-        stairTags.add(BIMObject.IfcWindow.toString().toUpperCase());
-        stairTags.add(BIMObject.IfcWindow.toString().toLowerCase());
         return stairTags;
     }
 
@@ -137,8 +78,6 @@ public class BIMtoOSMCatalog {
     public static List<String> getStairTags() {
         ArrayList<String> stairTags = new ArrayList<>();
         stairTags.add(BIMObject.IfcStair.toString());
-        stairTags.add(BIMObject.IfcStair.toString().toUpperCase());
-        stairTags.add(BIMObject.IfcStair.toString().toLowerCase());
         return stairTags;
     }
 
@@ -150,8 +89,6 @@ public class BIMtoOSMCatalog {
     public static List<String> getRelVoidsElementTags() {
         ArrayList<String> relVoidsTags = new ArrayList<>();
         relVoidsTags.add(BIMObject.IfcRelVoidsElement.toString());
-        relVoidsTags.add(BIMObject.IfcRelVoidsElement.toString().toUpperCase());
-        relVoidsTags.add(BIMObject.IfcRelVoidsElement.toString().toLowerCase());
         return relVoidsTags;
     }
 
@@ -161,11 +98,8 @@ public class BIMtoOSMCatalog {
      * @return List of IFCSITE tags
      */
     public static List<String> getIFCSITETags() {
-        String tag = "IfcSite";
         ArrayList<String> ifcSiteTags = new ArrayList<>();
-        ifcSiteTags.add(tag);
-        ifcSiteTags.add(tag.toUpperCase());
-        ifcSiteTags.add(tag.toLowerCase());
+        ifcSiteTags.add(BIMObject.IfcSite.toString());
         return ifcSiteTags;
     }
 
@@ -177,6 +111,6 @@ public class BIMtoOSMCatalog {
     public enum BIMObject {
         IfcSlab, IfcSlabStandardCase, IfcSlabElementedCase, IfcSlabType, IfcWall, IfcWallStandardCase,
         IfcWallElementedCase, IfcWallType, IfcColumn, IfcColumnType, IfcDoor, IfcDoorStandardCase, IfcStair,
-        IfcRelVoidsElement, IfcWindow
+        IfcRelVoidsElement, IfcWindow, IfcSite
     }
 }
