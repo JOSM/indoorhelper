@@ -91,7 +91,7 @@ public class BIMtoOSMParser {
         preparedBIMData.addAll(BIMtoOSMHelper.prepareBIMObjects(ifcModel, bimFileRootId, BIMtoOSMCatalog.BIMObject.IfcWall, filteredRawBIMData.getWallObjects()));
         preparedBIMData.addAll(BIMtoOSMHelper.prepareBIMObjects(ifcModel, bimFileRootId, BIMtoOSMCatalog.BIMObject.IfcColumn, filteredRawBIMData.getColumnObjects()));
 //        preparedBIMData.addAll(BIMtoOSMHelper.prepareBIMObjects(ifcModel, bimFileRootId, BIMtoOSMCatalog.BIMObject.IfcDoor, filteredRawBIMData.getDoorObjects()));
-//		  preparedBIMData.addAll(BIMtoOSMHelper.prepareBIMObjects(ifcModel, bimFileRootId, BIMtoOSMCatalog.BIMObject.IfcWindow, filteredRawBIMData.getWindowObjects()));
+//        preparedBIMData.addAll(BIMtoOSMHelper.prepareBIMObjects(ifcModel, bimFileRootId, BIMtoOSMCatalog.BIMObject.IfcWindow, filteredRawBIMData.getWindowObjects()));
         preparedBIMData.addAll(BIMtoOSMHelper.prepareBIMObjects(ifcModel, bimFileRootId, BIMtoOSMCatalog.BIMObject.IfcStair, filteredRawBIMData.getStairObjects()));
 
         // set length/ angle etc. unit
