@@ -1,12 +1,8 @@
 // License: AGPL. For details, see LICENSE file.
 package org.openstreetmap.josm.plugins.indoorhelper;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
+import controller.IndoorHelperController;
+import io.controller.ImportDataController;
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.MapFrame;
 import org.openstreetmap.josm.gui.autofilter.AutoFilter;
@@ -20,8 +16,7 @@ import org.openstreetmap.josm.plugins.Plugin;
 import org.openstreetmap.josm.plugins.PluginInformation;
 import org.openstreetmap.josm.spi.preferences.Config;
 
-import controller.IndoorHelperController;
-import io.controller.ImportDataController;
+import java.io.*;
 
 /**
  * This is the main class for the indoorhelper plug-in.
@@ -105,18 +100,13 @@ public class IndoorHelperPlugin extends Plugin implements PaintableInvalidationL
     @Override
     public void paintableInvalidated(PaintableInvalidationEvent event) {
         AutoFilter currentAutoFilter = AutoFilterManager.getInstance().getCurrentAutoFilter();
-
         if (currentAutoFilter != null) {
             if (indoorController != null) {
-                String currentFilterValue = currentAutoFilter.getLabel();
-
-                indoorController.setIndoorLevel(currentFilterValue);
-                indoorController.getIndoorLevel(currentFilterValue);
+                indoorController.setWorkingLevel(currentAutoFilter.getLabel());
                 indoorController.unsetSpecificKeyFilter("repeat_on");
             }
         } else if (indoorController != null) {
-            indoorController.setIndoorLevel("");
-            indoorController.getIndoorLevel("");
+            indoorController.setWorkingLevel("");
         }
     }
 

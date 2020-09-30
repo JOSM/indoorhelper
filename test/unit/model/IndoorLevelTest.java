@@ -1,12 +1,10 @@
 // License: AGPL. For details, see LICENSE file.
-package unit.model;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+package model;
 
 import org.junit.Test;
 
-import model.IndoorLevel;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests of {@link IndoorLevel} class.
@@ -14,7 +12,7 @@ import model.IndoorLevel;
 public class IndoorLevelTest {
 
     /**
-     * Test case for {@link IndoorLevel#isisPartOfWorkingLevel} method.
+     * Test case for {@link IndoorLevel#isPartOfWorkingLevel} method.
      */
     @Test
     public void testIsPartOfWorkingLevel() {
@@ -22,6 +20,7 @@ public class IndoorLevelTest {
         assertTrue(IndoorLevel.isPartOfWorkingLevel("-3--1", -2));
         assertTrue(IndoorLevel.isPartOfWorkingLevel("-3--1", -1));
         assertFalse(IndoorLevel.isPartOfWorkingLevel("-3--1", 0));
+        assertFalse(IndoorLevel.isPartOfWorkingLevel("-3--1", -4));
 
         assertTrue(IndoorLevel.isPartOfWorkingLevel("-1;0;1", -1));
         assertTrue(IndoorLevel.isPartOfWorkingLevel("-1;0;1", 0));
@@ -38,10 +37,14 @@ public class IndoorLevelTest {
         assertTrue(IndoorLevel.isPartOfWorkingLevel("0-3", 0));
         assertTrue(IndoorLevel.isPartOfWorkingLevel("0-3", 1));
         assertTrue(IndoorLevel.isPartOfWorkingLevel("0-3", 3));
+        assertFalse(IndoorLevel.isPartOfWorkingLevel("0-3", 4));
 
         assertFalse(IndoorLevel.isPartOfWorkingLevel("2;3;4", 1));
         assertTrue(IndoorLevel.isPartOfWorkingLevel("2;3;4", 2));
         assertTrue(IndoorLevel.isPartOfWorkingLevel("2;3;4", 3));
         assertTrue(IndoorLevel.isPartOfWorkingLevel("2;3;4", 4));
+
+        assertFalse(IndoorLevel.isPartOfWorkingLevel(".", 4));
+        assertFalse(IndoorLevel.isPartOfWorkingLevel(";t-3", 4));
     }
 }

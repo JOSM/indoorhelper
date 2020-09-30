@@ -1,30 +1,12 @@
 // License: AGPL. For details, see LICENSE file.
 package controller;
 
-import static org.openstreetmap.josm.tools.I18n.tr;
-
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.swing.AbstractAction;
-import javax.swing.JOptionPane;
-
+import model.IndoorHelperModel;
+import model.IndoorLevel;
+import model.TagCatalog.IndoorObject;
 import org.openstreetmap.josm.actions.ValidateAction;
 import org.openstreetmap.josm.data.Preferences;
-import org.openstreetmap.josm.data.osm.DataSet;
-import org.openstreetmap.josm.data.osm.OsmDataManager;
-import org.openstreetmap.josm.data.osm.OsmPrimitive;
-import org.openstreetmap.josm.data.osm.Tag;
+import org.openstreetmap.josm.data.osm.*;
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.help.HelpBrowser;
 import org.openstreetmap.josm.gui.mappaint.MapPaintStyles;
@@ -32,15 +14,16 @@ import org.openstreetmap.josm.spi.preferences.Config;
 import org.openstreetmap.josm.spi.preferences.MapListSetting;
 import org.openstreetmap.josm.spi.preferences.Setting;
 import org.openstreetmap.josm.tools.Shortcut;
-
-import model.IndoorHelperModel;
-import model.IndoorLevel;
-import model.TagCatalog.IndoorObject;
 import views.LevelSelectorView;
 import views.ToolBoxView;
 
+import javax.swing.*;
+import java.awt.event.*;
+import java.util.*;
+
+import static org.openstreetmap.josm.tools.I18n.tr;
+
 /**
- *
  * IndoorHelper controller class which provides the communication between the
  * IndoorHelperModel and the different views.
  *
@@ -51,7 +34,7 @@ public class IndoorHelperController {
 
     private final IndoorHelperModel model = new IndoorHelperModel();
     private ToolBoxView toolboxView;
-    private String levelValue, levelNum;
+    private String workingLevel, levelNum;
     private final SpaceAction spaceAction = new SpaceAction();
     private Shortcut spaceShortcut;
     private final EnterAction enterAction = new EnterAction();
@@ -74,8 +57,8 @@ public class IndoorHelperController {
 
         // collecting all tags
         List<Tag> tags = new ArrayList<>();
-        if (!toolboxView.getLevelCheckBoxStatus() && !levelValue.equals("")) {
-            tags.add(new Tag("level", levelValue));
+        if (!toolboxView.getLevelCheckBoxStatus() && !workingLevel.equals("")) {
+            tags.add(new Tag("level", workingLevel));
         }
         if (!toolboxView.getLevelNameText().isEmpty() && !toolboxView.getLevelCheckBoxStatus()) {
             tags.add(new Tag("level_name", toolboxView.getLevelNameText()));
@@ -107,9 +90,6 @@ public class IndoorHelperController {
 
     /**
      * The listener which is called when a new item in the object list is selected.
-     *
-     * @author egru
-     * @author rebsc
      */
     private final ItemListener toolObjectItemListener = e -> {
         if (toolboxView.getSelectedObject().equals(IndoorObject.ROOM)) {
@@ -126,23 +106,17 @@ public class IndoorHelperController {
 
     /**
      * The listener which is called when the LevelCheckBox is selected.
-     *
-     * @author rebsc
      */
     private final ItemListener toolLevelCheckBoxListener = e -> toolboxView
             .setLVLUiElementsEnabled(e.getStateChange() != ItemEvent.SELECTED);
 
     /**
      * The listener which is called when the helpButton got pushed.
-     *
-     * @author rebsc
      */
     private final ActionListener toolHelpButtonListener = e -> HelpBrowser.setUrlForHelpTopic("Plugin/IndoorHelper");
 
     /**
      * The listener which is called when the addLevelButton got pushed.
-     *
-     * @author rebsc
      */
     private final ActionListener toolAddLevelButtonListener = e -> {
         if (selectorView == null) {
@@ -159,16 +133,12 @@ public class IndoorHelperController {
 
     /**
      * The listener which is called when the MultiCheckBox is selected.
-     *
-     * @author rebsc
      */
     private final ItemListener toolMultiCheckBoxListener = e -> toolboxView
             .setMultiUiElementsEnabled(e.getStateChange() != ItemEvent.SELECTED);
 
     /**
      * The listener which is called when the OUTER Button got pushed.
-     *
-     * @author rebsc
      */
     private final ActionListener toolOuterButtonListener = e -> {
         // Select drawing action
@@ -181,8 +151,6 @@ public class IndoorHelperController {
 
     /**
      * The listener which is called when the INNER Button got pushed.
-     *
-     * @author rebsc
      */
     private final ActionListener toolInnerButtonListener = e -> {
         // Select drawing action
@@ -195,29 +163,21 @@ public class IndoorHelperController {
 
     /**
      * Listener for preset button 1.
-     *
-     * @author egru
      */
     private final ActionListener preset1Listener = e -> model.addTagsToOSM(toolboxView.getPreset1());
 
     /**
      * Listener for preset button 2.
-     *
-     * @author egru
      */
     private final ActionListener preset2Listener = e -> model.addTagsToOSM(toolboxView.getPreset2());
 
     /**
      * Listener for preset button 3.
-     *
-     * @author egru
      */
     private final ActionListener preset3Listener = e -> model.addTagsToOSM(toolboxView.getPreset3());
 
     /**
      * Listener for preset button 4.
-     *
-     * @author egru
      */
     private final ActionListener preset4Listener = e -> model.addTagsToOSM(toolboxView.getPreset4());
 
@@ -230,8 +190,6 @@ public class IndoorHelperController {
 
     /**
      * Specific listener for the applyButton
-     *
-     * @author rebsc
      */
     private final ActionListener toolLevelOkButtonListener = e -> {
         levelHelp = true;
@@ -254,8 +212,6 @@ public class IndoorHelperController {
 
     /**
      * Specific listener for the cancelButton
-     *
-     * @author rebsc
      */
     private final ActionListener toolLevelCancelButtonListener = e -> {
         selectorView.dispose();
@@ -264,8 +220,6 @@ public class IndoorHelperController {
 
     /**
      * General listener for LevelSelectorView window
-     *
-     * @author rebsc
      */
     class ToolSelectorWindowSListener extends WindowAdapter {
 
@@ -309,7 +263,7 @@ public class IndoorHelperController {
         innerHelp = false;
         levelHelp = false;
         innerRelation = null;
-        levelValue = "";
+        workingLevel = "";
         levelNum = "";
     }
 
@@ -346,8 +300,6 @@ public class IndoorHelperController {
 
     /**
      * Shortcut for spacebar
-     *
-     * @author rebsc
      */
     private class SpaceAction extends AbstractAction {
 
@@ -389,8 +341,6 @@ public class IndoorHelperController {
 
     /**
      * Shortcut for enter
-     *
-     * @author rebsc
      */
     private class EnterAction extends AbstractAction {
 
@@ -417,28 +367,27 @@ public class IndoorHelperController {
      * specific tag (key). Just unsets the disabled state if object has a tag-value which is part of the
      * current working level.
      *
-     * @author rebsc
      * @param key specific key to unset hidden objects which contains it
      */
     public void unsetSpecificKeyFilter(String key) {
-
         DataSet editDataSet = OsmDataManager.getInstance().getEditDataSet();
         if (editDataSet != null) {
-            Collection<OsmPrimitive> p = editDataSet.allPrimitives();
-            int level = Integer.parseInt(levelValue);
-
-            // Find all primitives with the specific tag and check if value is part of the current
-            // workinglevel. After that unset the disabled status.
-            for (OsmPrimitive osm : p) {
-                if ((osm.isDisabledAndHidden() || osm.isDisabled()) && osm.hasKey(key)) {
-                    for (Map.Entry<String, String> e : osm.getInterestingTags().entrySet()) {
-                        if (e.getKey().equals(key)) {
+            ArrayList<OsmPrimitive> primitiveCollection = new ArrayList<>(editDataSet.allPrimitives());
+            int level = Integer.parseInt(workingLevel);
+            // Find all primitives with the specific tag and check if value is part of the current working level.
+            // After that unset the disabled status.
+            for (OsmPrimitive primitive : primitiveCollection) {
+                if ((primitive.isDisabledAndHidden() || primitive.isDisabled()) && primitive.hasKey(key)) {
+                    for (Map.Entry<String, String> entry : primitive.getInterestingTags().entrySet()) {
+                        if (entry.getKey().equals(key)) {
                             // Compare values to current working level
-                            if (IndoorLevel.isPartOfWorkingLevel(e.getValue(), level)) {
-                                osm.unsetDisabledState();
-                            } else {
-                                osm.setDisabledState(true);
-                            }
+                            new Thread(() -> {
+                                if (IndoorLevel.isPartOfWorkingLevel(entry.getValue(), level)) {
+                                    primitive.unsetDisabledState();
+                                } else {
+                                    primitive.setDisabledType(true);
+                                }
+                            }).start();
                         }
                     }
                 }
@@ -447,21 +396,13 @@ public class IndoorHelperController {
     }
 
     /**
-     * Function which updates the current working level tag
+     * Function sets the current working level and updates the toolbox level label
      *
-     * @param indoorLevel current working level
+     * @param indoorLevel current working level as string
      */
-    public void setIndoorLevel(String indoorLevel) {
-        this.toolboxView.setLevelLabel(indoorLevel);
-    }
-
-    /**
-     * Function which gets the current working level tag
-     *
-     * @param indoorLevel current working level
-     */
-    public void getIndoorLevel(String indoorLevel) {
-        levelValue = indoorLevel;
+    public void setWorkingLevel(String indoorLevel) {
+        workingLevel = indoorLevel;
+        toolboxView.setLevelLabel(workingLevel);
     }
 
     /**
@@ -497,7 +438,7 @@ public class IndoorHelperController {
         for (Map<String, String> map : styleMapsNew) {
             if (map.containsValue(tr("Indoor"))) {
                 // find saved preference value
-            	enabled = map.containsValue(tr("true"));
+                enabled = map.containsValue(tr("true"));
                 styleMapsNew.remove(map);
                 break;
             }

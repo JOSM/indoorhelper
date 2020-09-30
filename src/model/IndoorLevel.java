@@ -1,22 +1,15 @@
 // License: AGPL. For details, see LICENSE file.
 package model;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.openstreetmap.josm.data.osm.Tag;
 
 /**
- *
  * The class to save a level of the building.
  *
  * @author egru
- *
  */
 
 public class IndoorLevel {
-
-    private static final Pattern RANGE = Pattern.compile("(-?[0-9]+)-(-?[0-9]+)");
 
     private Tag levelNumberTag;
     private Tag nameTag;
@@ -34,7 +27,7 @@ public class IndoorLevel {
      * Constructor which adds level number and name tag.
      *
      * @param levelNumber number of the level
-     * @param nameTag optional name tag for the level
+     * @param nameTag     optional name tag for the level
      */
     public IndoorLevel(int levelNumber, String nameTag) {
         this.setLevelNumber(levelNumber);
@@ -99,26 +92,61 @@ public class IndoorLevel {
         return this.nameTag == null;
     }
 
-    public static boolean isPartOfWorkingLevel(String vals, int level) {
-        for (String val : vals.split(";")) {
-            int firstVal, secVal;
-            Matcher m = RANGE.matcher(val);
-
-            //Extract values
-            if (m.matches()) {
-                firstVal = Integer.parseInt(m.group(1));
-                secVal = Integer.parseInt(m.group(2));
-            } else {
-                firstVal = Integer.parseInt(val);
-                secVal = firstVal;
-            }
-
-            // Compare values to current working level
-            if (level >= firstVal && level <= secVal) {
-                return true;
+    /**
+     * Checks if repeat_on tag value includes current working level value
+     * @param repeatOnValue tag as string
+     * @param workingLevel current working level as value
+     * @return true if repeat_on tag includes current working level, else false
+     */
+    public static boolean isPartOfWorkingLevel(String repeatOnValue, int workingLevel) {
+        // check if repeat_on value includes amount of levels
+        if (repeatOnValue.contains(";")) {
+            try {
+                String[] levels = repeatOnValue.split(";");
+                for (String levelIndex : levels) {
+                    if (workingLevel == Integer.parseInt(levelIndex)) return true;
+                }
+            } catch (Exception ignored) {
+                return false;
             }
         }
+        // check if repeat_on value includes a range
+        else if (repeatOnValue.contains("-")) {
+            try {
+                char[] elements = repeatOnValue.toCharArray();
+                int minLimit = 0;
+                int maxLimit = 0;
 
+                if (repeatOnValue.lastIndexOf("-") == 1) {    // case 2-1
+                    minLimit = Integer.parseInt(Character.toString(elements[0]));
+                    maxLimit = Integer.parseInt(Character.toString(elements[2]));
+                } else if (repeatOnValue.lastIndexOf("-") == 2) {   // case -2-1
+                    minLimit = Integer.parseInt(Character.toString(elements[1])) * -1;
+                    maxLimit = Integer.parseInt(Character.toString(elements[3]));
+                } else if (repeatOnValue.lastIndexOf("-") == 3) {   // case -2--1
+                    minLimit = Integer.parseInt(Character.toString(elements[1])) * -1;
+                    maxLimit = Integer.parseInt(Character.toString(elements[4])) * -1;
+                }
+
+                if (minLimit == maxLimit) {
+                    return false;
+                }
+
+                if (minLimit <= workingLevel && maxLimit >= workingLevel) {
+                    return true;
+                }
+            } catch (Exception ignored) {
+                return false;
+            }
+        }
+        // repeat_on value is single value
+        else {
+            try {
+                return workingLevel == Integer.parseInt(repeatOnValue);
+            } catch (Exception ignored) {
+                return false;
+            }
+        }
         return false;
     }
 }

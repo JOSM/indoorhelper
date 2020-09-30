@@ -1,15 +1,13 @@
 // License: AGPL. For details, see LICENSE file.
-package unit.model;
+package model;
 
-import static org.junit.Assert.assertEquals;
+import model.TagCatalog.IndoorObject;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Test;
-
-import model.PresetCounter;
-import model.TagCatalog.IndoorObject;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Unit tests of {@link PresetCounter} class.

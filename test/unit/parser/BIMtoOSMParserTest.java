@@ -1,11 +1,10 @@
 // License: AGPL. For details, see LICENSE file.
-package unit.parser;
-
-import java.io.File;
-
-import org.junit.Test;
+package parser;
 
 import io.parser.BIMtoOSMParser;
+import org.junit.Test;
+
+import java.io.File;
 /**
  * Unit tests of {@link BIMtoOSMParser} class.
  * @author rebsc
