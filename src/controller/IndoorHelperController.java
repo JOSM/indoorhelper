@@ -378,18 +378,11 @@ public class IndoorHelperController {
             // After that unset the disabled status.
             for (OsmPrimitive primitive : primitiveCollection) {
                 if ((primitive.isDisabledAndHidden() || primitive.isDisabled()) && primitive.hasKey(key)) {
-                    for (Map.Entry<String, String> entry : primitive.getInterestingTags().entrySet()) {
-                        if (entry.getKey().equals(key)) {
-                            // Compare values to current working level
-                            new Thread(() -> {
-                                if (IndoorLevel.isPartOfWorkingLevel(entry.getValue(), level)) {
-                                    primitive.unsetDisabledState();
-                                } else {
-                                    primitive.setDisabledType(true);
-                                }
-                            }).start();
+                    new Thread(() -> {
+                        if (IndoorLevel.isPartOfWorkingLevel(primitive.get(key), level)) {
+                            primitive.unsetDisabledState();
                         }
-                    }
+                    }).start();
                 }
             }
         }
