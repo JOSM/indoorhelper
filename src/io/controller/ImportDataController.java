@@ -47,15 +47,12 @@ import static org.openstreetmap.josm.tools.I18n.tr;
 public class ImportDataController implements ImportEventListener {
 
     private final ImportDataModel model;
-    private final BIMtoOSMParser parser;
-
     private JFrame progressFrame;
     private String importedFilepath;
     private final String pluginDir = Preferences.main().getPluginsDirectory().toString();
 
     public ImportDataController() {
         model = new ImportDataModel();
-        parser = new BIMtoOSMParser(this);
         JosmAction importBIMAction = new ImportBIMDataAction(this);
         MainMenu.add(MainApplication.getMenu().fileMenu, importBIMAction, false, 21);
         initProgressProcess();
@@ -91,9 +88,8 @@ public class ImportDataController implements ImportEventListener {
         addInfoLabel();
         importedFilepath = filepath;
         progressFrame.setVisible(true);
-        // parse data, parse on extra thread to show progress bar while parsing
         new Thread(() -> {
-            parser.parse(filepath);
+            new BIMtoOSMParser(this).parse(importedFilepath);
             progressFrame.setVisible(false);
         }).start();
     }

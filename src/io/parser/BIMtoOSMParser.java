@@ -57,7 +57,7 @@ public class BIMtoOSMParser {
     private IFCUnitsCatalog.LENGTHUNIT lengthUnit;
     private IFCUnitsCatalog.PLANEANGLEUNIT angleUnit;
 
-    private int defaultLevel = 999;
+    private final int defaultLevel = 999;
 
     public BIMtoOSMParser(ImportEventListener listener) {
         importListener = listener;
