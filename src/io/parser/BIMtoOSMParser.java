@@ -44,10 +44,10 @@ public class BIMtoOSMParser {
     private final String FLAG_IFC2X3_TC1 = "FILE_SCHEMA(('IFC2X3_TC1'))";
     private final String FLAG_IFC2X3 = "FILE_SCHEMA(('IFC2X3'))";
     private final String FLAG_IFC4 = "FILE_SCHEMA(('IFC4'))";
-    private final String resourcePathDir = Preferences.main().getPluginsDirectory().toString() + "/indoorhelper/resources/";
     private final String IFC2X3_TC1_Schema = "IFC2X3_TC1.exp";
     private final String IFC4_Schema = "IFC4.exp";
-    private String ifcSchemaFilePath = resourcePathDir + IFC2X3_TC1_Schema; // default
+    private final String resourcePathDir;
+    private String ifcSchemaFilePath;
 
     private ImportEventListener importListener;
     private FileInputStream inputfs = null;
@@ -59,8 +59,20 @@ public class BIMtoOSMParser {
 
     private final int defaultLevel = 999;
 
-    public BIMtoOSMParser(ImportEventListener listener) {
+    /**
+     * Constructor
+     *
+     * @param listener        for import events
+     * @param pluginDirectory of indoorHelper plugin
+     */
+    public BIMtoOSMParser(ImportEventListener listener, String pluginDirectory) {
         importListener = listener;
+        if (pluginDirectory == null) {
+            resourcePathDir = Preferences.main().getPluginsDirectory().toString() + "/indoorhelper/resources";
+        } else {
+            resourcePathDir = pluginDirectory + "/resources/";
+        }
+        ifcSchemaFilePath = resourcePathDir + IFC2X3_TC1_Schema;
         tagCatalog = new TagCatalog();
         lengthUnit = IFCUnitsCatalog.LENGTHUNIT.M;    // default
         angleUnit = IFCUnitsCatalog.PLANEANGLEUNIT.RAD;    // default
@@ -71,9 +83,9 @@ public class BIMtoOSMParser {
      *
      * @param filepath of IFC file
      */
-    public void parse(String filepath) {
+    public boolean parse(String filepath) {
         // load data into IFC model
-        if (!loadFile(filepath)) return;
+        if (!loadFile(filepath)) return false;
 
         // extract important data and put them into internal data structure
         FilteredRawBIMData filteredRawBIMData = BIMtoOSMHelper.extractMajorBIMData(ifcModel);
@@ -82,7 +94,7 @@ public class BIMtoOSMParser {
         int bimFileRootId = BIMtoOSMHelper.getIfcLocalPlacementRootObject(filteredRawBIMData);
         if (bimFileRootId == -1) {
             showParsingErrorView(filepath, "Could not import IFC file.\nIFC file does not contains IFCSITE element.", true);
-            return;
+            return false;
         }
 
         // prepare filtered BIM data - find global object coordinates and other attributes like object height, width etc.
@@ -112,8 +124,11 @@ public class BIMtoOSMParser {
         }
 
         // send parsed data to controller
-        importListener.onDataParsed(ways, nodes);
+        if (importListener != null) {
+            importListener.onDataParsed(ways, nodes);
+        }
         Logging.info(this.getClass().getName() + ": " + filepath + " parsed successfully");
+        return true;
     }
 
     /**

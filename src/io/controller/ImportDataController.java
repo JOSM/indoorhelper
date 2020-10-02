@@ -89,7 +89,7 @@ public class ImportDataController implements ImportEventListener {
         importedFilepath = filepath;
         progressFrame.setVisible(true);
         new Thread(() -> {
-            new BIMtoOSMParser(this).parse(importedFilepath);
+            new BIMtoOSMParser(this, pluginDir + "/indoorhelper/").parse(importedFilepath);
             progressFrame.setVisible(false);
         }).start();
     }
