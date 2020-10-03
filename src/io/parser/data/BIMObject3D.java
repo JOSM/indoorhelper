@@ -2,6 +2,9 @@
 package io.parser.data;
 
 import io.model.BIMtoOSMCatalog;
+import io.parser.data.math.Matrix3D;
+import io.parser.data.math.Point3D;
+import io.parser.data.math.Vector3D;
 import nl.tue.buildingsmart.express.population.EntityInstance;
 import org.openstreetmap.josm.data.coor.LatLon;
 
@@ -15,9 +18,10 @@ import java.util.List;
 public class BIMObject3D {
 
     // object identity
-    private int objectId;
+    private int id;
     private BIMtoOSMCatalog.BIMObject type;
-    private EntityInstance BIMFileRootEntity;
+    private EntityInstance rootEntity;
+    private EntityInstance placementEntity;
     private EntityInstance representationEntity;
 
     // object representation data
@@ -26,23 +30,27 @@ public class BIMObject3D {
     private List<Point3D> cartesianShapeCoordinates;
     private List<LatLon> geodeticShapeCoordinates;
 
-    public BIMObject3D(int id, EntityInstance representationEntity, BIMtoOSMCatalog.BIMObject type) {
-        this.objectId = id;
-        this.representationEntity = representationEntity;
-        this.type = type;
-    }
+    // transformation matrices
+    private Vector3D translation;
+    private Matrix3D rotation;
 
     public BIMObject3D(
             int id,
             BIMtoOSMCatalog.BIMObject type,
             Point3D cartesianCorner,
             List<Point3D> shapeCoordinates) {
-        this.objectId = id;
+        this.id = id;
         this.type = type;
-        this.cartesianPlacement = cartesianCorner;
-        this.geodeticPlacement = null;
-        this.cartesianShapeCoordinates = shapeCoordinates;
-        this.geodeticShapeCoordinates = null;
+        cartesianPlacement = cartesianCorner;
+        cartesianShapeCoordinates = shapeCoordinates;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public BIMtoOSMCatalog.BIMObject getType() {
@@ -51,6 +59,30 @@ public class BIMObject3D {
 
     public void setType(BIMtoOSMCatalog.BIMObject type) {
         this.type = type;
+    }
+
+    public EntityInstance getRootEntity() {
+        return rootEntity;
+    }
+
+    public void setRootEntity(EntityInstance rootEntity) {
+        this.rootEntity = rootEntity;
+    }
+
+    public EntityInstance getPlacementEntity() {
+        return placementEntity;
+    }
+
+    public void setPlacementEntity(EntityInstance placementEntity) {
+        this.placementEntity = placementEntity;
+    }
+
+    public EntityInstance getRepresentationEntity() {
+        return representationEntity;
+    }
+
+    public void setRepresentationEntity(EntityInstance representationEntity) {
+        this.representationEntity = representationEntity;
     }
 
     public Point3D getCartesianPlacement() {
@@ -69,14 +101,6 @@ public class BIMObject3D {
         this.cartesianShapeCoordinates = cartesianShapeCoordinates;
     }
 
-    public int getObjectId() {
-        return objectId;
-    }
-
-    public void setObjectId(int objectId) {
-        this.objectId = objectId;
-    }
-
     public LatLon getGeodeticPlacement() {
         return geodeticPlacement;
     }
@@ -93,20 +117,19 @@ public class BIMObject3D {
         this.geodeticShapeCoordinates = geodeticShapeCoordinates;
     }
 
-    public EntityInstance getRepresentationEntity() {
-        return representationEntity;
+    public Vector3D getTranslation() {
+        return translation;
     }
 
-    public void setRepresentationEntity(EntityInstance representationEntity) {
-        this.representationEntity = representationEntity;
+    public void setTranslation(Vector3D translation) {
+        this.translation = translation;
     }
 
-    public EntityInstance getBIMFileRootEntity() {
-        return BIMFileRootEntity;
+    public Matrix3D getRotation() {
+        return rotation;
     }
 
-    public void setBIMFileRootEntity(EntityInstance rootEntity) {
-        this.BIMFileRootEntity = rootEntity;
+    public void setRotation(Matrix3D rotation) {
+        this.rotation = rotation;
     }
-
 }

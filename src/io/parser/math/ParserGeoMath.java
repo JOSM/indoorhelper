@@ -1,11 +1,11 @@
 // License: AGPL. For details, see LICENSE file.
 package io.parser.math;
 
-import io.parser.data.IFCUnitsCatalog;
+import io.parser.data.ifc.IfcUnitCatalog;
 import org.openstreetmap.gui.jmapviewer.OsmMercator;
 import org.openstreetmap.josm.data.coor.LatLon;
 
-import io.parser.data.Point3D;
+import io.parser.data.math.Point3D;
 
 /**
  * Class providing math functions for geodetic operations
@@ -23,7 +23,7 @@ public class ParserGeoMath {
 	 * @param cartesianUnit m or cm
 	 * @return latlon of cartesian point
 	 */
-	public static LatLon cartesianToGeodetic(Point3D cartesianPoint, Point3D cartesianOrigin, LatLon latLonOfCartesianOrigin, IFCUnitsCatalog.LENGTHUNIT cartesianUnit) {
+	public static LatLon cartesianToGeodetic(Point3D cartesianPoint, Point3D cartesianOrigin, LatLon latLonOfCartesianOrigin, IfcUnitCatalog.LENGTHUNIT cartesianUnit) {
 		double originCartX = cartesianOrigin.getX();
 		double originCartY = cartesianOrigin.getY();
 		double originLat = Math.toRadians(latLonOfCartesianOrigin.lat());
@@ -36,11 +36,11 @@ public class ParserGeoMath {
 		bearing = Math.toRadians(90.0) - bearing;
 
 		// get distance
-		if(cartesianUnit.equals(IFCUnitsCatalog.LENGTHUNIT.CM)) {
+		if(cartesianUnit.equals(IfcUnitCatalog.LENGTHUNIT.CM)) {
 			pointX /= 100.0;
 			pointY /= 100.0;
 		}
-		else if(cartesianUnit.equals(IFCUnitsCatalog.LENGTHUNIT.MM)) {
+		else if(cartesianUnit.equals(IfcUnitCatalog.LENGTHUNIT.MM)) {
 			pointX /= 1000.0;
 			pointY /= 1000.0;
 		}

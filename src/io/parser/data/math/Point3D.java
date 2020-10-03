@@ -1,5 +1,5 @@
 // License: AGPL. For details, see LICENSE file.
-package io.parser.data;
+package io.parser.data.math;
 
 /**
  * Class holding coordinates of 3D point

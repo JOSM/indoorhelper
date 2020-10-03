@@ -1,10 +1,10 @@
 // License: AGPL. For details, see LICENSE file.
-package io.parser.data;
+package io.parser.data.ifc;
 
 /**
  * @author rebsc
  */
-public class IFCShapeRepresentationCatalog {
+public class IfcRepresentationCatalog {
 
     /**
      * RepresentationIdentifier of IFCSHAPEREPRESENTATION

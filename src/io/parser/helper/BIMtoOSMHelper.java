@@ -4,10 +4,10 @@ package io.parser.helper;
 import io.model.BIMtoOSMCatalog;
 import io.parser.data.BIMObject3D;
 import io.parser.data.FilteredRawBIMData;
-import io.parser.data.IFCShapeRepresentationCatalog.IfcSlabTypeEnum;
-import io.parser.data.IFCShapeRepresentationCatalog.RepresentationIdentifier;
-import io.parser.data.IFCShapeRepresentationIdentity;
-import io.parser.data.Point3D;
+import io.parser.data.ifc.IfcRepresentationCatalog.IfcSlabTypeEnum;
+import io.parser.data.ifc.IfcRepresentationCatalog.RepresentationIdentifier;
+import io.parser.data.ifc.IfcRepresentation;
+import io.parser.data.math.Point3D;
 import io.parser.math.ParserMath;
 import nl.tue.buildingsmart.express.population.EntityInstance;
 import nl.tue.buildingsmart.express.population.ModelPopulation;
@@ -132,7 +132,7 @@ public class BIMtoOSMHelper {
 
                 // rotation about x-axis
                 for (Point3D point : shapeDataOfObject) {
-                    if (point.equalsPoint3D(IFCShapeDataExtractor.defaultPoint)) continue;    // for workaround
+                    if (point.equalsPoint3D(IfcRepresentationExtractor.defaultPoint)) continue;    // for workaround
                     double[] pointAsVector = {point.getX(), point.getY(), point.getZ()};
                     double[] rotatedPoint = ParserMath.rotate3DPoint(pointAsVector, xRotMatrix);
                     if (rotatedPoint != null) {
@@ -144,7 +144,7 @@ public class BIMtoOSMHelper {
 
                 // translate points to object placement origin
                 for (Point3D point : shapeDataOfObject) {
-                    if (point.equalsPoint3D(IFCShapeDataExtractor.defaultPoint)) {
+                    if (point.equalsPoint3D(IfcRepresentationExtractor.defaultPoint)) {
                         continue;    // for workaround
                     }
                     point.setX(point.getX() + cartesianPlacementOfObject.getX());
@@ -153,22 +153,22 @@ public class BIMtoOSMHelper {
 
                 // Check if data includes IFCShapeDataExtractor.defaultPoint. IFCShapeDataExtractor.defaultPoint got added
                 // for workaround handling multiple closed loops in data set
-                if (!shapeDataOfObject.contains(IFCShapeDataExtractor.defaultPoint)) {
-					preparedObjects.add(new BIMObject3D(object.getId(), objectType, cartesianPlacementOfObject, shapeDataOfObject));
+                if (!shapeDataOfObject.contains(IfcRepresentationExtractor.defaultPoint)) {
+                    preparedObjects.add(new BIMObject3D(object.getId(), objectType, cartesianPlacementOfObject, shapeDataOfObject));
                     continue;
                 }
 
                 // Workaround: Check data set for closed loops (separated by defaultPoint). If closed loop in data set, extract and add as own way
                 ArrayList<Point3D> loop = new ArrayList<>();
                 for (Point3D point : shapeDataOfObject) {
-                    if (point.equalsPoint3D(IFCShapeDataExtractor.defaultPoint) && !loop.isEmpty()) {
-						preparedObjects.add(new BIMObject3D(object.getId(), objectType, cartesianPlacementOfObject, loop));
+                    if (point.equalsPoint3D(IfcRepresentationExtractor.defaultPoint) && !loop.isEmpty()) {
+                        preparedObjects.add(new BIMObject3D(object.getId(), objectType, cartesianPlacementOfObject, loop));
                         loop = new ArrayList<>();
-                    } else if (!point.equalsPoint3D(IFCShapeDataExtractor.defaultPoint)) {
+                    } else if (!point.equalsPoint3D(IfcRepresentationExtractor.defaultPoint)) {
                         loop.add(point);
                     }
                     if (shapeDataOfObject.indexOf(point) == shapeDataOfObject.size() - 1 && !loop.isEmpty()) {
-						preparedObjects.add(new BIMObject3D(object.getId(), objectType, cartesianPlacementOfObject, loop));
+                        preparedObjects.add(new BIMObject3D(object.getId(), objectType, cartesianPlacementOfObject, loop));
                     }
                 }
 
@@ -189,8 +189,8 @@ public class BIMtoOSMHelper {
         ArrayList<Point3D> shapeData = new ArrayList<>();
 
         // identify and keep types of IFCPRODUCTDEFINITIONSHAPE.REPRESENTATIONS objects
-        List<IFCShapeRepresentationIdentity> repObjectIdentities = identifyRepresentationsOfObject(object);
-        if(repObjectIdentities == null) return null;
+        List<IfcRepresentation> repObjectIdentities = identifyRepresentationsOfObject(object);
+        if (repObjectIdentities == null) return null;
 
         // first check if IFCPRODUCTDEFINITIONSHAPE.REPRESENTATIONS include IFCSHAPEREPRESENTATION of type "body"
 //        IFCShapeRepresentationIdentity bodyRepresentation = getRepresentationSpecificObjectType(repObjectIdentities, RepresentationIdentifier.Body);
@@ -199,15 +199,15 @@ public class BIMtoOSMHelper {
 //        }
 
         // if no IFCSHAPEREPRESENTATION of type "body" check if IFCSHAPEREPRESENTATION of type "box" exists
-        IFCShapeRepresentationIdentity boxRepresentation = getRepresentationSpecificObjectType(repObjectIdentities, RepresentationIdentifier.Box);
+        IfcRepresentation boxRepresentation = getRepresentationSpecificObjectType(repObjectIdentities, RepresentationIdentifier.Box);
         if (boxRepresentation != null) {
-            return IFCShapeDataExtractor.getDataFromBoxRepresentation(ifcModel, boxRepresentation);
+            return IfcRepresentationExtractor.getDataFromBoxRepresentation(ifcModel, boxRepresentation);
         }
 
         // if no IFCSHAPEREPRESENTATION of type "box" check if IFCSHAPEREPRESENTATION of type "axis" exists
-        IFCShapeRepresentationIdentity axisRepresentation = getRepresentationSpecificObjectType(repObjectIdentities, RepresentationIdentifier.Axis);
+        IfcRepresentation axisRepresentation = getRepresentationSpecificObjectType(repObjectIdentities, RepresentationIdentifier.Axis);
         if (axisRepresentation != null) {
-            return IFCShapeDataExtractor.getDataFromAxisRepresentation(ifcModel, axisRepresentation);
+            return IfcRepresentationExtractor.getDataFromAxisRepresentation(ifcModel, axisRepresentation);
         }
 
         return shapeData;
@@ -221,10 +221,10 @@ public class BIMtoOSMHelper {
      * @param identifier          RepresentationIdentifier
      * @return returns IfcShapeRepresentation "identifier" or null if not in list
      */
-    public static IFCShapeRepresentationIdentity getRepresentationSpecificObjectType(
-            List<IFCShapeRepresentationIdentity> repObjectIdentities,
+    public static IfcRepresentation getRepresentationSpecificObjectType(
+            List<IfcRepresentation> repObjectIdentities,
             RepresentationIdentifier identifier) {
-        for (IFCShapeRepresentationIdentity repObject : repObjectIdentities) {
+        for (IfcRepresentation repObject : repObjectIdentities) {
             if (repObject.getIdentifier().equals(identifier)) return repObject;
         }
         return null;
@@ -442,8 +442,8 @@ public class BIMtoOSMHelper {
      * @param object object to get the IFCPRODUCTDEFINITIONSHAPE.REPRESENTATIONS from which will be identified
      * @return List of IFCShapeRepresentationIdentity holding an IFC representation object and it's identifier
      */
-    public static List<IFCShapeRepresentationIdentity> identifyRepresentationsOfObject(EntityInstance object) {
-        ArrayList<IFCShapeRepresentationIdentity> repObjectIdentities = new ArrayList<>();
+    public static List<IfcRepresentation> identifyRepresentationsOfObject(EntityInstance object) {
+        ArrayList<IfcRepresentation> repObjectIdentities = new ArrayList<>();
 
         // get representation objects
         ArrayList<EntityInstance> objectRepresentations = getRepresentationsOfObject(object);
@@ -451,8 +451,8 @@ public class BIMtoOSMHelper {
         // identify each object
         for (EntityInstance repObject : objectRepresentations) {
             //identify IFCSHAPEREPRESENTATION type
-            IFCShapeRepresentationIdentity repIdentity = IFCShapeRepresentationIdentifier.identifyShapeRepresentation(repObject);
-            repIdentity.setRootObjectEntity(object);
+            IfcRepresentation repIdentity = IFCShapeRepresentationIdentifier.identifyShapeRepresentation(repObject);
+            repIdentity.setRootEntity(object);
             if (!repIdentity.isFilled()) return null;
             repObjectIdentities.add(repIdentity);
         }

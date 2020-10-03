@@ -1,6 +1,6 @@
-package io.parser.data;
+package io.parser.data.ifc;
 
-public class IFCUnitsCatalog {
+public class IfcUnitCatalog {
 
     public enum LENGTHUNIT {
         M, CM, MM

@@ -1,9 +1,9 @@
 // License: AGPL. For details, see LICENSE file.
 package io.parser.helper;
 
-import io.parser.data.IFCShapeRepresentationCatalog.*;
-import io.parser.data.IFCShapeRepresentationIdentity;
-import io.parser.data.Point3D;
+import io.parser.data.ifc.IfcRepresentation;
+import io.parser.data.ifc.IfcRepresentationCatalog.*;
+import io.parser.data.math.Point3D;
 import nl.tue.buildingsmart.express.population.EntityInstance;
 import nl.tue.buildingsmart.express.population.ModelPopulation;
 import org.openstreetmap.josm.tools.Logging;
@@ -17,7 +17,7 @@ import java.util.Vector;
  *
  * @author rebsc
  */
-public class IFCShapeDataExtractor {
+public class IfcRepresentationExtractor {
 
     public static final Point3D defaultPoint = new Point3D(-99.0, -99.0, -99.0);
 
@@ -37,11 +37,11 @@ public class IFCShapeDataExtractor {
      * @param bodyRepresentation representation of body
      * @return List of points representing object shape or null if object type not supported
      */
-    public static List<Point3D> getDataFromBodyRepresentation(ModelPopulation ifcModel, IFCShapeRepresentationIdentity bodyRepresentation) {
+    public static List<Point3D> getDataFromBodyRepresentation(ModelPopulation ifcModel, IfcRepresentation bodyRepresentation) {
         ArrayList<Point3D> shapeRep = new ArrayList<>();
 
         // get IFCOBJECT and REPRESENTATIONIDENTIFIER
-        EntityInstance repObject = bodyRepresentation.getRepresentationObjectEntity();
+        EntityInstance repObject = bodyRepresentation.getEntity();
 
         // get IFCREPRESENTATIONITEMS
         ArrayList<EntityInstance> bodyItems = repObject.getAttributeValueBNasEntityInstanceList("Items");
@@ -66,7 +66,7 @@ public class IFCShapeDataExtractor {
                 ArrayList<Point3D> shapeData = getShapeDataFromIfcFacetedBrep(ifcModel, item);
                 // check if entity includes(floor-)openings and handle them
                 // shapeDataWithOpeningHandling will be null, if no openings exists or type of opening not supported
-                ArrayList<Point3D> shapeDataWithOpeningHandling = handleOpeningsInEntityShape(ifcModel, shapeData, bodyRepresentation.getRootObjectEntity());
+                ArrayList<Point3D> shapeDataWithOpeningHandling = handleOpeningsInEntityShape(ifcModel, shapeData, bodyRepresentation.getRootEntity());
                 if (shapeDataWithOpeningHandling != null) shapeRep.addAll(shapeDataWithOpeningHandling);
                 else if (shapeData != null) shapeRep.addAll(shapeData);
             } else if (repItemType.equals(CSGRepresentationTypeItems.IfcBooleanResult.name())) {
@@ -82,7 +82,7 @@ public class IFCShapeDataExtractor {
                 }
                 // check if entity includes(floor-)openings and handle them
                 // shapeDataWithOpeningHandling will be null, if no openings exists or type of opening not supported
-                ArrayList<Point3D> shapeDataWithOpeningHandling = handleOpeningsInEntityShape(ifcModel, shapeData, bodyRepresentation.getRootObjectEntity());
+                ArrayList<Point3D> shapeDataWithOpeningHandling = handleOpeningsInEntityShape(ifcModel, shapeData, bodyRepresentation.getRootEntity());
                 if (shapeDataWithOpeningHandling != null) shapeRep.addAll(shapeDataWithOpeningHandling);
                 else if (shapeData != null) shapeRep.addAll(shapeData);
             } else if (repItemType.equals(CSGRepresentationTypeItems.IfcCsgSolid.name())) {
@@ -98,7 +98,7 @@ public class IFCShapeDataExtractor {
                 ArrayList<Point3D> shapeData = getShapeDataFromIfcBooleanResult(ifcModel, item, IfcBooleanOperator.DIFFERENCE);
                 // check if entity includes(floor-)openings and handle them
                 // shapeDataWithOpeningHandling will be null, if no openings exists or type of opening not supported
-                ArrayList<Point3D> shapeDataWithOpeningHandling = handleOpeningsInEntityShape(ifcModel, shapeData, bodyRepresentation.getRootObjectEntity());
+                ArrayList<Point3D> shapeDataWithOpeningHandling = handleOpeningsInEntityShape(ifcModel, shapeData, bodyRepresentation.getRootEntity());
                 if (shapeDataWithOpeningHandling != null) shapeRep.addAll(shapeDataWithOpeningHandling);
                 else if (shapeData != null) shapeRep.addAll(shapeData);
             } else if (repItemType.equals(SurfaceModelRepresentationTypeItems.IfcTessellatedItem.name())) {
@@ -114,7 +114,7 @@ public class IFCShapeDataExtractor {
                 ArrayList<Point3D> shapeData = getShapeDataFromIfcExtrudedAreaSolid(ifcModel, item);
                 // check if entity includes(floor-)openings and handle them
                 // shapeDataWithOpeningHandling will be null, if no openings exists or type of opening not supported
-                ArrayList<Point3D> shapeDataWithOpeningHandling = handleOpeningsInEntityShape(ifcModel, shapeData, bodyRepresentation.getRootObjectEntity());
+                ArrayList<Point3D> shapeDataWithOpeningHandling = handleOpeningsInEntityShape(ifcModel, shapeData, bodyRepresentation.getRootEntity());
                 if (shapeDataWithOpeningHandling != null) shapeRep.addAll(shapeDataWithOpeningHandling);
                 else if (shapeData != null) shapeRep.addAll(shapeData);
             } else if (repItemType.equals(SweptSolidRepresentationTypeItems.IfcRevolvedAreaSolid.name())) {
@@ -138,11 +138,11 @@ public class IFCShapeDataExtractor {
      * @param boxRepresentation representation of box
      * @return List of points representing object shape or null if object type not supported
      */
-    public static List<Point3D> getDataFromBoxRepresentation(ModelPopulation ifcModel, IFCShapeRepresentationIdentity boxRepresentation) {
+    public static List<Point3D> getDataFromBoxRepresentation(ModelPopulation ifcModel, IfcRepresentation boxRepresentation) {
         ArrayList<Point3D> shapeRep = new ArrayList<>();
 
         // get IFCObject and RepresentationIdentifier
-        EntityInstance repObject = boxRepresentation.getRepresentationObjectEntity();
+        EntityInstance repObject = boxRepresentation.getEntity();
 
         // get IfcRepresentationItems
         ArrayList<EntityInstance> boxItems = repObject.getAttributeValueBNasEntityInstanceList("Items");
@@ -183,11 +183,11 @@ public class IFCShapeDataExtractor {
      * @param axisRepresentation representation of axis
      * @return List of points representing object shape or null if object type not supported
      */
-    static ArrayList<Point3D> getDataFromAxisRepresentation(ModelPopulation ifcModel, IFCShapeRepresentationIdentity axisRepresentation) {
+    static ArrayList<Point3D> getDataFromAxisRepresentation(ModelPopulation ifcModel, IfcRepresentation axisRepresentation) {
         ArrayList<Point3D> shapeRep = new ArrayList<>();
 
         // get IFCObject and RepresentationIdentifier
-        EntityInstance repObject = axisRepresentation.getRepresentationObjectEntity();
+        EntityInstance repObject = axisRepresentation.getEntity();
 
         // get IfcRepresentationItems of object
         ArrayList<EntityInstance> axisItems = repObject.getAttributeValueBNasEntityInstanceList("Items");
@@ -594,7 +594,7 @@ public class IFCShapeDataExtractor {
         }
 
         // IfcVoidingFeature as opening element is not supported right now
-        Logging.info(IFCShapeDataExtractor.class.getName() + ": IfcVoidingFeature is not supported right now");
+        Logging.info(IfcRepresentationExtractor.class.getName() + ": IfcVoidingFeature is not supported right now");
         return null;
     }
 
@@ -645,7 +645,7 @@ public class IFCShapeDataExtractor {
      * @param representationItemType representation item as string
      */
     private static void logNotSupportedRepresentationTypeInfo(String representationItemType) {
-        Logging.info(IFCShapeDataExtractor.class.getName() + ": " + representationItemType + " is not supported right now");
+        Logging.info(IfcRepresentationExtractor.class.getName() + ": " + representationItemType + " is not supported right now");
     }
 
 }

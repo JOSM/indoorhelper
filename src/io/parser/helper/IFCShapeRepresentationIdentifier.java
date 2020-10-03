@@ -2,8 +2,8 @@
 package io.parser.helper;
 
 import io.model.BIMtoOSMCatalog.BIMObject;
-import io.parser.data.IFCShapeRepresentationCatalog.*;
-import io.parser.data.IFCShapeRepresentationIdentity;
+import io.parser.data.ifc.IfcRepresentationCatalog.*;
+import io.parser.data.ifc.IfcRepresentation;
 import nl.tue.buildingsmart.express.population.EntityInstance;
 import nl.tue.buildingsmart.express.population.ModelPopulation;
 import org.openstreetmap.josm.tools.Logging;
@@ -23,13 +23,13 @@ public class IFCShapeRepresentationIdentifier {
      * @param shapeRepresentation IFCShapeRepresentationIdentity
      * @return Returns object containing IFCSHAPEREPRESENTATION.REPRESENTATIONIDENTIFIER and IFCSHAPEREPRESENTATION.REPRESENTATIONTYPE
      */
-    public static IFCShapeRepresentationIdentity identifyShapeRepresentation(EntityInstance shapeRepresentation) {
-        IFCShapeRepresentationIdentity rep = new IFCShapeRepresentationIdentity();
+    public static IfcRepresentation identifyShapeRepresentation(EntityInstance shapeRepresentation) {
+        IfcRepresentation rep = new IfcRepresentation();
         String identifier = prepareRepresentationAttribute(shapeRepresentation.getAttributeValueBN("RepresentationIdentifier").toString());
         String type = prepareRepresentationAttribute(shapeRepresentation.getAttributeValueBN("RepresentationType").toString());
 
         // set representationObjectId
-        rep.setRepresentationObjectEntity(shapeRepresentation);
+        rep.setEntity(shapeRepresentation);
 
         // get identifier
         for (RepresentationIdentifier i : RepresentationIdentifier.values()) {
@@ -58,7 +58,7 @@ public class IFCShapeRepresentationIdentifier {
      * @param item     to get the representation type for (IFCSHAPEREPRESENTATION.ITEM packed into EntityInstance object)
      * @return String with IFCSHAPEREPRESENTATION.ITEM type definition or null if not allowed in standard
      */
-    public static String getRepresentationItemType(ModelPopulation ifcModel, IFCShapeRepresentationIdentity ident, EntityInstance item) {
+    public static String getRepresentationItemType(ModelPopulation ifcModel, IfcRepresentation ident, EntityInstance item) {
 
         if (ident.getType().equals(RepresentationType.AdvancedBrep)) {
             // here IFC standard only allows IFCADVANCEDBREP and IFCFACETEDBREP as item

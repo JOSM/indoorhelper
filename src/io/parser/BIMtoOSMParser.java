@@ -4,10 +4,13 @@ package io.parser;
 import io.controller.ImportEventListener;
 import io.model.BIMtoOSMCatalog;
 import io.parser.data.*;
-import io.parser.data.IFCShapeRepresentationCatalog.IfcSpatialStructureElementTypes;
-import io.parser.data.IFCShapeRepresentationCatalog.RepresentationIdentifier;
+import io.parser.data.ifc.IfcRepresentationCatalog.IfcSpatialStructureElementTypes;
+import io.parser.data.ifc.IfcRepresentationCatalog.RepresentationIdentifier;
+import io.parser.data.ifc.IfcRepresentation;
+import io.parser.data.ifc.IfcUnitCatalog;
+import io.parser.data.math.Point3D;
 import io.parser.helper.BIMtoOSMHelper;
-import io.parser.helper.IFCShapeDataExtractor;
+import io.parser.helper.IfcRepresentationExtractor;
 import io.parser.helper.IFCShapeRepresentationIdentifier;
 import io.parser.math.ParserGeoMath;
 import io.parser.math.ParserMath;
@@ -54,8 +57,8 @@ public class BIMtoOSMParser {
 
     private ModelPopulation ifcModel;
     private TagCatalog tagCatalog;
-    private IFCUnitsCatalog.LENGTHUNIT lengthUnit;
-    private IFCUnitsCatalog.PLANEANGLEUNIT angleUnit;
+    private IfcUnitCatalog.LENGTHUNIT lengthUnit;
+    private IfcUnitCatalog.PLANEANGLEUNIT angleUnit;
 
     private final int defaultLevel = 999;
 
@@ -74,8 +77,8 @@ public class BIMtoOSMParser {
         }
         ifcSchemaFilePath = resourcePathDir + IFC2X3_TC1_Schema;
         tagCatalog = new TagCatalog();
-        lengthUnit = IFCUnitsCatalog.LENGTHUNIT.M;    // default
-        angleUnit = IFCUnitsCatalog.PLANEANGLEUNIT.RAD;    // default
+        lengthUnit = IfcUnitCatalog.LENGTHUNIT.M;    // default
+        angleUnit = IfcUnitCatalog.PLANEANGLEUNIT.RAD;    // default
     }
 
     /**
@@ -273,7 +276,7 @@ public class BIMtoOSMParser {
             // check if object is part of contained entities
             for (EntityInstance element : containedElements) {
 
-                if (element.getId() == object.getObjectId()) {
+                if (element.getId() == object.getId()) {
                     // if part of contained elements get Elevation entity from object
                     EntityInstance relatingStructure = entity.getAttributeValueBNasEntityInstance("RelatingStructure");
 
@@ -282,7 +285,7 @@ public class BIMtoOSMParser {
                     if (!relatingStructureType.equals(IfcSpatialStructureElementTypes.IfcBuildingStorey.name()))
                         return 0;
                     // if of type IFCBUILDINGSTOREY
-                    double storeyElevation = IFCShapeDataExtractor.prepareDoubleString((String) relatingStructure.getAttributeValueBN("Elevation"));
+                    double storeyElevation = IfcRepresentationExtractor.prepareDoubleString((String) relatingStructure.getAttributeValueBN("Elevation"));
 
                     // get assigned level tag to Elevation entity
                     for (Pair<Double, Integer> identifier : levelIdentifierList) {
@@ -313,7 +316,7 @@ public class BIMtoOSMParser {
         // run thru IfcRelContainedInSpatialStructure and get the buildingStorey elements. Those elements include an Elevation entity
         for (EntityInstance entity : relContainedInSpatialStructureElements) {
             EntityInstance buildingStorey = entity.getAttributeValueBNasEntityInstance("RelatingStructure");
-            double storeyElevation = IFCShapeDataExtractor.prepareDoubleString((String) buildingStorey.getAttributeValueBN("Elevation"));
+            double storeyElevation = IfcRepresentationExtractor.prepareDoubleString((String) buildingStorey.getAttributeValueBN("Elevation"));
             levelList.add(storeyElevation);
         }
 
@@ -388,17 +391,17 @@ public class BIMtoOSMParser {
         if (ifcSite.getAttributeValueBNasEntityInstance("Representation") != null) {
             // get the offset between IFCSITE geodetic coordinates and building origin coordinate
             // handle IFCSITE offset if IFCBOUNDINGBOX representation
-            List<IFCShapeRepresentationIdentity> repObjectIdentities = BIMtoOSMHelper.identifyRepresentationsOfObject(ifcSite);
+            List<IfcRepresentation> repObjectIdentities = BIMtoOSMHelper.identifyRepresentationsOfObject(ifcSite);
             if (repObjectIdentities == null) return null;
 
-            IFCShapeRepresentationIdentity boxRepresentation =
+            IfcRepresentation boxRepresentation =
                     BIMtoOSMHelper.getRepresentationSpecificObjectType(repObjectIdentities, RepresentationIdentifier.Box);
             if (boxRepresentation != null) {
                 // get offset
-                EntityInstance bb = boxRepresentation.getRepresentationObjectEntity();
+                EntityInstance bb = boxRepresentation.getEntity();
                 EntityInstance bbItem = bb.getAttributeValueBNasEntityInstanceList("Items").get(0);
                 EntityInstance cartesianCorner = bbItem.getAttributeValueBNasEntityInstance("Corner");
-                ifcSiteOffset = IFCShapeDataExtractor.ifcCartesianCoordinateToPoint3D(cartesianCorner);
+                ifcSiteOffset = IfcRepresentationExtractor.ifcCartesianCoordinateToPoint3D(cartesianCorner);
             }
         }
 
@@ -416,13 +419,13 @@ public class BIMtoOSMParser {
 
         // transform angle measurement to latlon
         double lat = ParserGeoMath.degreeMinutesSecondsToLatLon(
-                IFCShapeDataExtractor.prepareDoubleString(refLat.get(0)),
-                IFCShapeDataExtractor.prepareDoubleString(refLat.get(1)),
-                IFCShapeDataExtractor.prepareDoubleString(refLat.get(2)));
+                IfcRepresentationExtractor.prepareDoubleString(refLat.get(0)),
+                IfcRepresentationExtractor.prepareDoubleString(refLat.get(1)),
+                IfcRepresentationExtractor.prepareDoubleString(refLat.get(2)));
         double lon = ParserGeoMath.degreeMinutesSecondsToLatLon(
-                IFCShapeDataExtractor.prepareDoubleString(refLon.get(0)),
-                IFCShapeDataExtractor.prepareDoubleString(refLon.get(1)),
-                IFCShapeDataExtractor.prepareDoubleString(refLon.get(2)));
+                IfcRepresentationExtractor.prepareDoubleString(refLon.get(0)),
+                IfcRepresentationExtractor.prepareDoubleString(refLon.get(1)),
+                IfcRepresentationExtractor.prepareDoubleString(refLon.get(2)));
 
         // if offset, calculate building origin without offset
         if (ifcSiteOffset != null && ifcSiteOffset.getX() != 0.0 && ifcSiteOffset.getY() != 0.0) {
@@ -509,8 +512,8 @@ public class BIMtoOSMParser {
                     if (unitLabel.equals(".METRE.")) {
                         try {
                             String unitPrefix = (String) unit.getAttributeValueBN("Prefix");
-                            if (unitPrefix.equals(".CENTI.")) lengthUnit = IFCUnitsCatalog.LENGTHUNIT.CM;
-                            if (unitPrefix.equals(".MILLI.")) lengthUnit = IFCUnitsCatalog.LENGTHUNIT.MM;
+                            if (unitPrefix.equals(".CENTI.")) lengthUnit = IfcUnitCatalog.LENGTHUNIT.CM;
+                            if (unitPrefix.equals(".MILLI.")) lengthUnit = IfcUnitCatalog.LENGTHUNIT.MM;
                             break;
                             // TODO handle more prefixes
                         } catch (NullPointerException e) {
@@ -521,7 +524,7 @@ public class BIMtoOSMParser {
                 }
                 if (unitType.equals(".PLANEANGLEUNIT.")) {
                     if (unitLabel.equals(".DEGREE.")) {
-                        angleUnit = IFCUnitsCatalog.PLANEANGLEUNIT.DEG;
+                        angleUnit = IfcUnitCatalog.PLANEANGLEUNIT.DEG;
                         break;
                     }
                 }
