@@ -17,6 +17,18 @@ public class Matrix3D {
     private double m21;
     private double m22;
 
+    public Matrix3D(){
+        this.m00 = 0.0;
+        this.m01 = 0.0;
+        this.m02 = 0.0;
+        this.m10 = 0.0;
+        this.m11 = 0.0;
+        this.m12 = 0.0;
+        this.m20 = 0.0;
+        this.m21 = 0.0;
+        this.m22 = 0.0;
+    }
+
     public Matrix3D(double m00, double m01, double m02,
                     double m10, double m11, double m12,
                     double m20, double m21, double m22) {

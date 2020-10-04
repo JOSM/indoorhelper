@@ -109,7 +109,7 @@ public class BIMtoOSMParser {
 //        preparedBIMData.addAll(BIMtoOSMHelper.prepareBIMObjects(ifcModel, bimFileRootId, BIMtoOSMCatalog.BIMObject.IfcWindow, filteredRawBIMData.getWindowObjects()));
         preparedBIMData.addAll(BIMtoOSMHelper.prepareBIMObjects(ifcModel, bimFileRootId, BIMtoOSMCatalog.BIMObject.IfcStair, filteredRawBIMData.getStairObjects()));
 
-        // set length/ angle etc. unit
+        // set units
         setUnits();
 
         // transform coordinates from local system to geodetic
@@ -406,8 +406,8 @@ public class BIMtoOSMParser {
         }
 
         // get RefLatitude and RefLongitude of IFCSITE
-        Vector<String> refLat = null;
-        Vector<String> refLon = null;
+        Vector<String> refLat;
+        Vector<String> refLon;
         try {
             refLat = (Vector<String>) ifcSite.getAttributeValueBN("RefLatitude");
             refLon = (Vector<String>) ifcSite.getAttributeValueBN("RefLongitude");

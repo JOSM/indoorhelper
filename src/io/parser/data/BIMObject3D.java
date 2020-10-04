@@ -8,6 +8,7 @@ import io.parser.data.math.Vector3D;
 import nl.tue.buildingsmart.express.population.EntityInstance;
 import org.openstreetmap.josm.data.coor.LatLon;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -34,6 +35,16 @@ public class BIMObject3D {
     private Vector3D translation;
     private Matrix3D rotation;
 
+    public BIMObject3D(int id){
+        this.id = id;
+        cartesianPlacement = new Point3D();
+        geodeticPlacement = new LatLon(0.0, 0.0);
+        cartesianShapeCoordinates = new ArrayList<>();
+        geodeticShapeCoordinates = new ArrayList<>();
+        translation = new Vector3D();
+        rotation = new Matrix3D();
+    }
+
     public BIMObject3D(
             int id,
             BIMtoOSMCatalog.BIMObject type,
@@ -42,7 +53,11 @@ public class BIMObject3D {
         this.id = id;
         this.type = type;
         cartesianPlacement = cartesianCorner;
+        geodeticPlacement = new LatLon(0.0, 0.0);
         cartesianShapeCoordinates = shapeCoordinates;
+        geodeticShapeCoordinates = new ArrayList<>();
+        translation = new Vector3D();
+        rotation = new Matrix3D();
     }
 
     public int getId() {

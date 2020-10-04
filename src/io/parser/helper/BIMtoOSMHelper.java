@@ -4,10 +4,11 @@ package io.parser.helper;
 import io.model.BIMtoOSMCatalog;
 import io.parser.data.BIMObject3D;
 import io.parser.data.FilteredRawBIMData;
+import io.parser.data.ifc.IfcRepresentation;
 import io.parser.data.ifc.IfcRepresentationCatalog.IfcSlabTypeEnum;
 import io.parser.data.ifc.IfcRepresentationCatalog.RepresentationIdentifier;
-import io.parser.data.ifc.IfcRepresentation;
 import io.parser.data.math.Point3D;
+import io.parser.data.math.Vector3D;
 import io.parser.math.ParserMath;
 import nl.tue.buildingsmart.express.population.EntityInstance;
 import nl.tue.buildingsmart.express.population.ModelPopulation;
@@ -103,19 +104,24 @@ public class BIMtoOSMHelper {
      * @return Prepared BIM objects
      */
     public static List<BIMObject3D> prepareBIMObjects(ModelPopulation ifcModel, int bimFileRootId, BIMtoOSMCatalog.BIMObject objectType, Vector<EntityInstance> bimObjects) {
-        // TODO improve object placement determination
+        // TODO - WIP: Improve object placement determination
         ArrayList<BIMObject3D> preparedObjects = new ArrayList<>();
 
-        for (EntityInstance object : bimObjects) {
+        for (EntityInstance objectEntity : bimObjects) {
+
+            // resolve placement
+            EntityInstance objectIFCLP = objectEntity.getAttributeValueBNasEntityInstance("ObjectPlacement");
+            BIMObject3D object = resolvePlacement(objectIFCLP, new BIMObject3D(objectEntity.getId()));
+
             // get IFCLOCALPLACEMENT of object (origin of object)
-            Point3D cartesianPlacementOfObject = getCartesianOriginOfObject(bimFileRootId, object);
+            Point3D cartesianPlacementOfObject = object.getCartesianPlacement();
 
             // get rotation matrices of object
-            double[][] xRotMatrix = getXAxisRotationMatrix(bimFileRootId, object);
-            double[][] zRotMatrix = getZAxisRotationMatrix(ifcModel, bimFileRootId, object);
+            double[][] xRotMatrix = getXAxisRotationMatrix(bimFileRootId, objectEntity);
+            double[][] zRotMatrix = getZAxisRotationMatrix(ifcModel, bimFileRootId, objectEntity);
 
             // get local points representing shape of object
-            List<Point3D> shapeDataOfObject = getShapeDataOfObject(ifcModel, object);
+            List<Point3D> shapeDataOfObject = getShapeDataOfObject(ifcModel, objectEntity);
 
             // create PreparedBIMObject3D and save
             if (cartesianPlacementOfObject != null && (shapeDataOfObject != null && !shapeDataOfObject.isEmpty())) {
@@ -154,7 +160,7 @@ public class BIMtoOSMHelper {
                 // Check if data includes IFCShapeDataExtractor.defaultPoint. IFCShapeDataExtractor.defaultPoint got added
                 // for workaround handling multiple closed loops in data set
                 if (!shapeDataOfObject.contains(IfcRepresentationExtractor.defaultPoint)) {
-                    preparedObjects.add(new BIMObject3D(object.getId(), objectType, cartesianPlacementOfObject, shapeDataOfObject));
+                    preparedObjects.add(new BIMObject3D(objectEntity.getId(), objectType, cartesianPlacementOfObject, shapeDataOfObject));
                     continue;
                 }
 
@@ -162,13 +168,13 @@ public class BIMtoOSMHelper {
                 ArrayList<Point3D> loop = new ArrayList<>();
                 for (Point3D point : shapeDataOfObject) {
                     if (point.equalsPoint3D(IfcRepresentationExtractor.defaultPoint) && !loop.isEmpty()) {
-                        preparedObjects.add(new BIMObject3D(object.getId(), objectType, cartesianPlacementOfObject, loop));
+                        preparedObjects.add(new BIMObject3D(objectEntity.getId(), objectType, cartesianPlacementOfObject, loop));
                         loop = new ArrayList<>();
                     } else if (!point.equalsPoint3D(IfcRepresentationExtractor.defaultPoint)) {
                         loop.add(point);
                     }
                     if (shapeDataOfObject.indexOf(point) == shapeDataOfObject.size() - 1 && !loop.isEmpty()) {
-                        preparedObjects.add(new BIMObject3D(object.getId(), objectType, cartesianPlacementOfObject, loop));
+                        preparedObjects.add(new BIMObject3D(objectEntity.getId(), objectType, cartesianPlacementOfObject, loop));
                     }
                 }
 
@@ -176,6 +182,61 @@ public class BIMtoOSMHelper {
         }
 
         return preparedObjects;
+    }
+
+    /**
+     * Method resolves placement of Ifc object and safes the result in {@link BIMObject3D}
+     *
+     * @param objectPlacementEntity of {@link BIMObject3D}
+     * @param object                to resolve placement of
+     * @return {@link BIMObject3D} with resolved placement
+     */
+    private static BIMObject3D resolvePlacement(EntityInstance objectPlacementEntity, BIMObject3D object) {
+        if (object == null) return null;
+        if (objectPlacementEntity == null) return object;
+
+        // get objects IFCRELATIVEPLACEMENT entity
+        EntityInstance relativePlacement = objectPlacementEntity.getAttributeValueBNasEntityInstance("RelativePlacement");
+
+        // set translation
+        Vector3D translation = getTranslationFromRelativePlacement(relativePlacement);
+        if (translation != null) {
+            object.setCartesianPlacement(new Point3D(
+                    object.getCartesianPlacement().getX() + translation.getX(),
+                    object.getCartesianPlacement().getY() + translation.getY(),
+                    object.getCartesianPlacement().getZ() + translation.getZ()
+            ));
+        }
+
+        // TODO extract and apply rotation matrix
+
+        // get id of placement relative to this (PLACEMENTRELTO)
+        if (objectPlacementEntity.getAttributeValueBNasEntityInstance("PlacementRelTo") != null) {
+            EntityInstance placementRelTo = objectPlacementEntity.getAttributeValueBNasEntityInstance("PlacementRelTo");
+            resolvePlacement(placementRelTo, object);
+        }
+        return object;
+    }
+
+    /**
+     * Method extracts translation vector from relative placement
+     *
+     * @param relativePlacement to get translation information of
+     * @return translation vector for required object
+     */
+    private static Vector3D getTranslationFromRelativePlacement(EntityInstance relativePlacement) {
+        EntityInstance cPoint = relativePlacement.getAttributeValueBNasEntityInstance("Location");
+        @SuppressWarnings("unchecked")
+        Vector<String> objectCoords = (Vector<String>) cPoint.getAttributeValueBN("Coordinates");
+        if (objectCoords.isEmpty()) return null;
+        double relativeX = prepareDoubleString(objectCoords.get(0));
+        double relativeY = prepareDoubleString(objectCoords.get(1));
+        double relativeZ = 0.0;
+        if (objectCoords.size() == 3) relativeZ = prepareDoubleString(objectCoords.get(2));
+        if (Double.isNaN(relativeX) || Double.isNaN(relativeY) || Double.isNaN(relativeZ)) {
+            return null;
+        }
+        return new Vector3D(relativeX, relativeY, relativeZ);
     }
 
     /**
@@ -231,47 +292,6 @@ public class BIMtoOSMHelper {
     }
 
     /**
-     * Get global cartesian origin coordinates of object
-     *
-     * @param bimFileRootId Root IFCLOCALPLACEMENT element of BIM file
-     * @param object        to find origin for
-     * @return cartesian origin
-     */
-    private static Point3D getCartesianOriginOfObject(int bimFileRootId, EntityInstance object) {
-
-        // get objects IFCLOCALPLACEMENT entity
-        EntityInstance objectIFCLP = object.getAttributeValueBNasEntityInstance("ObjectPlacement");
-
-        // get all RELATIVEPLACEMENTs to root
-        ArrayList<EntityInstance> objectRP = getRelativePlacementsToRoot(bimFileRootId, objectIFCLP, new ArrayList<EntityInstance>());
-
-        // calculate cartesian corner of object (origin) by using the relative placements
-        Point3D cartesianCornerOfWall = new Point3D(0.0, 0.0, 0.0);
-
-        for (EntityInstance relativeObject : objectRP) {
-            // get LOCATION (IFCCARTESIANPOINT) of IFCAXIS2PLACEMENT2D/3D including relative coordinates
-            EntityInstance cPoint = relativeObject.getAttributeValueBNasEntityInstance("Location");
-            @SuppressWarnings("unchecked")
-            Vector<String> objectCoords = (Vector<String>) cPoint.getAttributeValueBN("Coordinates");
-            if (objectCoords.isEmpty()) return null;
-            double relativeX = prepareDoubleString(objectCoords.get(0));
-            double relativeY = prepareDoubleString(objectCoords.get(1));
-            double relativeZ = 0.0;
-            if (objectCoords.size() == 3) relativeZ = prepareDoubleString(objectCoords.get(2));
-            if (Double.isNaN(relativeX) || Double.isNaN(relativeY) || Double.isNaN(relativeZ)) {
-                return null;
-            }
-
-            // add relative coordinates to finally get relative position to root element
-            cartesianCornerOfWall.setX(cartesianCornerOfWall.getX() + relativeX);
-            cartesianCornerOfWall.setY(cartesianCornerOfWall.getY() + relativeY);
-            cartesianCornerOfWall.setZ(cartesianCornerOfWall.getZ() + relativeZ);
-        }
-
-        return cartesianCornerOfWall;
-    }
-
-    /**
      * Gets rotation matrix about x-axis for ifc object
      *
      * @param bimFileRootId root IFCLOCALPLACEMENT element of BIM file
@@ -291,7 +311,7 @@ public class BIMtoOSMHelper {
 
         for (EntityInstance relativeObject : objectRP) {
             // get REFDIRECTION (x axis vector)
-            Vector<String> xDirectionRatios = null;
+            Vector<String> xDirectionRatios;
             try {
                 EntityInstance xRefDirection = relativeObject.getAttributeValueBNasEntityInstance("RefDirection");
                 // get DIRECTIONRATIOS from REFDIRECTION (vector values)
