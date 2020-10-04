@@ -6,7 +6,10 @@ import model.IndoorLevel;
 import model.TagCatalog.IndoorObject;
 import org.openstreetmap.josm.actions.ValidateAction;
 import org.openstreetmap.josm.data.Preferences;
-import org.openstreetmap.josm.data.osm.*;
+import org.openstreetmap.josm.data.osm.DataSet;
+import org.openstreetmap.josm.data.osm.OsmDataManager;
+import org.openstreetmap.josm.data.osm.OsmPrimitive;
+import org.openstreetmap.josm.data.osm.Tag;
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.help.HelpBrowser;
 import org.openstreetmap.josm.gui.mappaint.MapPaintStyles;
@@ -373,18 +376,18 @@ public class IndoorHelperController {
         DataSet editDataSet = OsmDataManager.getInstance().getEditDataSet();
         if (editDataSet != null) {
             ArrayList<OsmPrimitive> primitiveCollection = new ArrayList<>(editDataSet.allPrimitives());
+            ArrayList<OsmPrimitive> primitivesToDisable = new ArrayList<>();
             int level = Integer.parseInt(workingLevel);
-            // Find all primitives with the specific tag and check if value is part of the current working level.
-            // After that unset the disabled status.
             for (OsmPrimitive primitive : primitiveCollection) {
                 if ((primitive.isDisabledAndHidden() || primitive.isDisabled()) && primitive.hasKey(key)) {
-                    new Thread(() -> {
-                        if (IndoorLevel.isPartOfWorkingLevel(primitive.get(key), level)) {
-                            primitive.unsetDisabledState();
-                        }
-                    }).start();
+                    primitivesToDisable.add(primitive);
                 }
             }
+            new Thread(() -> primitivesToDisable.forEach(primitive -> {
+                if (IndoorLevel.isPartOfWorkingLevel(primitive.get(key), level)) {
+                    primitive.unsetDisabledState();
+                }
+            })).start();
         }
     }
 
