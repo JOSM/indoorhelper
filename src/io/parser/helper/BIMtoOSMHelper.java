@@ -7,6 +7,7 @@ import io.parser.data.FilteredRawBIMData;
 import io.parser.data.ifc.IfcRepresentation;
 import io.parser.data.ifc.IfcRepresentationCatalog.IfcSlabTypeEnum;
 import io.parser.data.ifc.IfcRepresentationCatalog.RepresentationIdentifier;
+import io.parser.data.math.Matrix3D;
 import io.parser.data.math.Point3D;
 import io.parser.data.math.Vector3D;
 import io.parser.math.ParserMath;
@@ -208,7 +209,11 @@ public class BIMtoOSMHelper {
             ));
         }
 
-        // TODO extract and apply rotation matrix
+        // set rotation
+        Matrix3D rotation = getRotationFromRelativePlacement(relativePlacement);
+        if(rotation != null){
+            object.getRotation().multiply(rotation);
+        }
 
         // get id of placement relative to this (PLACEMENTRELTO)
         if (objectPlacementEntity.getAttributeValueBNasEntityInstance("PlacementRelTo") != null) {
@@ -216,6 +221,54 @@ public class BIMtoOSMHelper {
             resolvePlacement(placementRelTo, object);
         }
         return object;
+    }
+
+    private static Matrix3D getRotationFromRelativePlacement(EntityInstance relativePlacement){
+        Vector<String> axis;
+        Vector<String> refDirection;
+        try {
+            // get Axis
+            EntityInstance axisEntity = relativePlacement.getAttributeValueBNasEntityInstance("RefDirection");
+            axis = (Vector<String>) axisEntity.getAttributeValueBN("DirectionRatios");
+            // get RefDirection
+            EntityInstance refDirectionEntity = relativePlacement.getAttributeValueBNasEntityInstance("RefDirection");
+            refDirection = (Vector<String>) refDirectionEntity.getAttributeValueBN("DirectionRatios");
+            if (refDirection.isEmpty() || axis.isEmpty()) return null;
+        } catch (NullPointerException e) {
+            return null;
+        }
+
+        // pack data for calculation
+        Vector3D refDirectionVector = new Vector3D();
+        Vector3D axisVector = new Vector3D();
+        if (refDirection.size() == 2) {
+            refDirectionVector.setX(prepareDoubleString(refDirection.get(0)));
+            refDirectionVector.setY(prepareDoubleString(refDirection.get(1)));
+        }
+        if (refDirection.size() == 3) {
+            refDirectionVector.setZ(prepareDoubleString(refDirection.get(2)));
+        }
+        if (axis.size() == 2) {
+            axisVector.setX(prepareDoubleString(axis.get(0)));
+            axisVector.setY(prepareDoubleString(axis.get(1)));
+        }
+        if (refDirection.size() == 3) {
+            axisVector.setZ(prepareDoubleString(axis.get(2)));
+        }
+
+        // build rotation matrix
+        Vector3D xNorm = new Vector3D();
+        xNorm.normalize(axisVector);
+        Vector3D yNorm = new Vector3D();
+        yNorm.cross(refDirectionVector, axisVector);
+        yNorm.normalize();
+        Vector3D zNorm = new Vector3D();
+        zNorm.normalize(axisVector);
+        return new Matrix3D(
+                xNorm.getX(), xNorm.getY(), xNorm.getZ(),
+                yNorm.getX(), yNorm.getY(), yNorm.getZ(),
+                zNorm.getX(), zNorm.getY(), zNorm.getZ()
+        );
     }
 
     /**
