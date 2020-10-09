@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
+import static io.parser.ParserUtility.prepareDoubleString;
+
 /**
  * Class helps parsing BIM data with providing methods to extract OSM relevant data
  *
@@ -618,25 +620,6 @@ public class IfcRepresentationExtractor {
             return null;
         }
         return new Point3D(x, y, z);
-    }
-
-    /**
-     * Parses string of double value from IFC file into proper double
-     *
-     * @param doubleString String of coordinate
-     * @return double representing double
-     */
-    public static double prepareDoubleString(String doubleString) {
-        if (doubleString == null) return Double.NaN;
-        if (doubleString.endsWith(".")) {
-            doubleString = doubleString + "0";
-        }
-        try {
-            return Double.parseDouble(doubleString);
-        } catch (NumberFormatException e) {
-            Logging.error(e.getMessage());
-            return Double.NaN;
-        }
     }
 
     /**
