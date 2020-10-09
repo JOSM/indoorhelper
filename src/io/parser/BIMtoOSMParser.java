@@ -3,15 +3,17 @@ package io.parser;
 
 import io.controller.ImportEventListener;
 import io.model.BIMtoOSMCatalog;
-import io.parser.data.*;
+import io.parser.data.BIMObject3D;
+import io.parser.data.FilteredRawBIMData;
+import io.parser.data.ifc.IfcRepresentation;
 import io.parser.data.ifc.IfcRepresentationCatalog.IfcSpatialStructureElementTypes;
 import io.parser.data.ifc.IfcRepresentationCatalog.RepresentationIdentifier;
-import io.parser.data.ifc.IfcRepresentation;
 import io.parser.data.ifc.IfcUnitCatalog;
 import io.parser.data.math.Point3D;
+import io.parser.data.math.Vector3D;
 import io.parser.helper.BIMtoOSMHelper;
-import io.parser.helper.IfcRepresentationExtractor;
 import io.parser.helper.IFCShapeRepresentationIdentifier;
+import io.parser.helper.IfcRepresentationExtractor;
 import io.parser.math.ParserGeoMath;
 import io.parser.math.ParserMath;
 import model.TagCatalog;
@@ -35,6 +37,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.*;
 
+import static io.parser.ParserUtility.prepareDoubleString;
+import static io.parser.ParserUtility.stringVectorToVector3D;
 import static org.openstreetmap.josm.tools.I18n.tr;
 
 /**
@@ -285,7 +289,7 @@ public class BIMtoOSMParser {
                     if (!relatingStructureType.equals(IfcSpatialStructureElementTypes.IfcBuildingStorey.name()))
                         return 0;
                     // if of type IFCBUILDINGSTOREY
-                    double storeyElevation = IfcRepresentationExtractor.prepareDoubleString((String) relatingStructure.getAttributeValueBN("Elevation"));
+                    double storeyElevation = prepareDoubleString((String) relatingStructure.getAttributeValueBN("Elevation"));
 
                     // get assigned level tag to Elevation entity
                     for (Pair<Double, Integer> identifier : levelIdentifierList) {
@@ -316,7 +320,7 @@ public class BIMtoOSMParser {
         // run thru IfcRelContainedInSpatialStructure and get the buildingStorey elements. Those elements include an Elevation entity
         for (EntityInstance entity : relContainedInSpatialStructureElements) {
             EntityInstance buildingStorey = entity.getAttributeValueBNasEntityInstance("RelatingStructure");
-            double storeyElevation = IfcRepresentationExtractor.prepareDoubleString((String) buildingStorey.getAttributeValueBN("Elevation"));
+            double storeyElevation = prepareDoubleString((String) buildingStorey.getAttributeValueBN("Elevation"));
             levelList.add(storeyElevation);
         }
 
@@ -419,13 +423,13 @@ public class BIMtoOSMParser {
 
         // transform angle measurement to latlon
         double lat = ParserGeoMath.degreeMinutesSecondsToLatLon(
-                IfcRepresentationExtractor.prepareDoubleString(refLat.get(0)),
-                IfcRepresentationExtractor.prepareDoubleString(refLat.get(1)),
-                IfcRepresentationExtractor.prepareDoubleString(refLat.get(2)));
+                prepareDoubleString(refLat.get(0)),
+                prepareDoubleString(refLat.get(1)),
+                prepareDoubleString(refLat.get(2)));
         double lon = ParserGeoMath.degreeMinutesSecondsToLatLon(
-                IfcRepresentationExtractor.prepareDoubleString(refLon.get(0)),
-                IfcRepresentationExtractor.prepareDoubleString(refLon.get(1)),
-                IfcRepresentationExtractor.prepareDoubleString(refLon.get(2)));
+                prepareDoubleString(refLon.get(0)),
+                prepareDoubleString(refLon.get(1)),
+                prepareDoubleString(refLon.get(2)));
 
         // if offset, calculate building origin without offset
         if (ifcSiteOffset != null && ifcSiteOffset.getX() != 0.0 && ifcSiteOffset.getY() != 0.0) {
@@ -452,19 +456,9 @@ public class BIMtoOSMParser {
         } catch (NullPointerException e) {
             return null;
         }
-
-        double x = 0;
-        double y = 0;
-        double z = 0;
-        if (projectNorthDirectionRatios.size() == 2) {
-            x = BIMtoOSMHelper.prepareDoubleString(projectNorthDirectionRatios.get(0));
-            y = BIMtoOSMHelper.prepareDoubleString(projectNorthDirectionRatios.get(1));
-        } else if (projectNorthDirectionRatios.size() == 3) {
-            x = BIMtoOSMHelper.prepareDoubleString(projectNorthDirectionRatios.get(0));
-            y = BIMtoOSMHelper.prepareDoubleString(projectNorthDirectionRatios.get(1));
-            z = BIMtoOSMHelper.prepareDoubleString(projectNorthDirectionRatios.get(2));
-        }
-        return new Point3D(x, y, z);
+        Vector3D pNDRVector = stringVectorToVector3D(projectNorthDirectionRatios);
+        if(pNDRVector == null) return null;
+        return new Point3D(pNDRVector.getX(), pNDRVector.getY(), pNDRVector.getZ());
     }
 
     /**
@@ -483,19 +477,9 @@ public class BIMtoOSMParser {
         } catch (NullPointerException e) {
             return null;
         }
-
-        double x = 0;
-        double y = 0;
-        double z = 0;
-        if (trueNorthDirectionRatios.size() == 2) {
-            x = BIMtoOSMHelper.prepareDoubleString(trueNorthDirectionRatios.get(0));
-            y = BIMtoOSMHelper.prepareDoubleString(trueNorthDirectionRatios.get(1));
-        } else if (trueNorthDirectionRatios.size() == 3) {
-            x = BIMtoOSMHelper.prepareDoubleString(trueNorthDirectionRatios.get(0));
-            y = BIMtoOSMHelper.prepareDoubleString(trueNorthDirectionRatios.get(1));
-            z = BIMtoOSMHelper.prepareDoubleString(trueNorthDirectionRatios.get(2));
-        }
-        return new Point3D(x, y, z);
+        Vector3D tNDRVector = stringVectorToVector3D(trueNorthDirectionRatios);
+        if(tNDRVector == null) return null;
+        return new Point3D(tNDRVector.getX(), tNDRVector.getY(), tNDRVector.getZ());
     }
 
     /**
