@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- License: GPL. For details, see LICENSE file. -->
+<ivy-module version="2.0">
+    <info organisation="org.openstreetmap.josm.plugins" module="indoorhelper"/>
+    <dependencies>
+        <dependency org="org.opensourcebim" name="BuildingSMARTLibrary" rev="1.0.9" conf="default->default"/>
+    </dependencies>
+</ivy-module>
