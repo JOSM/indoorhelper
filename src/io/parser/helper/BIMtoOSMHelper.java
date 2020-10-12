@@ -127,36 +127,27 @@ public class BIMtoOSMHelper {
 
             // create PreparedBIMObject3D and save
             if (cartesianOrigin != null && (shapeDataOfObject != null && !shapeDataOfObject.isEmpty())) {
-                // rotation about z-axis
+
                 if (zRotMatrix != null) {
                     for (Point3D point : shapeDataOfObject) {
+                        if (point.equalsPoint3D(IfcRepresentationExtractor.defaultPoint)) continue;    // for workaround
+                        // rotate TODO: improve
                         double[] pointAsVector = {point.getX(), point.getY(), point.getZ()};
-                        double[] rotatedPoint = ParserMath.rotate3DPoint(pointAsVector, zRotMatrix);
-                        point.setX(rotatedPoint[0]);
-                        point.setY(rotatedPoint[1]);
-                        point.setZ(rotatedPoint[2]);
-                    }
-                }
+                        double[] rotatedZPoint = ParserMath.rotate3DPoint(pointAsVector, zRotMatrix);
+                        double[] rotatedXPoint = ParserMath.rotate3DPoint(rotatedZPoint, xRotMatrix);
+                        if (rotatedXPoint != null) {
+                            point.setX(rotatedXPoint[0]);
+                            point.setY(rotatedXPoint[1]);
+                            point.setZ(rotatedXPoint[2]);
+                        }
+                        // translate
+                        Vector3D pointVec = new Vector3D(point.getX(), point.getY(), point.getZ());
+                        pointVec.add(object.getTranslation());
+                        point.setX(pointVec.getX());
+                        point.setY(pointVec.getY());
+                        point.setZ(pointVec.getZ());
 
-                // rotation about x-axis
-                for (Point3D point : shapeDataOfObject) {
-                    if (point.equalsPoint3D(IfcRepresentationExtractor.defaultPoint)) continue;    // for workaround
-                    double[] pointAsVector = {point.getX(), point.getY(), point.getZ()};
-                    double[] rotatedPoint = ParserMath.rotate3DPoint(pointAsVector, xRotMatrix);
-                    if (rotatedPoint != null) {
-                        point.setX(rotatedPoint[0]);
-                        point.setY(rotatedPoint[1]);
-                        point.setZ(rotatedPoint[2]);
                     }
-                }
-
-                // translate points to object placement origin
-                for (Point3D point : shapeDataOfObject) {
-                    if (point.equalsPoint3D(IfcRepresentationExtractor.defaultPoint)) {
-                        continue;    // for workaround
-                    }
-                    point.setX(point.getX() + cartesianOrigin.getX());
-                    point.setY(point.getY() + cartesianOrigin.getY());
                 }
 
                 // Check if data includes IFCShapeDataExtractor.defaultPoint. IFCShapeDataExtractor.defaultPoint got added

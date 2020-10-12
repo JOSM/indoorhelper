@@ -154,6 +154,23 @@ public class Matrix3D {
     }
 
     /**
+     * Sets this matrix to identity
+     */
+    public void setIdentity(){
+        this.m00 = 1.0;
+        this.m01 = 0.0;
+        this.m02 = 0.0;
+
+        this.m10 = 0.0;
+        this.m11 = 1.0;
+        this.m12 = 0.0;
+
+        this.m20 = 0.0;
+        this.m21 = 0.0;
+        this.m22 = 1.0;
+    }
+
+    /**
      * Set values of this matrix to values from param matrix
      * @param matrix to get values from
      */

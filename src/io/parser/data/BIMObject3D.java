@@ -1,16 +1,15 @@
 // License: AGPL. For details, see LICENSE file.
 package io.parser.data;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.openstreetmap.josm.data.coor.LatLon;
-
 import io.model.BIMtoOSMCatalog;
 import io.parser.data.math.Matrix3D;
 import io.parser.data.math.Point3D;
 import io.parser.data.math.Vector3D;
 import nl.tue.buildingsmart.express.population.EntityInstance;
+import org.openstreetmap.josm.data.coor.LatLon;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Class holding OSM relevant data of 3D BIM object
@@ -40,6 +39,7 @@ public class BIMObject3D {
         geodeticShapeCoordinates = new ArrayList<>();
         translation = new Vector3D();
         rotation = new Matrix3D();
+        rotation.setIdentity();
     }
 
     public BIMObject3D(
@@ -53,6 +53,7 @@ public class BIMObject3D {
         geodeticShapeCoordinates = new ArrayList<>();
         translation = cartesianOrigin;
         rotation = new Matrix3D();
+        rotation.setIdentity();
     }
 
     public int getId() {
