@@ -127,7 +127,7 @@ public class Matrix3D {
         return m22;
     }
 
-    public void print(){
+    public void print() {
         System.out.print(this.getM00() + ", ");
         System.out.print(this.getM01() + ", ");
         System.out.print(this.getM02() + "\n");
@@ -139,16 +139,16 @@ public class Matrix3D {
         System.out.print(this.getM22() + "\n");
     }
 
-    public boolean equalsMatrix(Matrix3D matrix){
-        if(this.m00 != matrix.m00) return false;
-        if(this.m01 != matrix.m01) return false;
-        if(this.m02 != matrix.m02) return false;
-        if(this.m10 != matrix.m10) return false;
-        if(this.m11 != matrix.m11) return false;
-        if(this.m12 != matrix.m12) return false;
-        if(this.m20 != matrix.m20) return false;
-        if(this.m21 != matrix.m21) return false;
-        if(this.m22 != matrix.m22) return false;
+    public boolean equalsMatrix(Matrix3D matrix) {
+        if (this.m00 != matrix.m00) return false;
+        if (this.m01 != matrix.m01) return false;
+        if (this.m02 != matrix.m02) return false;
+        if (this.m10 != matrix.m10) return false;
+        if (this.m11 != matrix.m11) return false;
+        if (this.m12 != matrix.m12) return false;
+        if (this.m20 != matrix.m20) return false;
+        if (this.m21 != matrix.m21) return false;
+        if (this.m22 != matrix.m22) return false;
 
         return true;
     }
@@ -156,7 +156,7 @@ public class Matrix3D {
     /**
      * Sets this matrix to identity
      */
-    public void setIdentity(){
+    public void setIdentity() {
         this.m00 = 1.0;
         this.m01 = 0.0;
         this.m02 = 0.0;
@@ -172,9 +172,10 @@ public class Matrix3D {
 
     /**
      * Set values of this matrix to values from param matrix
+     *
      * @param matrix to get values from
      */
-    public void set(Matrix3D matrix){
+    public void set(Matrix3D matrix) {
         this.m00 = matrix.m00;
         this.m01 = matrix.m01;
         this.m02 = matrix.m02;
@@ -218,9 +219,10 @@ public class Matrix3D {
 
     /**
      * Transforms param vector with using this matrix
+     *
      * @param vec to transform
      */
-    public void transform(Vector3D vec){
+    public void transform(Vector3D vec) {
         double x = this.m00 * vec.getX() + this.m01 * vec.getY() + this.m02 * vec.getZ();
         double y = this.m10 * vec.getX() + this.m11 * vec.getY() + this.m12 * vec.getZ();
         vec.setZ(this.m20 * vec.getX() + this.m21 * vec.getY() + this.m22 * vec.getZ());
@@ -233,7 +235,7 @@ public class Matrix3D {
      *
      * @param scalar multiplier
      */
-    public void multiply(double scalar){
+    public void multiply(double scalar) {
         this.m00 *= scalar;
         this.m01 *= scalar;
         this.m02 *= scalar;
@@ -250,11 +252,11 @@ public class Matrix3D {
     /**
      * Inverts and sets this matrix
      */
-    public void invert(){
+    public void invert() {
         Matrix3D inverse = new Matrix3D();
         double det = det();
-        if(det == 0)    return;
-        double factor = 1.0/det;
+        if (det == 0) return;
+        double factor = 1.0 / det;
 
         double inverse00 = this.m11 * this.m22 - this.m12 * this.m21;
         double inverse01 = this.m02 * this.m21 - this.m01 * this.m22;
@@ -285,6 +287,7 @@ public class Matrix3D {
 
     /**
      * Calculates the determinant of this matrix
+     *
      * @return determinant of matrix
      */
     public double det() {

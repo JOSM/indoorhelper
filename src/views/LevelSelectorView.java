@@ -1,30 +1,22 @@
 // License: AGPL. For details, see LICENSE file.
 package views;
 
-import static org.openstreetmap.josm.tools.I18n.tr;
+import org.openstreetmap.josm.gui.widgets.DisableShortcutsOnFocusGainedTextField;
 
-import java.awt.BorderLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.WindowListener;
 
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-
-import org.openstreetmap.josm.gui.widgets.DisableShortcutsOnFocusGainedTextField;
+import static org.openstreetmap.josm.tools.I18n.tr;
 
 /**
  * This is the level selector toolbox of the indoorhelper plug-in.
  *
  * @author rebsc
- *
  */
 public class LevelSelectorView extends JFrame {
 
@@ -76,10 +68,10 @@ public class LevelSelectorView extends JFrame {
         //======== contentPanel ========
 
         contentPanel.setLayout(new GridBagLayout());
-        ((GridBagLayout) contentPanel.getLayout()).columnWidths = new int[] {0, 0, 0, 0, 0};
-        ((GridBagLayout) contentPanel.getLayout()).rowHeights = new int[] {0, 0, 0, 0, 0, 0};
-        ((GridBagLayout) contentPanel.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 1.0E-4};
-        ((GridBagLayout) contentPanel.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
+        ((GridBagLayout) contentPanel.getLayout()).columnWidths = new int[]{0, 0, 0, 0, 0};
+        ((GridBagLayout) contentPanel.getLayout()).rowHeights = new int[]{0, 0, 0, 0, 0, 0};
+        ((GridBagLayout) contentPanel.getLayout()).columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 1.0E-4};
+        ((GridBagLayout) contentPanel.getLayout()).rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
 
         //---- Label2 ----
         label2.setText(tr("level number:"));
@@ -92,7 +84,8 @@ public class LevelSelectorView extends JFrame {
         field.addFocusListener(new FocusListener() {
 
             @Override
-            public void focusLost(FocusEvent e) {}
+            public void focusLost(FocusEvent e) {
+            }
 
             @Override
             public void focusGained(FocusEvent e) {
@@ -109,8 +102,8 @@ public class LevelSelectorView extends JFrame {
 
         buttonBar.setBorder(new EmptyBorder(12, 0, 0, 0));
         buttonBar.setLayout(new GridBagLayout());
-        ((GridBagLayout) buttonBar.getLayout()).columnWidths = new int[] {0, 85, 80};
-        ((GridBagLayout) buttonBar.getLayout()).columnWeights = new double[] {1.0, 0.0, 0.0};
+        ((GridBagLayout) buttonBar.getLayout()).columnWidths = new int[]{0, 85, 80};
+        ((GridBagLayout) buttonBar.getLayout()).columnWeights = new double[]{1.0, 0.0, 0.0};
 
         //---- okButton ----
         okButton.setText(tr("OK"));

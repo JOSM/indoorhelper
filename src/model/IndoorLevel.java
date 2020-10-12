@@ -94,8 +94,9 @@ public class IndoorLevel {
 
     /**
      * Checks if repeat_on tag value includes current working level value
+     *
      * @param repeatOnValue tag as string
-     * @param workingLevel current working level as value
+     * @param workingLevel  current working level as value
      * @return true if repeat_on tag includes current working level, else false
      */
     public static boolean isPartOfWorkingLevel(String repeatOnValue, int workingLevel) {

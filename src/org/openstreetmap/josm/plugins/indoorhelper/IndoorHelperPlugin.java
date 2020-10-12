@@ -26,14 +26,14 @@ import java.io.*;
  */
 public class IndoorHelperPlugin extends Plugin implements PaintableInvalidationListener, ActiveLayerChangeListener {
 
-    private IndoorHelperController indoorController;	// controller for indoor helper panel
-	private ImportDataController importController = null;		// controller for import function
+    private IndoorHelperController indoorController;    // controller for indoor helper panel
+    private ImportDataController importController = null;        // controller for import function
 
     String sep = System.getProperty("file.separator");
 
     /**
      * Constructor for the plug-in.
-     *
+     * <p>
      * Exports the needed files and adds them to the settings.
      *
      * @param info general information about the plug-in
@@ -55,7 +55,7 @@ public class IndoorHelperPlugin extends Plugin implements PaintableInvalidationL
         if (oldFrame == null && newFrame != null) {
             // Secures that the plug-in is only loaded, if a new MapFrame is created.
             indoorController = new IndoorHelperController();
-            if(importController == null) {
+            if (importController == null) {
                 importController = new ImportDataController();
             }
         }
@@ -63,6 +63,7 @@ public class IndoorHelperPlugin extends Plugin implements PaintableInvalidationL
 
     /**
      * Exports the mapCSS file to the preferences directory.
+     *
      * @param resourceName resource name
      * @throws IOException if any I/O error occurs
      */
@@ -79,7 +80,7 @@ public class IndoorHelperPlugin extends Plugin implements PaintableInvalidationL
             String valDirPath = Config.getDirs().getUserDataDirectory(true) + sep + "styles";
             File valDir = new File(valDirPath);
             valDir.mkdirs();
-            outPath = valDir.getAbsolutePath() +sep+ resourceName;
+            outPath = valDir.getAbsolutePath() + sep + resourceName;
 
             try (OutputStream resStreamOut = new FileOutputStream(outPath)) {
                 while ((readBytes = stream.read(buffer)) > 0) {

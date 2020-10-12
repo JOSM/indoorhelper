@@ -1,12 +1,12 @@
 // License: AGPL. For details, see LICENSE file.
 package model;
 
+import model.TagCatalog.IndoorObject;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
-
-import model.TagCatalog.IndoorObject;
 
 /**
  * Counter for the calls of specific indoor objects, to track which items were used most frequently.
@@ -44,6 +44,7 @@ public class PresetCounter {
 
     /**
      * Increments the counter of a specific IndoorObject in the list.
+     *
      * @param object the IndoorObject, which counter should be incremented
      */
     public void count(IndoorObject object) {
@@ -53,7 +54,7 @@ public class PresetCounter {
         while (iterator.hasNext()) {
             ObjectCounter counterTemp = iterator.next();
             if (counterTemp.getObject().equals(object)) {
-                    counterList.get(iterator.nextIndex()-1).increment();
+                counterList.get(iterator.nextIndex() - 1).increment();
             }
         }
 

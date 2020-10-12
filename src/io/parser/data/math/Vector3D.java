@@ -52,22 +52,23 @@ public class Vector3D {
         return z;
     }
 
-    public void print(){
+    public void print() {
         System.out.print(this.getX() + ",");
         System.out.print(this.getY() + ",");
         System.out.print(this.getZ() + "\n");
     }
 
-    public boolean equalsVector(Vector3D vec){
-        if(this.x != vec.x) return false;
-        if(this.y != vec.y) return false;
-        if(this.z != vec.z) return false;
+    public boolean equalsVector(Vector3D vec) {
+        if (this.x != vec.x) return false;
+        if (this.y != vec.y) return false;
+        if (this.z != vec.z) return false;
 
         return true;
     }
 
     /**
      * Adds param vector to this
+     *
      * @param vector to add
      */
     public void add(Vector3D vector) {
@@ -76,7 +77,7 @@ public class Vector3D {
         this.z += vector.z;
     }
 
-    public void sub(Vector3D vector){
+    public void sub(Vector3D vector) {
         this.x -= vector.x;
         this.y -= vector.y;
         this.z -= vector.z;
@@ -118,23 +119,24 @@ public class Vector3D {
 
     /**
      * Returns dot product of this vector and param vector
+     *
      * @param vector for operation
      * @return dot product of this vector and param vector
      */
-    public double dot(Vector3D vector){
+    public double dot(Vector3D vector) {
         return (this.x * vector.x + this.y * vector.y + this.z * vector.z);
     }
 
     /**
      * Returns squared length of this vector
+     *
      * @return squared length of this vector
      */
-    public double lengthSquared()
-    {
+    public double lengthSquared() {
         return (this.x * this.x + this.y * this.y + this.z * this.z);
     }
 
-    public void scale(double scalar){
+    public void scale(double scalar) {
         this.x *= scalar;
         this.y *= scalar;
         this.z *= scalar;
