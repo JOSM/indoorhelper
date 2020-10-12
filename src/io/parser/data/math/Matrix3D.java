@@ -217,18 +217,6 @@ public class Matrix3D {
     }
 
     /**
-     * Transforms param point with using this matrix
-     * @param point to transform
-     */
-    public void transform(Point3D point){
-        double x = this.m00 * point.getX() + this.m01 * point.getY() + this.m02 * point.getZ();
-        double y = this.m10 * point.getX() + this.m11 * point.getY() + this.m12 * point.getZ();
-        point.setZ(this.m20 * point.getX() + this.m21 * point.getY() + this.m22 * point.getZ());
-        point.setX(x);
-        point.setY(y);
-    }
-
-    /**
      * Transforms param vector with using this matrix
      * @param vec to transform
      */

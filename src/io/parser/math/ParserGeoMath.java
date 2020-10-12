@@ -2,10 +2,9 @@
 package io.parser.math;
 
 import io.parser.data.ifc.IfcUnitCatalog;
+import io.parser.data.math.Vector3D;
 import org.openstreetmap.gui.jmapviewer.OsmMercator;
 import org.openstreetmap.josm.data.coor.LatLon;
-
-import io.parser.data.math.Point3D;
 
 /**
  * Class providing math functions for geodetic operations
@@ -23,7 +22,7 @@ public class ParserGeoMath {
 	 * @param cartesianUnit m or cm
 	 * @return latlon of cartesian point
 	 */
-	public static LatLon cartesianToGeodetic(Point3D cartesianPoint, Point3D cartesianOrigin, LatLon latLonOfCartesianOrigin, IfcUnitCatalog.LENGTHUNIT cartesianUnit) {
+	public static LatLon cartesianToGeodetic(Vector3D cartesianPoint, Vector3D cartesianOrigin, LatLon latLonOfCartesianOrigin, IfcUnitCatalog.LENGTHUNIT cartesianUnit) {
 		double originCartX = cartesianOrigin.getX();
 		double originCartY = cartesianOrigin.getY();
 		double originLat = Math.toRadians(latLonOfCartesianOrigin.lat());

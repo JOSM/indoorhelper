@@ -9,7 +9,6 @@ import io.parser.data.ifc.IfcRepresentation;
 import io.parser.data.ifc.IfcRepresentationCatalog.IfcSlabTypeEnum;
 import io.parser.data.ifc.IfcRepresentationCatalog.RepresentationIdentifier;
 import io.parser.data.math.Matrix3D;
-import io.parser.data.math.Point3D;
 import io.parser.data.math.Vector3D;
 import io.parser.math.ParserMath;
 import nl.tue.buildingsmart.express.population.EntityInstance;
@@ -123,14 +122,14 @@ public class BIMtoOSMHelper {
             double[][] zRotMatrix = getZAxisRotationMatrix(ifcModel, bimFileRootId, objectEntity);
 
             // get local points representing shape of object
-            List<Point3D> shapeDataOfObject = getShapeDataOfObject(ifcModel, objectEntity);
+            List<Vector3D> shapeDataOfObject = getShapeDataOfObject(ifcModel, objectEntity);
 
             // create PreparedBIMObject3D and save
             if (cartesianOrigin != null && (shapeDataOfObject != null && !shapeDataOfObject.isEmpty())) {
 
                 if (zRotMatrix != null) {
-                    for (Point3D point : shapeDataOfObject) {
-                        if (point.equalsPoint3D(IfcRepresentationExtractor.defaultPoint)) continue;    // for workaround
+                    for (Vector3D point : shapeDataOfObject) {
+                        if (point.equalsVector(IfcRepresentationExtractor.defaultPoint)) continue;    // for workaround
                         // rotate TODO: improve
                         double[] pointAsVector = {point.getX(), point.getY(), point.getZ()};
                         double[] rotatedZPoint = ParserMath.rotate3DPoint(pointAsVector, zRotMatrix);
@@ -141,11 +140,10 @@ public class BIMtoOSMHelper {
                             point.setZ(rotatedXPoint[2]);
                         }
                         // translate
-                        Vector3D pointVec = new Vector3D(point.getX(), point.getY(), point.getZ());
-                        pointVec.add(object.getTranslation());
-                        point.setX(pointVec.getX());
-                        point.setY(pointVec.getY());
-                        point.setZ(pointVec.getZ());
+                        point.add(object.getTranslation());
+                        point.setX(point.getX());
+                        point.setY(point.getY());
+                        point.setZ(point.getZ());
 
                     }
                 }
@@ -158,12 +156,12 @@ public class BIMtoOSMHelper {
                 }
 
                 // Workaround: Check data set for closed loops (separated by defaultPoint). If closed loop in data set, extract and add as own way
-                ArrayList<Point3D> loop = new ArrayList<>();
-                for (Point3D point : shapeDataOfObject) {
-                    if (point.equalsPoint3D(IfcRepresentationExtractor.defaultPoint) && !loop.isEmpty()) {
+                ArrayList<Vector3D> loop = new ArrayList<>();
+                for (Vector3D point : shapeDataOfObject) {
+                    if (point.equalsVector(IfcRepresentationExtractor.defaultPoint) && !loop.isEmpty()) {
                         preparedObjects.add(new BIMObject3D(objectEntity.getId(), objectType, cartesianOrigin, loop));
                         loop = new ArrayList<>();
-                    } else if (!point.equalsPoint3D(IfcRepresentationExtractor.defaultPoint)) {
+                    } else if (!point.equalsVector(IfcRepresentationExtractor.defaultPoint)) {
                         loop.add(point);
                     }
                     if (shapeDataOfObject.indexOf(point) == shapeDataOfObject.size() - 1 && !loop.isEmpty()) {
@@ -281,8 +279,8 @@ public class BIMtoOSMHelper {
      * @param object   BIM object
      * @return Array including points of shape representation
      */
-    public static List<Point3D> getShapeDataOfObject(ModelPopulation ifcModel, EntityInstance object) {
-        ArrayList<Point3D> shapeData = new ArrayList<>();
+    public static List<Vector3D> getShapeDataOfObject(ModelPopulation ifcModel, EntityInstance object) {
+        ArrayList<Vector3D> shapeData = new ArrayList<>();
 
         // identify and keep types of IFCPRODUCTDEFINITIONSHAPE.REPRESENTATIONS objects
         List<IfcRepresentation> repObjectIdentities = identifyRepresentationsOfObject(object);

@@ -9,7 +9,6 @@ import io.parser.data.ifc.IfcRepresentation;
 import io.parser.data.ifc.IfcRepresentationCatalog.IfcSpatialStructureElementTypes;
 import io.parser.data.ifc.IfcRepresentationCatalog.RepresentationIdentifier;
 import io.parser.data.ifc.IfcUnitCatalog;
-import io.parser.data.math.Point3D;
 import io.parser.data.math.Vector3D;
 import io.parser.helper.BIMtoOSMHelper;
 import io.parser.helper.IFCShapeRepresentationIdentifier;
@@ -355,8 +354,8 @@ public class BIMtoOSMParser {
         if (latlonBuildingOrigin != null) {
 
             // get building rotation matrix
-            Point3D projectNorth = getProjectNorth();
-            Point3D trueNorth = getTrueNorth();
+            Vector3D projectNorth = getProjectNorth();
+            Vector3D trueNorth = getTrueNorth();
             double[][] rotationMatrix = null;
             if (projectNorth != null && trueNorth != null) {
                 double[] projectNorthVector = {projectNorth.getX(), projectNorth.getY(), projectNorth.getZ()};
@@ -367,7 +366,7 @@ public class BIMtoOSMParser {
 
             for (BIMObject3D object : preparedBIMdata) {
                 ArrayList<LatLon> transformedCoordinates = new ArrayList<>();
-                for (Point3D point : object.getCartesianShapeCoordinates()) {
+                for (Vector3D point : object.getCartesianShapeCoordinates()) {
                     // rotate point
                     double[] pointAsVector = {point.getX(), point.getY(), point.getZ()};
                     double[] rotatedPoint = ParserMath.rotate3DPoint(pointAsVector, rotationMatrix);
@@ -375,7 +374,7 @@ public class BIMtoOSMParser {
                     point.setY(rotatedPoint[1]);
                     point.setZ(rotatedPoint[2]);
                     // transform point
-                    LatLon llPoint = ParserGeoMath.cartesianToGeodetic(point, new Point3D(0.0, 0.0, 0.0), latlonBuildingOrigin, lengthUnit);
+                    LatLon llPoint = ParserGeoMath.cartesianToGeodetic(point, new Vector3D(0.0, 0.0, 0.0), latlonBuildingOrigin, lengthUnit);
                     transformedCoordinates.add(llPoint);
                 }
                 object.setGeodeticShapeCoordinates(transformedCoordinates);
@@ -391,7 +390,7 @@ public class BIMtoOSMParser {
      */
     @SuppressWarnings("unchecked")
     private LatLon getLatLonOriginOfBuilding(EntityInstance ifcSite) {
-        Point3D ifcSiteOffset = null;
+        Vector3D ifcSiteOffset = null;
         if (ifcSite.getAttributeValueBNasEntityInstance("Representation") != null) {
             // get the offset between IFCSITE geodetic coordinates and building origin coordinate
             // handle IFCSITE offset if IFCBOUNDINGBOX representation
@@ -405,7 +404,7 @@ public class BIMtoOSMParser {
                 EntityInstance bb = boxRepresentation.getEntity();
                 EntityInstance bbItem = bb.getAttributeValueBNasEntityInstanceList("Items").get(0);
                 EntityInstance cartesianCorner = bbItem.getAttributeValueBNasEntityInstance("Corner");
-                ifcSiteOffset = IfcRepresentationExtractor.ifcCartesianCoordinateToPoint3D(cartesianCorner);
+                ifcSiteOffset = IfcRepresentationExtractor.ifcCartesianCoordinateToVector3D(cartesianCorner);
             }
         }
 
@@ -433,7 +432,7 @@ public class BIMtoOSMParser {
 
         // if offset, calculate building origin without offset
         if (ifcSiteOffset != null && ifcSiteOffset.getX() != 0.0 && ifcSiteOffset.getY() != 0.0) {
-            return ParserGeoMath.cartesianToGeodetic(new Point3D(0.0, 0.0, 0.0), ifcSiteOffset, new LatLon(lat, lon), lengthUnit);
+            return ParserGeoMath.cartesianToGeodetic(new Vector3D(0.0, 0.0, 0.0), ifcSiteOffset, new LatLon(lat, lon), lengthUnit);
         }
 
         return new LatLon(lat, lon);
@@ -442,10 +441,10 @@ public class BIMtoOSMParser {
     /**
      * Get project north of building
      *
-     * @return project north as Point3D
+     * @return project north as {@link Vector3D}
      */
     @SuppressWarnings("unchecked")
-    private Point3D getProjectNorth() {
+    private Vector3D getProjectNorth() {
         Vector<String> projectNorthDirectionRatios = null;
         try {
             EntityInstance ifcProject = ifcModel.getInstancesOfType("IfcProject").get(0);
@@ -456,18 +455,16 @@ public class BIMtoOSMParser {
         } catch (NullPointerException e) {
             return null;
         }
-        Vector3D pNDRVector = stringVectorToVector3D(projectNorthDirectionRatios);
-        if(pNDRVector == null) return null;
-        return new Point3D(pNDRVector.getX(), pNDRVector.getY(), pNDRVector.getZ());
+        return stringVectorToVector3D(projectNorthDirectionRatios);
     }
 
     /**
      * get true north vector of building
      *
-     * @return true north as Point3D
+     * @return true north as {@link Vector3D}
      */
     @SuppressWarnings("unchecked")
-    private Point3D getTrueNorth() {
+    private Vector3D getTrueNorth() {
         Vector<String> trueNorthDirectionRatios = null;
         try {
             EntityInstance ifcProject = ifcModel.getInstancesOfType("IfcProject").get(0);
@@ -477,9 +474,7 @@ public class BIMtoOSMParser {
         } catch (NullPointerException e) {
             return null;
         }
-        Vector3D tNDRVector = stringVectorToVector3D(trueNorthDirectionRatios);
-        if(tNDRVector == null) return null;
-        return new Point3D(tNDRVector.getX(), tNDRVector.getY(), tNDRVector.getZ());
+        return stringVectorToVector3D(trueNorthDirectionRatios);
     }
 
     /**

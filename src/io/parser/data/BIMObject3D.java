@@ -3,7 +3,6 @@ package io.parser.data;
 
 import io.model.BIMtoOSMCatalog;
 import io.parser.data.math.Matrix3D;
-import io.parser.data.math.Point3D;
 import io.parser.data.math.Vector3D;
 import nl.tue.buildingsmart.express.population.EntityInstance;
 import org.openstreetmap.josm.data.coor.LatLon;
@@ -26,7 +25,7 @@ public class BIMObject3D {
     private EntityInstance representationEntity;
 
     // object representation data
-    private List<Point3D> cartesianShapeCoordinates;
+    private List<Vector3D> cartesianShapeCoordinates;
     private List<LatLon> geodeticShapeCoordinates;
 
     // transformation matrices
@@ -46,7 +45,7 @@ public class BIMObject3D {
             int id,
             BIMtoOSMCatalog.BIMObject type,
             Vector3D cartesianOrigin,
-            List<Point3D> shapeCoordinates) {
+            List<Vector3D> shapeCoordinates) {
         this.id = id;
         this.type = type;
         cartesianShapeCoordinates = shapeCoordinates;
@@ -96,16 +95,16 @@ public class BIMObject3D {
         this.representationEntity = representationEntity;
     }
 
-    public Point3D getCartesianPlacement() {
+    public Vector3D getCartesianPlacement() {
         // TODO implement
         throw new UnsupportedOperationException();
     }
 
-    public List<Point3D> getCartesianShapeCoordinates() {
+    public List<Vector3D> getCartesianShapeCoordinates() {
         return cartesianShapeCoordinates;
     }
 
-    public void setCartesianShapeCoordinates(List<Point3D> cartesianShapeCoordinates) {
+    public void setCartesianShapeCoordinates(List<Vector3D> cartesianShapeCoordinates) {
         this.cartesianShapeCoordinates = cartesianShapeCoordinates;
     }
 
