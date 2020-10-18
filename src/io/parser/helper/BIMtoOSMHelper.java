@@ -318,12 +318,12 @@ public class BIMtoOSMHelper {
         EntityInstance objectIFCLP = object.getAttributeValueBNasEntityInstance("ObjectPlacement");
 
         // get all RELATIVEPLACEMENTs to root
-        ArrayList<EntityInstance> objectRP = getRelativePlacementsToRoot(bimFileRootId, objectIFCLP, new ArrayList<EntityInstance>());
+        ArrayList<EntityInstance> objectRP = getRelativePlacementsToRoot(bimFileRootId, objectIFCLP, new ArrayList<>());
 
         double rotAngleX = 0.0;    // in rad
         double rotAngleZ = 0.0;    // in rad
-        double[] parentXVector = null;
-        double[] parentZVector = null;
+        Vector3D parentXVector = null;
+        Vector3D parentZVector = null;
 
         for (EntityInstance relativeObject : objectRP) {
             // get REFDIRECTION (x axis vector)
@@ -338,44 +338,39 @@ public class BIMtoOSMHelper {
                 return null;
             }
 
-            // x axis
             Vector3D xAxis = stringVectorToVector3D(xDirectionRatios);
+            if (xAxis == null ) return null;
             Vector3D zAxis = stringVectorToVector3D(zDirectionRatios);
-
+            if (zAxis == null ) return null;
             xAxis = retrieveXAxis(zAxis, xAxis);
 
+            // get x-axis rotation angle
             if (parentXVector != null) {
-                double[] xVector = {xAxis.getX(), xAxis.getY(), xAxis.getZ()};
-                rotAngleX += ParserMath.getAngleBetweenVectors(parentXVector, xVector);
+                rotAngleX += parentXVector.angleBetween(xAxis);
+            }
+            else{
+                parentXVector = new Vector3D();
             }
             // update parent vector
-            parentXVector = new double[3];
-            parentXVector[0] = xAxis.getX();
-            parentXVector[1] = xAxis.getY();
-            parentXVector[2] = xAxis.getZ();
+            parentXVector.setX(xAxis.getX());
+            parentXVector.setY(xAxis.getY());
+            parentXVector.setZ(xAxis.getZ());
 
-            // z axis
+            // get z-axis rotation angle
             if (parentZVector != null) {
-                double[] zVector = {zAxis.getX(), zAxis.getY(), zAxis.getZ()};
-                rotAngleZ += ParserMath.getAngleBetweenVectors(parentZVector, zVector);
+                rotAngleZ += parentZVector.angleBetween(zAxis);
+            }
+            else{
+                parentZVector = new Vector3D();
             }
             // update parent vector
-            parentZVector = new double[3];
-            parentZVector[0] = zAxis.getX();
-            parentZVector[1] = zAxis.getY();
-            parentZVector[2] = zAxis.getZ();
+            parentZVector.setX(zAxis.getX());
+            parentZVector.setY(zAxis.getY());
+            parentZVector.setZ(zAxis.getZ());
         }
 
-
-        double[][] mX = ParserMath.getRotationMatrixAboutZAxis(rotAngleX);
-        double[][] mZ = ParserMath.getRotationMatrixAboutXAxis(rotAngleZ);
-
-        Matrix3D xMatrix = new Matrix3D(mX[0][0], mX[0][1], mX[0][2],
-                mX[1][0], mX[1][1], mX[1][2],
-                mX[2][0], mX[2][1], mX[2][2]);
-        Matrix3D zMatrix = new Matrix3D(mZ[0][0], mZ[0][1], mZ[0][2],
-                mZ[1][0], mZ[1][1], mZ[1][2],
-                mZ[2][0], mZ[2][1], mZ[2][2]);
+        Matrix3D xMatrix = ParserMath.getRotationMatrixAboutZAxis(rotAngleX);
+        Matrix3D zMatrix = ParserMath.getRotationMatrixAboutXAxis(rotAngleZ);
         xMatrix.multiply(zMatrix);
 
         return xMatrix;
@@ -383,11 +378,12 @@ public class BIMtoOSMHelper {
 
     /**
      * Gets the actual x-axis vector from reference system
-     * @param zAxis of IfcAxis2Placement3D
+     *
+     * @param zAxis        of IfcAxis2Placement3D
      * @param refDirection of IfcAxis2Placement3D
      * @return actual x-axis vector
      */
-    private static Vector3D retrieveXAxis(Vector3D zAxis, Vector3D refDirection){
+    private static Vector3D retrieveXAxis(Vector3D zAxis, Vector3D refDirection) {
         double d = refDirection.dot(zAxis) / zAxis.lengthSquared();
         Vector3D xAxis = new Vector3D(refDirection);
         Vector3D refZ = new Vector3D(zAxis);

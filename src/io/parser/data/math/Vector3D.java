@@ -142,4 +142,32 @@ public class Vector3D {
         this.z *= scalar;
     }
 
+    public double angleBetween(Vector3D vector){
+        if (this.equalsVector(vector)) return 0.0;
+
+        // check sign - vector order is important for rotation
+        double result2DWithSign = Math.atan2(this.getY(), this.getX()) - Math.atan2(vector.getY(), vector.getX());
+
+        double ab;
+        double a_abs;
+        double b_abs;
+        double r;
+        if (this.getZ() == 0.0 && vector.getZ() == 0.0) {
+//			ab = vector1[0] * vector2[0] + vector1[1] * vector2[1];
+//			a_abs = Math.sqrt(Math.pow(vector1[0], 2.0) + Math.pow(vector1[1], 2.0));
+//			b_abs = Math.sqrt(Math.pow(vector2[0], 2.0) + Math.pow(vector2[1], 2.0));
+//			r = ab / (a_abs + b_abs);
+//			if(result2DWithSign < 0 && Math.acos(r) > 0)	return -(Math.acos(r));
+            return result2DWithSign;
+        } else{
+            ab = this.getX() * vector.getX() + this.getY() * vector.getY() + this.getZ() * vector.getZ();
+            a_abs = Math.sqrt(Math.pow(this.getX(), 2.0) + Math.pow(this.getY(), 2.0) + Math.pow(this.getZ(), 2.0));
+            b_abs = Math.sqrt(Math.pow(vector.getX(), 2.0) + Math.pow(vector.getY(), 2.0) + Math.pow(vector.getZ(), 2.0));
+            r = ab / (a_abs * b_abs);
+            if (result2DWithSign < 0 && Math.acos(r) > 0) return -Math.acos(r);
+            return Math.acos(r);
+
+        }
+    }
+
 }

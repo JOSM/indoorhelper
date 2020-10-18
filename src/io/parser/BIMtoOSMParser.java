@@ -9,6 +9,7 @@ import io.parser.data.ifc.IfcRepresentation;
 import io.parser.data.ifc.IfcRepresentationCatalog.IfcSpatialStructureElementTypes;
 import io.parser.data.ifc.IfcRepresentationCatalog.RepresentationIdentifier;
 import io.parser.data.ifc.IfcUnitCatalog;
+import io.parser.data.math.Matrix3D;
 import io.parser.data.math.Vector3D;
 import io.parser.helper.BIMtoOSMHelper;
 import io.parser.helper.IFCShapeRepresentationIdentifier;
@@ -356,23 +357,19 @@ public class BIMtoOSMParser {
             // get building rotation matrix
             Vector3D projectNorth = getProjectNorth();
             Vector3D trueNorth = getTrueNorth();
-            double[][] rotationMatrix = null;
+            Matrix3D rotationMatrix = null;
             if (projectNorth != null && trueNorth != null) {
-                double[] projectNorthVector = {projectNorth.getX(), projectNorth.getY(), projectNorth.getZ()};
-                double[] trueNorthVector = {trueNorth.getX(), trueNorth.getY(), trueNorth.getZ()};
-                double rotationAngle = ParserMath.getAngleBetweenVectors(trueNorthVector, projectNorthVector);
+                double rotationAngle = trueNorth.angleBetween(projectNorth);
                 rotationMatrix = ParserMath.getRotationMatrixAboutZAxis(rotationAngle);
             }
+
+            if(rotationMatrix == null) return;
 
             for (BIMObject3D object : preparedBIMdata) {
                 ArrayList<LatLon> transformedCoordinates = new ArrayList<>();
                 for (Vector3D point : object.getCartesianShapeCoordinates()) {
                     // rotate point
-                    double[] pointAsVector = {point.getX(), point.getY(), point.getZ()};
-                    double[] rotatedPoint = ParserMath.rotate3DPoint(pointAsVector, rotationMatrix);
-                    point.setX(rotatedPoint[0]);
-                    point.setY(rotatedPoint[1]);
-                    point.setZ(rotatedPoint[2]);
+                    rotationMatrix.transform(point);
                     // transform point
                     LatLon llPoint = ParserGeoMath.cartesianToGeodetic(point, new Vector3D(0.0, 0.0, 0.0), latlonBuildingOrigin, lengthUnit);
                     transformedCoordinates.add(llPoint);
