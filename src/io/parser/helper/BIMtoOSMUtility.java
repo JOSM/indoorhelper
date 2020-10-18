@@ -82,30 +82,14 @@ public class BIMtoOSMUtility {
     }
 
     /**
-     * Gets the LOCALPLACEMENT root element of IFC file
-     *
-     * @param filteredBIMData Data including IFCSITE flag of IFC file
-     * @return Root LOCALPLACEMENT element of IFC file
-     */
-    public static int getIfcLocalPlacementRootObject(FilteredRawBIMData filteredBIMData) {
-        try {
-            return filteredBIMData.getIfcSite().getAttributeValueBNasEntityInstance("ObjectPlacement").getId();
-        } catch (NullPointerException e) {
-            return -1;
-        }
-    }
-
-    /**
      * Prepares BIM objects for further operations. Extracts OSM relevant information and puts it into {@link BIMObject3D}
      *
-     * @param ifcModel      ifcModel
-     * @param bimFileRootId Root IFCLOCALPLACEMENT element of BIM file
-     * @param objectType    relating BIMtoOSMCatalog.BIMObject
-     * @param bimObjects    All BIM objects of objectType
+     * @param ifcModel   ifcModel
+     * @param objectType relating BIMtoOSMCatalog.BIMObject
+     * @param bimObjects All BIM objects of objectType
      * @return Prepared BIM objects
      */
-    public static List<BIMObject3D> prepareBIMObjects(ModelPopulation ifcModel, int bimFileRootId, BIMtoOSMCatalog.BIMObject objectType, Vector<EntityInstance> bimObjects) {
-        // TODO - WIP: Improve object placement determination
+    public static List<BIMObject3D> prepareBIMObjects(ModelPopulation ifcModel, BIMtoOSMCatalog.BIMObject objectType, Vector<EntityInstance> bimObjects) {
         ArrayList<BIMObject3D> preparedObjects = new ArrayList<>();
 
         for (EntityInstance objectEntity : bimObjects) {
@@ -117,7 +101,7 @@ public class BIMtoOSMUtility {
             // get IFCLOCALPLACEMENT of object (origin of object)
             Vector3D cartesianOrigin = object.getTranslation();
             // get rotation matrix of object
-            Matrix3D rotMatrix = getObjectRotationMatrix(bimFileRootId, objectEntity);
+            Matrix3D rotMatrix = getObjectRotationMatrix(objectEntity);
 
             // get local points representing shape of object
             ArrayList<Vector3D> shapeDataOfObject = (ArrayList<Vector3D>) getShapeDataOfObject(ifcModel, objectEntity);
@@ -125,11 +109,7 @@ public class BIMtoOSMUtility {
             // create PreparedBIMObject3D and save
             if (cartesianOrigin != null && rotMatrix != null && (shapeDataOfObject != null && !shapeDataOfObject.isEmpty())) {
                 // transform points
-                for (Vector3D point : shapeDataOfObject) {
-                    if (point.equalsVector(IfcRepresentationExtractor.defaultPoint)) continue;    // for workaround
-                    rotMatrix.transform(point);
-                    point.add(object.getTranslation());
-                }
+                transformPoints(shapeDataOfObject, rotMatrix, cartesianOrigin);
                 object.setCartesianShapeCoordinates(shapeDataOfObject);
 
                 // Check if data includes IFCShapeDataExtractor.defaultPoint. IFCShapeDataExtractor.defaultPoint got added
@@ -140,20 +120,11 @@ public class BIMtoOSMUtility {
                 }
 
                 // Workaround: Check data set for closed loops (separated by defaultPoint). If closed loop in data set, extract and add as own way
-                ArrayList<Vector3D> loop = new ArrayList<>();
-                for (Vector3D point : shapeDataOfObject) {
-                    if (point.equalsVector(IfcRepresentationExtractor.defaultPoint) && !loop.isEmpty()) {
-                        object.setCartesianShapeCoordinates(loop);
-                        preparedObjects.add(object);
-                        loop = new ArrayList<>();
-                    } else if (!point.equalsVector(IfcRepresentationExtractor.defaultPoint)) {
-                        loop.add(point);
-                    }
-                    if (shapeDataOfObject.indexOf(point) == shapeDataOfObject.size() - 1 && !loop.isEmpty()) {
-                        object.setCartesianShapeCoordinates(loop);
-                        preparedObjects.add(object);
-                    }
-                }
+                List<List<Vector3D>> loops = splitClosedLoopsInDataSet(shapeDataOfObject);
+                loops.forEach(l -> {
+                    object.setCartesianShapeCoordinates(l);
+                    preparedObjects.add(object);
+                });
             }
         }
 
@@ -308,17 +279,16 @@ public class BIMtoOSMUtility {
     /**
      * Gets rotation matrix for ifc object
      *
-     * @param bimFileRootId root IFCLOCALPLACEMENT element of BIM file
-     * @param object        to get rotation matrix for
+     * @param object to get rotation matrix for
      * @return rotation matrix
      */
     @SuppressWarnings("unchecked")
-    private static Matrix3D getObjectRotationMatrix(int bimFileRootId, EntityInstance object) {
+    private static Matrix3D getObjectRotationMatrix(EntityInstance object) {
         // get objects IFCLOCALPLACEMENT entity
         EntityInstance objectIFCLP = object.getAttributeValueBNasEntityInstance("ObjectPlacement");
 
         // get all RELATIVEPLACEMENTs to root
-        ArrayList<EntityInstance> objectRP = getRelativePlacementsToRoot(bimFileRootId, objectIFCLP, new ArrayList<>());
+        ArrayList<EntityInstance> objectRP = getRelativePlacementsToRoot(objectIFCLP, new ArrayList<>());
 
         double rotAngleX = 0.0;    // in rad
         double rotAngleZ = 0.0;    // in rad
@@ -339,16 +309,15 @@ public class BIMtoOSMUtility {
             }
 
             Vector3D xAxis = stringVectorToVector3D(xDirectionRatios);
-            if (xAxis == null ) return null;
+            if (xAxis == null) return null;
             Vector3D zAxis = stringVectorToVector3D(zDirectionRatios);
-            if (zAxis == null ) return null;
+            if (zAxis == null) return null;
             xAxis = retrieveXAxis(zAxis, xAxis);
 
             // get x-axis rotation angle
             if (parentXVector != null) {
                 rotAngleX += parentXVector.angleBetween(xAxis);
-            }
-            else{
+            } else {
                 parentXVector = new Vector3D();
             }
             // update parent vector
@@ -359,8 +328,7 @@ public class BIMtoOSMUtility {
             // get z-axis rotation angle
             if (parentZVector != null) {
                 rotAngleZ += parentZVector.angleBetween(zAxis);
-            }
-            else{
+            } else {
                 parentZVector = new Vector3D();
             }
             // update parent vector
@@ -377,31 +345,14 @@ public class BIMtoOSMUtility {
     }
 
     /**
-     * Gets the actual x-axis vector from reference system
-     *
-     * @param zAxis        of IfcAxis2Placement3D
-     * @param refDirection of IfcAxis2Placement3D
-     * @return actual x-axis vector
-     */
-    private static Vector3D retrieveXAxis(Vector3D zAxis, Vector3D refDirection) {
-        double d = refDirection.dot(zAxis) / zAxis.lengthSquared();
-        Vector3D xAxis = new Vector3D(refDirection);
-        Vector3D refZ = new Vector3D(zAxis);
-        refZ.scale(d);
-        xAxis.sub(refZ);
-        return xAxis;
-    }
-
-    /**
      * Method recursive walks thru IFC file and collects the RELATIVEPLACEMENT EntityInstances from start entity to root entity
      *
-     * @param bimFileRootId            of root IFCLOCALPLACEMENT element of BIMFile
      * @param entity                   you want to collect the RELATIVEPLACEMENT from
      * @param relativePlacementsToRoot empty list at beginning, needed for recursive iteration
      * @return List with EntityInstances of RELATIVEPLACEMENTs
      */
-    private static ArrayList<EntityInstance> getRelativePlacementsToRoot(int bimFileRootId, EntityInstance entity, ArrayList<EntityInstance> relativePlacementsToRoot) {
-        if (entity.getId() == bimFileRootId) return relativePlacementsToRoot;
+    private static ArrayList<EntityInstance> getRelativePlacementsToRoot(EntityInstance entity, ArrayList<EntityInstance> relativePlacementsToRoot) {
+        if (entity == null) return relativePlacementsToRoot;
 
         // get objects IFCRELATIVEPLACEMENT entity
         EntityInstance relativePlacement = entity.getAttributeValueBNasEntityInstance("RelativePlacement");
@@ -409,7 +360,7 @@ public class BIMtoOSMUtility {
 
         // get id of placement relative to this (PLACEMENTRELTO)
         EntityInstance placementRelTo = entity.getAttributeValueBNasEntityInstance("PlacementRelTo");
-        getRelativePlacementsToRoot(bimFileRootId, placementRelTo, relativePlacementsToRoot);
+        getRelativePlacementsToRoot(placementRelTo, relativePlacementsToRoot);
 
         return relativePlacementsToRoot;
     }
@@ -452,5 +403,57 @@ public class BIMtoOSMUtility {
         return repObjectIdentities;
     }
 
+    /**
+     * Transforms the list of points using the given rotation matrix and translation vector
+     *
+     * @param points      to transform
+     * @param rotation    matrix
+     * @param translation vector
+     */
+    private static void transformPoints(ArrayList<Vector3D> points, Matrix3D rotation, Vector3D translation) {
+        points.forEach(p -> {
+            rotation.transform(p);
+            p.add(translation);
+        });
+    }
+
+    /**
+     * Gets the actual x-axis vector from reference system
+     *
+     * @param zAxis        of IfcAxis2Placement3D
+     * @param refDirection of IfcAxis2Placement3D
+     * @return actual x-axis vector
+     */
+    private static Vector3D retrieveXAxis(Vector3D zAxis, Vector3D refDirection) {
+        double d = refDirection.dot(zAxis) / zAxis.lengthSquared();
+        Vector3D xAxis = new Vector3D(refDirection);
+        Vector3D refZ = new Vector3D(zAxis);
+        refZ.scale(d);
+        xAxis.sub(refZ);
+        return xAxis;
+    }
+
+    /**
+     * Method finds and slips loops in data set
+     *
+     * @param data to check for loops
+     * @return list with data for each loop
+     */
+    private static List<List<Vector3D>> splitClosedLoopsInDataSet(List<Vector3D> data) {
+        List<List<Vector3D>> loops = new ArrayList<>();
+        ArrayList<Vector3D> loop = new ArrayList<>();
+        for (Vector3D point : data) {
+            if (point.equalsVector(IfcRepresentationExtractor.defaultPoint) && !loop.isEmpty()) {
+                loops.add(loop);
+                loop = new ArrayList<>();
+            } else if (!point.equalsVector(IfcRepresentationExtractor.defaultPoint)) {
+                loop.add(point);
+            }
+            if (data.indexOf(point) == data.size() - 1 && !loop.isEmpty()) {
+                loops.add(loop);
+            }
+        }
+        return loops;
+    }
 
 }

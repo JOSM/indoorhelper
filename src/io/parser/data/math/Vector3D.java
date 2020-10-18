@@ -153,11 +153,6 @@ public class Vector3D {
         double b_abs;
         double r;
         if (this.getZ() == 0.0 && vector.getZ() == 0.0) {
-//			ab = vector1[0] * vector2[0] + vector1[1] * vector2[1];
-//			a_abs = Math.sqrt(Math.pow(vector1[0], 2.0) + Math.pow(vector1[1], 2.0));
-//			b_abs = Math.sqrt(Math.pow(vector2[0], 2.0) + Math.pow(vector2[1], 2.0));
-//			r = ab / (a_abs + b_abs);
-//			if(result2DWithSign < 0 && Math.acos(r) > 0)	return -(Math.acos(r));
             return result2DWithSign;
         } else{
             ab = this.getX() * vector.getX() + this.getY() * vector.getY() + this.getZ() * vector.getZ();

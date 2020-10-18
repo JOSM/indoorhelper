@@ -97,21 +97,14 @@ public class BIMtoOSMParser {
         // extract important data and put them into internal data structure
         FilteredRawBIMData filteredRawBIMData = BIMtoOSMUtility.extractMajorBIMData(ifcModel);
 
-        // for preparation of filtered BIM data find Id of BIM root IFCLOCALPLACEMENT element (kept in IFCSITE flag)
-        int bimFileRootId = BIMtoOSMUtility.getIfcLocalPlacementRootObject(filteredRawBIMData);
-        if (bimFileRootId == -1) {
-            showParsingErrorView(filepath, "Could not import IFC file.\nIFC file does not contains IFCSITE element.", true);
-            return false;
-        }
-
         // prepare filtered BIM data - find global object coordinates and other attributes like object height, width etc.
         ArrayList<BIMObject3D> preparedBIMData = new ArrayList<>();
-        preparedBIMData.addAll(BIMtoOSMUtility.prepareBIMObjects(ifcModel, bimFileRootId, BIMtoOSMCatalog.BIMObject.IfcSlab, filteredRawBIMData.getAreaObjects()));
-        preparedBIMData.addAll(BIMtoOSMUtility.prepareBIMObjects(ifcModel, bimFileRootId, BIMtoOSMCatalog.BIMObject.IfcWall, filteredRawBIMData.getWallObjects()));
-        preparedBIMData.addAll(BIMtoOSMUtility.prepareBIMObjects(ifcModel, bimFileRootId, BIMtoOSMCatalog.BIMObject.IfcColumn, filteredRawBIMData.getColumnObjects()));
-//        preparedBIMData.addAll(BIMtoOSMHelper.prepareBIMObjects(ifcModel, bimFileRootId, BIMtoOSMCatalog.BIMObject.IfcDoor, filteredRawBIMData.getDoorObjects()));
-//        preparedBIMData.addAll(BIMtoOSMHelper.prepareBIMObjects(ifcModel, bimFileRootId, BIMtoOSMCatalog.BIMObject.IfcWindow, filteredRawBIMData.getWindowObjects()));
-        preparedBIMData.addAll(BIMtoOSMUtility.prepareBIMObjects(ifcModel, bimFileRootId, BIMtoOSMCatalog.BIMObject.IfcStair, filteredRawBIMData.getStairObjects()));
+        preparedBIMData.addAll(BIMtoOSMUtility.prepareBIMObjects(ifcModel, BIMtoOSMCatalog.BIMObject.IfcSlab, filteredRawBIMData.getAreaObjects()));
+        preparedBIMData.addAll(BIMtoOSMUtility.prepareBIMObjects(ifcModel, BIMtoOSMCatalog.BIMObject.IfcWall, filteredRawBIMData.getWallObjects()));
+        preparedBIMData.addAll(BIMtoOSMUtility.prepareBIMObjects(ifcModel, BIMtoOSMCatalog.BIMObject.IfcColumn, filteredRawBIMData.getColumnObjects()));
+//        preparedBIMData.addAll(BIMtoOSMHelper.prepareBIMObjects(ifcModel, BIMtoOSMCatalog.BIMObject.IfcDoor, filteredRawBIMData.getDoorObjects()));
+//        preparedBIMData.addAll(BIMtoOSMHelper.prepareBIMObjects(ifcModel, BIMtoOSMCatalog.BIMObject.IfcWindow, filteredRawBIMData.getWindowObjects()));
+        preparedBIMData.addAll(BIMtoOSMUtility.prepareBIMObjects(ifcModel, BIMtoOSMCatalog.BIMObject.IfcStair, filteredRawBIMData.getStairObjects()));
 
         // set units
         setUnits();
