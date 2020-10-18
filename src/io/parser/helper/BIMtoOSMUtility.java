@@ -17,14 +17,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
-import static io.parser.ParserUtility.stringVectorToVector3D;
+import static io.parser.helper.ParserUtility.stringVectorToVector3D;
 
 /**
  * Class helps parsing BIM data with providing methods to extract OSM relevant data.
  *
  * @author rebsc
  */
-public class BIMtoOSMHelper {
+public class BIMtoOSMUtility {
 
     /**
      * Filters important OSM data into internal data structure
@@ -443,7 +443,7 @@ public class BIMtoOSMHelper {
         // identify each object
         for (EntityInstance repObject : objectRepresentations) {
             //identify IFCSHAPEREPRESENTATION type
-            IfcRepresentation repIdentity = IFCShapeRepresentationIdentifier.identifyShapeRepresentation(repObject);
+            IfcRepresentation repIdentity = IfcShapeRepresentationIdentifier.identifyShapeRepresentation(repObject);
             repIdentity.setRootEntity(object);
             if (!repIdentity.isFilled()) return null;
             repObjectIdentities.add(repIdentity);

@@ -11,8 +11,8 @@ import io.parser.data.ifc.IfcRepresentationCatalog.RepresentationIdentifier;
 import io.parser.data.ifc.IfcUnitCatalog;
 import io.parser.data.math.Matrix3D;
 import io.parser.data.math.Vector3D;
-import io.parser.helper.BIMtoOSMHelper;
-import io.parser.helper.IFCShapeRepresentationIdentifier;
+import io.parser.helper.BIMtoOSMUtility;
+import io.parser.helper.IfcShapeRepresentationIdentifier;
 import io.parser.helper.IfcRepresentationExtractor;
 import io.parser.math.ParserGeoMath;
 import io.parser.math.ParserMath;
@@ -37,8 +37,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.*;
 
-import static io.parser.ParserUtility.prepareDoubleString;
-import static io.parser.ParserUtility.stringVectorToVector3D;
+import static io.parser.helper.ParserUtility.prepareDoubleString;
+import static io.parser.helper.ParserUtility.stringVectorToVector3D;
 import static org.openstreetmap.josm.tools.I18n.tr;
 
 /**
@@ -95,10 +95,10 @@ public class BIMtoOSMParser {
         if (!loadFile(filepath)) return false;
 
         // extract important data and put them into internal data structure
-        FilteredRawBIMData filteredRawBIMData = BIMtoOSMHelper.extractMajorBIMData(ifcModel);
+        FilteredRawBIMData filteredRawBIMData = BIMtoOSMUtility.extractMajorBIMData(ifcModel);
 
         // for preparation of filtered BIM data find Id of BIM root IFCLOCALPLACEMENT element (kept in IFCSITE flag)
-        int bimFileRootId = BIMtoOSMHelper.getIfcLocalPlacementRootObject(filteredRawBIMData);
+        int bimFileRootId = BIMtoOSMUtility.getIfcLocalPlacementRootObject(filteredRawBIMData);
         if (bimFileRootId == -1) {
             showParsingErrorView(filepath, "Could not import IFC file.\nIFC file does not contains IFCSITE element.", true);
             return false;
@@ -106,12 +106,12 @@ public class BIMtoOSMParser {
 
         // prepare filtered BIM data - find global object coordinates and other attributes like object height, width etc.
         ArrayList<BIMObject3D> preparedBIMData = new ArrayList<>();
-        preparedBIMData.addAll(BIMtoOSMHelper.prepareBIMObjects(ifcModel, bimFileRootId, BIMtoOSMCatalog.BIMObject.IfcSlab, filteredRawBIMData.getAreaObjects()));
-        preparedBIMData.addAll(BIMtoOSMHelper.prepareBIMObjects(ifcModel, bimFileRootId, BIMtoOSMCatalog.BIMObject.IfcWall, filteredRawBIMData.getWallObjects()));
-        preparedBIMData.addAll(BIMtoOSMHelper.prepareBIMObjects(ifcModel, bimFileRootId, BIMtoOSMCatalog.BIMObject.IfcColumn, filteredRawBIMData.getColumnObjects()));
+        preparedBIMData.addAll(BIMtoOSMUtility.prepareBIMObjects(ifcModel, bimFileRootId, BIMtoOSMCatalog.BIMObject.IfcSlab, filteredRawBIMData.getAreaObjects()));
+        preparedBIMData.addAll(BIMtoOSMUtility.prepareBIMObjects(ifcModel, bimFileRootId, BIMtoOSMCatalog.BIMObject.IfcWall, filteredRawBIMData.getWallObjects()));
+        preparedBIMData.addAll(BIMtoOSMUtility.prepareBIMObjects(ifcModel, bimFileRootId, BIMtoOSMCatalog.BIMObject.IfcColumn, filteredRawBIMData.getColumnObjects()));
 //        preparedBIMData.addAll(BIMtoOSMHelper.prepareBIMObjects(ifcModel, bimFileRootId, BIMtoOSMCatalog.BIMObject.IfcDoor, filteredRawBIMData.getDoorObjects()));
 //        preparedBIMData.addAll(BIMtoOSMHelper.prepareBIMObjects(ifcModel, bimFileRootId, BIMtoOSMCatalog.BIMObject.IfcWindow, filteredRawBIMData.getWindowObjects()));
-        preparedBIMData.addAll(BIMtoOSMHelper.prepareBIMObjects(ifcModel, bimFileRootId, BIMtoOSMCatalog.BIMObject.IfcStair, filteredRawBIMData.getStairObjects()));
+        preparedBIMData.addAll(BIMtoOSMUtility.prepareBIMObjects(ifcModel, bimFileRootId, BIMtoOSMCatalog.BIMObject.IfcStair, filteredRawBIMData.getStairObjects()));
 
         // set units
         setUnits();
@@ -284,7 +284,7 @@ public class BIMtoOSMParser {
                     // if part of contained elements get Elevation entity from object
                     EntityInstance relatingStructure = entity.getAttributeValueBNasEntityInstance("RelatingStructure");
 
-                    String relatingStructureType = IFCShapeRepresentationIdentifier.getSpatialStructureElementType(ifcModel, relatingStructure);
+                    String relatingStructureType = IfcShapeRepresentationIdentifier.getSpatialStructureElementType(ifcModel, relatingStructure);
                     // get type of relatingStructure
                     if (!relatingStructureType.equals(IfcSpatialStructureElementTypes.IfcBuildingStorey.name()))
                         return 0;
@@ -391,11 +391,11 @@ public class BIMtoOSMParser {
         if (ifcSite.getAttributeValueBNasEntityInstance("Representation") != null) {
             // get the offset between IFCSITE geodetic coordinates and building origin coordinate
             // handle IFCSITE offset if IFCBOUNDINGBOX representation
-            List<IfcRepresentation> repObjectIdentities = BIMtoOSMHelper.identifyRepresentationsOfObject(ifcSite);
+            List<IfcRepresentation> repObjectIdentities = BIMtoOSMUtility.identifyRepresentationsOfObject(ifcSite);
             if (repObjectIdentities == null) return null;
 
             IfcRepresentation boxRepresentation =
-                    BIMtoOSMHelper.getRepresentationSpecificObjectType(repObjectIdentities, RepresentationIdentifier.Box);
+                    BIMtoOSMUtility.getRepresentationSpecificObjectType(repObjectIdentities, RepresentationIdentifier.Box);
             if (boxRepresentation != null) {
                 // get offset
                 EntityInstance bb = boxRepresentation.getEntity();
@@ -442,7 +442,7 @@ public class BIMtoOSMParser {
      */
     @SuppressWarnings("unchecked")
     private Vector3D getProjectNorth() {
-        Vector<String> projectNorthDirectionRatios = null;
+        Vector<String> projectNorthDirectionRatios;
         try {
             EntityInstance ifcProject = ifcModel.getInstancesOfType("IfcProject").get(0);
             EntityInstance geometricContext = ifcProject.getAttributeValueBNasEntityInstanceList("RepresentationContexts").get(0);
@@ -462,7 +462,7 @@ public class BIMtoOSMParser {
      */
     @SuppressWarnings("unchecked")
     private Vector3D getTrueNorth() {
-        Vector<String> trueNorthDirectionRatios = null;
+        Vector<String> trueNorthDirectionRatios;
         try {
             EntityInstance ifcProject = ifcModel.getInstancesOfType("IfcProject").get(0);
             EntityInstance geometricContext = ifcProject.getAttributeValueBNasEntityInstanceList("RepresentationContexts").get(0);
