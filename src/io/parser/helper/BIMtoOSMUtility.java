@@ -106,7 +106,7 @@ public class BIMtoOSMUtility {
             // get local points representing shape of object
             ArrayList<Vector3D> shapeDataOfObject = (ArrayList<Vector3D>) getShapeDataOfObject(ifcModel, objectEntity);
 
-            // create PreparedBIMObject3D and save
+            // transform and prepare objects
             if (cartesianOrigin != null && rotMatrix != null && (shapeDataOfObject != null && !shapeDataOfObject.isEmpty())) {
                 // transform points
                 transformPoints(shapeDataOfObject, rotMatrix, cartesianOrigin);

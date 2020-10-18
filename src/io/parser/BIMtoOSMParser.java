@@ -97,6 +97,12 @@ public class BIMtoOSMParser {
         // extract important data and put them into internal data structure
         FilteredRawBIMData filteredRawBIMData = BIMtoOSMUtility.extractMajorBIMData(ifcModel);
 
+        // check for IFCSITE element in file
+        if (!checkForIFCSITE(filteredRawBIMData)) {
+            showParsingErrorView(filepath, "Could not import IFC file.\nIFC file does not contains IFCSITE element.", true);
+            return false;
+        }
+
         // prepare filtered BIM data - find global object coordinates and other attributes like object height, width etc.
         ArrayList<BIMObject3D> preparedBIMData = new ArrayList<>();
         preparedBIMData.addAll(BIMtoOSMUtility.prepareBIMObjects(ifcModel, BIMtoOSMCatalog.BIMObject.IfcSlab, filteredRawBIMData.getAreaObjects()));
@@ -212,6 +218,21 @@ public class BIMtoOSMParser {
         }
 
         return schema;
+    }
+
+    /**
+     * Checks if IFCSITE element exists in data
+     *
+     * @param data to check
+     * @return true if exists, else false
+     */
+    private boolean checkForIFCSITE(FilteredRawBIMData data) {
+        try {
+            data.getIfcSite().getAttributeValueBNasEntityInstance("ObjectPlacement").getId();
+            return true;
+        } catch (NullPointerException e) {
+            return false;
+        }
     }
 
     /**
@@ -356,7 +377,7 @@ public class BIMtoOSMParser {
                 rotationMatrix = ParserMath.getRotationMatrixAboutZAxis(rotationAngle);
             }
 
-            if(rotationMatrix == null) return;
+            if (rotationMatrix == null) return;
 
             for (BIMObject3D object : preparedBIMdata) {
                 ArrayList<LatLon> transformedCoordinates = new ArrayList<>();
