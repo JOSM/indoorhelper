@@ -12,8 +12,9 @@ import io.parser.data.ifc.IfcUnitCatalog;
 import io.parser.data.math.Matrix3D;
 import io.parser.data.math.Vector3D;
 import io.parser.helper.BIMtoOSMUtility;
-import io.parser.helper.IfcShapeRepresentationIdentifier;
 import io.parser.helper.IfcRepresentationExtractor;
+import io.parser.helper.IfcShapeRepresentationIdentifier;
+import io.parser.utils.FileOptimizer;
 import io.parser.math.ParserGeoMath;
 import io.parser.math.ParserMath;
 import model.TagCatalog;
@@ -145,9 +146,12 @@ public class BIMtoOSMParser {
      */
     private boolean loadFile(String filepath) {
         try {
-            // find used IFC schema
-            String usedIfcSchema = chooseSchemaFile(filepath);
+            // pre-optimize and load IFC file
+            File optimizedFile = FileOptimizer.optimizeIfcFile(filepath);
+            inputfs = new FileInputStream(optimizedFile);
 
+            // find used IFC schema
+            String usedIfcSchema = chooseSchemaFile(optimizedFile);
             if (usedIfcSchema.isEmpty()) {
                 showLoadingErrorView(filepath, "Could not load IFC file.\nIFC schema is no supported.");
                 return false;
@@ -156,8 +160,6 @@ public class BIMtoOSMParser {
                 ifcSchemaFilePath = resourcePathDir + IFC4_Schema;
             }
 
-            // load IFC file
-            inputfs = new FileInputStream(filepath);
             // load IFC file data into model
             ifcModel = new ModelPopulation(inputfs);
             ifcModel.setSchemaFile(Paths.get(ifcSchemaFilePath));
@@ -168,7 +170,7 @@ public class BIMtoOSMParser {
                 showLoadingErrorView(filepath, "Could not load IFC file.");
                 return false;
             }
-        } catch (FileNotFoundException e) {
+        } catch (IOException e) {
             Logging.error(e.getMessage());
             return false;
         } finally {
@@ -186,15 +188,13 @@ public class BIMtoOSMParser {
     /**
      * Read the FILE_SCHEMA flag from IFC file and return used schema
      *
-     * @param filepath path of IFC file
+     * @param ifcFile (if necessary) optimized IFC file
      * @return Used IFC file schema as string
      */
-    private String chooseSchemaFile(String filepath) {
+    private String chooseSchemaFile(File ifcFile) {
         String schema = "";
         try {
-            File file = new File(filepath);
-            Scanner reader = new Scanner(file, StandardCharsets.UTF_8.name());
-
+            Scanner reader = new Scanner(ifcFile, StandardCharsets.UTF_8.name());
             while (reader.hasNextLine()) {
                 String data = reader.nextLine();
                 data = data.replaceAll("\\s+", "");
