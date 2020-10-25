@@ -1,5 +1,5 @@
 // License: AGPL. For details, see LICENSE file.
-package io.parser.helper;
+package io.parser.utils;
 
 import io.parser.data.ifc.IfcRepresentation;
 import io.parser.data.ifc.IfcRepresentationCatalog.*;
@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
-import static io.parser.helper.ParserUtility.prepareDoubleString;
+import static io.parser.utils.ParserUtility.prepareDoubleString;
 
 /**
  * Class helps parsing BIM data with providing methods to extract OSM relevant data

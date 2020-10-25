@@ -11,12 +11,12 @@ import io.parser.data.ifc.IfcRepresentationCatalog.RepresentationIdentifier;
 import io.parser.data.ifc.IfcUnitCatalog;
 import io.parser.data.math.Matrix3D;
 import io.parser.data.math.Vector3D;
-import io.parser.helper.BIMtoOSMUtility;
-import io.parser.helper.IfcRepresentationExtractor;
-import io.parser.helper.IfcShapeRepresentationIdentifier;
-import io.parser.utils.FileOptimizer;
 import io.parser.math.ParserGeoMath;
 import io.parser.math.ParserMath;
+import io.parser.utils.BIMtoOSMUtility;
+import io.parser.utils.FileOptimizer;
+import io.parser.utils.IfcRepresentationExtractor;
+import io.parser.utils.IfcShapeRepresentationIdentifier;
 import model.TagCatalog;
 import nl.tue.buildingsmart.express.population.EntityInstance;
 import nl.tue.buildingsmart.express.population.ModelPopulation;
@@ -38,8 +38,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.*;
 
-import static io.parser.helper.ParserUtility.prepareDoubleString;
-import static io.parser.helper.ParserUtility.stringVectorToVector3D;
+import static io.parser.utils.ParserUtility.prepareDoubleString;
+import static io.parser.utils.ParserUtility.stringVectorToVector3D;
 import static org.openstreetmap.josm.tools.I18n.tr;
 
 /**

@@ -1,4 +1,4 @@
-package io.parser.helper;
+package io.parser.utils;
 
 import io.parser.data.math.Vector3D;
 import org.openstreetmap.josm.tools.Logging;
