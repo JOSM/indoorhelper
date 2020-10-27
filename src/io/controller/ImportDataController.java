@@ -129,7 +129,7 @@ public class ImportDataController implements ImportEventListener {
         Font font = infoPanel.getFont().deriveFont(Font.PLAIN, 14.0f);
         JMultilineLabel iLabel = new JMultilineLabel(
                 tr("BIM importer is in beta version! \n You can help to improve the BIM import by reporting bugs or other issues. " +
-                        "For more details see logfile: <i>" + pluginDir + "\\logfile_indoorhelper.log</i>"));
+                        "For more details see logfile: <i>" + pluginDir + File.separator + "logfile_indoorhelper.log</i>"));
         UrlLabel issueURL = new UrlLabel(Config.getUrls().getJOSMWebsite() + "/newticket", tr("Report bug"));
         issueURL.setFont(font);
         iLabel.setFont(font);
