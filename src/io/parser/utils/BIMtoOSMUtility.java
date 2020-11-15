@@ -15,7 +15,6 @@ import nl.tue.buildingsmart.express.population.ModelPopulation;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 import static io.parser.utils.ParserUtility.stringVectorToVector3D;
 
@@ -36,15 +35,15 @@ public class BIMtoOSMUtility {
         FilteredRawBIMData bimData = new FilteredRawBIMData();
 
         // get the root element IFCSITE
-        Vector<EntityInstance> ifcSiteObjects = new Vector<>();
+        List<EntityInstance> ifcSiteObjects = new ArrayList<>();
         BIMtoOSMCatalog.getIFCSITETags().forEach(tag -> ifcSiteObjects.addAll(ifcModel.getInstancesOfType(tag)));
 
         if (!ifcSiteObjects.isEmpty()) {
-            bimData.setIfcSite(ifcSiteObjects.firstElement());
+            bimData.setIfcSite(ifcSiteObjects.get(0));
         }
 
         // get all relevant areas
-        Vector<EntityInstance> areaObjects = new Vector<>();
+        List<EntityInstance> areaObjects = new ArrayList<>();
         BIMtoOSMCatalog.getAreaTags().forEach(tag -> ifcModel.getInstancesOfType(tag).forEach(entity -> {
             String identifier = (String) entity.getAttributeValueBN("PredefinedType");
             if (!identifier.equals("." + IfcSlabTypeEnum.ROOF + ".")) {
@@ -54,27 +53,27 @@ public class BIMtoOSMUtility {
         bimData.setAreaObjects(areaObjects);
 
         // get all walls
-        Vector<EntityInstance> wallObjects = new Vector<>();
+        List<EntityInstance> wallObjects = new ArrayList<>();
         BIMtoOSMCatalog.getWallTags().forEach(tag -> wallObjects.addAll(ifcModel.getInstancesOfType(tag)));
         bimData.setWallObjects(wallObjects);
 
         // get all columns
-        Vector<EntityInstance> colObjects = new Vector<>();
+        List<EntityInstance> colObjects = new ArrayList<>();
         BIMtoOSMCatalog.getColumnTags().forEach(tag -> colObjects.addAll(ifcModel.getInstancesOfType(tag)));
         bimData.setColumnObjects(colObjects);
 
         // get all doors
-        Vector<EntityInstance> doorObjects = new Vector<>();
+        List<EntityInstance> doorObjects = new ArrayList<>();
         BIMtoOSMCatalog.getDoorTags().forEach(tag -> doorObjects.addAll(ifcModel.getInstancesOfType(tag)));
         bimData.setDoorObjects(doorObjects);
 
         // get all doors
-        Vector<EntityInstance> stairObjects = new Vector<>();
+        List<EntityInstance> stairObjects = new ArrayList<>();
         BIMtoOSMCatalog.getStairTags().forEach(tag -> stairObjects.addAll(ifcModel.getInstancesOfType(tag)));
         bimData.setStairObjects(stairObjects);
 
         // get all windows
-        Vector<EntityInstance> windowObjects = new Vector<>();
+        List<EntityInstance> windowObjects = new ArrayList<>();
         BIMtoOSMCatalog.getWindowTags().forEach(tag -> windowObjects.addAll(ifcModel.getInstancesOfType(tag)));
         bimData.setWindowObjects(windowObjects);
 
@@ -89,7 +88,7 @@ public class BIMtoOSMUtility {
      * @param bimObjects All BIM objects of objectType
      * @return Prepared BIM objects
      */
-    public static List<BIMObject3D> prepareBIMObjects(ModelPopulation ifcModel, BIMtoOSMCatalog.BIMObject objectType, Vector<EntityInstance> bimObjects) {
+    public static List<BIMObject3D> prepareBIMObjects(ModelPopulation ifcModel, BIMtoOSMCatalog.BIMObject objectType, List<EntityInstance> bimObjects) {
         ArrayList<BIMObject3D> preparedObjects = new ArrayList<>();
 
         for (EntityInstance objectEntity : bimObjects) {
@@ -177,7 +176,7 @@ public class BIMtoOSMUtility {
     private static Vector3D getTranslationFromRelativePlacement(EntityInstance relativePlacement) {
         EntityInstance cPoint = relativePlacement.getAttributeValueBNasEntityInstance("Location");
         @SuppressWarnings("unchecked")
-        Vector<String> objectCoords = (Vector<String>) cPoint.getAttributeValueBN("Coordinates");
+        List<String> objectCoords = (List<String>) cPoint.getAttributeValueBN("Coordinates");
         return stringVectorToVector3D(objectCoords);
     }
 
@@ -188,15 +187,15 @@ public class BIMtoOSMUtility {
      * @return rotation matrix
      */
     private static Matrix3D getRotationFromRelativePlacement(EntityInstance relativePlacement) {
-        Vector<String> refDirection;
-        Vector<String> zAxis;
+        List<String> refDirection;
+        List<String> zAxis;
         try {
             // get RefDirection
             EntityInstance refDirectionEntity = relativePlacement.getAttributeValueBNasEntityInstance("RefDirection");
-            refDirection = (Vector<String>) refDirectionEntity.getAttributeValueBN("DirectionRatios");
+            refDirection = (List<String>) refDirectionEntity.getAttributeValueBN("DirectionRatios");
             // get z-Axis
             EntityInstance axisEntity = relativePlacement.getAttributeValueBNasEntityInstance("Axis");
-            zAxis = (Vector<String>) axisEntity.getAttributeValueBN("DirectionRatios");
+            zAxis = (List<String>) axisEntity.getAttributeValueBN("DirectionRatios");
         } catch (NullPointerException e) {
             return null;
         }
@@ -297,13 +296,13 @@ public class BIMtoOSMUtility {
 
         for (EntityInstance relativeObject : objectRP) {
             // get REFDIRECTION (x axis vector)
-            Vector<String> xDirectionRatios;
-            Vector<String> zDirectionRatios;
+            List<String> xDirectionRatios;
+            List<String> zDirectionRatios;
             try {
                 EntityInstance xAxisEntity = relativeObject.getAttributeValueBNasEntityInstance("RefDirection");
                 EntityInstance zAxisEntity = relativeObject.getAttributeValueBNasEntityInstance("Axis");
-                xDirectionRatios = (Vector<String>) xAxisEntity.getAttributeValueBN("DirectionRatios");
-                zDirectionRatios = (Vector<String>) zAxisEntity.getAttributeValueBN("DirectionRatios");
+                xDirectionRatios = (List<String>) xAxisEntity.getAttributeValueBN("DirectionRatios");
+                zDirectionRatios = (List<String>) zAxisEntity.getAttributeValueBN("DirectionRatios");
             } catch (NullPointerException e) {
                 return null;
             }

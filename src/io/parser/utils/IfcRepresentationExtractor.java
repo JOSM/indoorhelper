@@ -10,7 +10,6 @@ import org.openstreetmap.josm.tools.Logging;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 import static io.parser.utils.ParserUtility.prepareDoubleString;
 
@@ -608,7 +607,7 @@ public class IfcRepresentationExtractor {
      */
     public static Vector3D ifcCartesianCoordinateToVector3D(EntityInstance cartesianCoordinate) {
         @SuppressWarnings("unchecked")
-        Vector<String> objectCoords = (Vector<String>) cartesianCoordinate.getAttributeValueBN("Coordinates");
+        List<String> objectCoords = (List<String>) cartesianCoordinate.getAttributeValueBN("Coordinates");
         if (objectCoords.isEmpty()) return null;
         double x = prepareDoubleString(objectCoords.get(0));
         double y = prepareDoubleString(objectCoords.get(1));

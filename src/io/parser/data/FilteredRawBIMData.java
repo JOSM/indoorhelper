@@ -3,7 +3,7 @@ package io.parser.data;
 
 import nl.tue.buildingsmart.express.population.EntityInstance;
 
-import java.util.Vector;
+import java.util.List;
 
 /**
  * Data structure holding specific BIM data elements.
@@ -12,13 +12,13 @@ import java.util.Vector;
  */
 public class FilteredRawBIMData {
     private EntityInstance ifcSite;    // root of data set
-    private Vector<EntityInstance> areaObjects;
-    private Vector<EntityInstance> wallObjects;
-    private Vector<EntityInstance> columnObjects;
-    private Vector<EntityInstance> doorObjects;
-    private Vector<EntityInstance> stairObjects;
-    private Vector<EntityInstance> windowObjects;
-    private Vector<EntityInstance> relVoidsElements;    // IFCRELVOIDSELEMENT
+    private List<EntityInstance> areaObjects;
+    private List<EntityInstance> wallObjects;
+    private List<EntityInstance> columnObjects;
+    private List<EntityInstance> doorObjects;
+    private List<EntityInstance> stairObjects;
+    private List<EntityInstance> windowObjects;
+    private List<EntityInstance> relVoidsElements;    // IFCRELVOIDSELEMENT
 
     public EntityInstance getIfcSite() {
         return ifcSite;
@@ -28,59 +28,59 @@ public class FilteredRawBIMData {
         this.ifcSite = ifcSite;
     }
 
-    public Vector<EntityInstance> getAreaObjects() {
+    public List<EntityInstance> getAreaObjects() {
         return areaObjects;
     }
 
-    public void setAreaObjects(Vector<EntityInstance> areaObjects) {
+    public void setAreaObjects(List<EntityInstance> areaObjects) {
         this.areaObjects = areaObjects;
     }
 
-    public Vector<EntityInstance> getWallObjects() {
+    public List<EntityInstance> getWallObjects() {
         return wallObjects;
     }
 
-    public void setWallObjects(Vector<EntityInstance> wallObjects) {
+    public void setWallObjects(List<EntityInstance> wallObjects) {
         this.wallObjects = wallObjects;
     }
 
-    public Vector<EntityInstance> getColumnObjects() {
+    public List<EntityInstance> getColumnObjects() {
         return columnObjects;
     }
 
-    public void setColumnObjects(Vector<EntityInstance> columnObjects) {
+    public void setColumnObjects(List<EntityInstance> columnObjects) {
         this.columnObjects = columnObjects;
     }
 
-    public Vector<EntityInstance> getDoorObjects() {
+    public List<EntityInstance> getDoorObjects() {
         return doorObjects;
     }
 
-    public void setDoorObjects(Vector<EntityInstance> doorObjects) {
+    public void setDoorObjects(List<EntityInstance> doorObjects) {
         this.doorObjects = doorObjects;
     }
 
-    public Vector<EntityInstance> getStairObjects() {
+    public List<EntityInstance> getStairObjects() {
         return stairObjects;
     }
 
-    public void setStairObjects(Vector<EntityInstance> stairObjects) {
+    public void setStairObjects(List<EntityInstance> stairObjects) {
         this.stairObjects = stairObjects;
     }
 
-    public Vector<EntityInstance> getWindowObjects() {
+    public List<EntityInstance> getWindowObjects() {
         return windowObjects;
     }
 
-    public void setWindowObjects(Vector<EntityInstance> windowObjects) {
+    public void setWindowObjects(List<EntityInstance> windowObjects) {
         this.windowObjects = windowObjects;
     }
 
-    public Vector<EntityInstance> getRelVoidsElements() {
+    public List<EntityInstance> getRelVoidsElements() {
         return relVoidsElements;
     }
 
-    public void setRelVoidsElements(Vector<EntityInstance> relVoidsElements) {
+    public void setRelVoidsElements(List<EntityInstance> relVoidsElements) {
         this.relVoidsElements = relVoidsElements;
     }
 

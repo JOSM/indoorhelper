@@ -285,7 +285,7 @@ public class BIMtoOSMParser {
         int level = defaultLevel;
 
         // get all IfcRelContainedInSpatialStructure elements
-        Vector<EntityInstance> relContainedInSpatialStructureElements = ifcModel.getInstancesOfType("IfcRelContainedInSpatialStructure");
+        List<EntityInstance> relContainedInSpatialStructureElements = ifcModel.getInstancesOfType("IfcRelContainedInSpatialStructure");
 
         for (EntityInstance entity : relContainedInSpatialStructureElements) {
             // for each element get contained entities
@@ -326,7 +326,7 @@ public class BIMtoOSMParser {
      */
     private ArrayList<Pair<Double, Integer>> extractAndIdentifyLevels() {
         // get all IfcRelContainedInSpatialStructure elements
-        Vector<EntityInstance> relContainedInSpatialStructureElements = ifcModel.getInstancesOfType("IfcRelContainedInSpatialStructure");
+        List<EntityInstance> relContainedInSpatialStructureElements = ifcModel.getInstancesOfType("IfcRelContainedInSpatialStructure");
 
         ArrayList<Pair<Double, Integer>> levelIdentifier = new ArrayList<>();
         ArrayList<Double> levelList = new ArrayList<>();
@@ -420,11 +420,11 @@ public class BIMtoOSMParser {
         }
 
         // get RefLatitude and RefLongitude of IFCSITE
-        Vector<String> refLat;
-        Vector<String> refLon;
+        List<String> refLat;
+        List<String> refLon;
         try {
-            refLat = (Vector<String>) ifcSite.getAttributeValueBN("RefLatitude");
-            refLon = (Vector<String>) ifcSite.getAttributeValueBN("RefLongitude");
+            refLat = (List<String>) ifcSite.getAttributeValueBN("RefLatitude");
+            refLon = (List<String>) ifcSite.getAttributeValueBN("RefLongitude");
         } catch (NullPointerException e) {
             return null;
         }
@@ -456,13 +456,13 @@ public class BIMtoOSMParser {
      */
     @SuppressWarnings("unchecked")
     private Vector3D getProjectNorth() {
-        Vector<String> projectNorthDirectionRatios;
+        List<String> projectNorthDirectionRatios;
         try {
             EntityInstance ifcProject = ifcModel.getInstancesOfType("IfcProject").get(0);
             EntityInstance geometricContext = ifcProject.getAttributeValueBNasEntityInstanceList("RepresentationContexts").get(0);
             EntityInstance worldCoordinates = geometricContext.getAttributeValueBNasEntityInstance("WorldCoordinateSystem");
             EntityInstance projectNorth = worldCoordinates.getAttributeValueBNasEntityInstance("RefDirection");
-            projectNorthDirectionRatios = (Vector<String>) projectNorth.getAttributeValueBN("DirectionRatios");
+            projectNorthDirectionRatios = (List<String>) projectNorth.getAttributeValueBN("DirectionRatios");
         } catch (NullPointerException e) {
             return null;
         }
@@ -476,12 +476,12 @@ public class BIMtoOSMParser {
      */
     @SuppressWarnings("unchecked")
     private Vector3D getTrueNorth() {
-        Vector<String> trueNorthDirectionRatios;
+        List<String> trueNorthDirectionRatios;
         try {
             EntityInstance ifcProject = ifcModel.getInstancesOfType("IfcProject").get(0);
             EntityInstance geometricContext = ifcProject.getAttributeValueBNasEntityInstanceList("RepresentationContexts").get(0);
             EntityInstance trueNorth = geometricContext.getAttributeValueBNasEntityInstance("TrueNorth");
-            trueNorthDirectionRatios = (Vector<String>) trueNorth.getAttributeValueBN("DirectionRatios");
+            trueNorthDirectionRatios = (List<String>) trueNorth.getAttributeValueBN("DirectionRatios");
         } catch (NullPointerException e) {
             return null;
         }

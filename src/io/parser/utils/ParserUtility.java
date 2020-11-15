@@ -3,7 +3,7 @@ package io.parser.utils;
 import io.parser.data.math.Vector3D;
 import org.openstreetmap.josm.tools.Logging;
 
-import java.util.Vector;
+import java.util.List;
 
 /**
  * Parser utility methods
@@ -18,7 +18,7 @@ public class ParserUtility {
      * @param vector to parse
      * @return parsed vector
      */
-    public static Vector3D stringVectorToVector3D(Vector<String> vector) {
+    public static Vector3D stringVectorToVector3D(List<String> vector) {
         if (vector.isEmpty()) return null;
         double x = 0.0;
         double y = 0.0;
