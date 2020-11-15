@@ -109,8 +109,8 @@ public class BIMtoOSMParser {
         preparedBIMData.addAll(BIMtoOSMUtility.prepareBIMObjects(ifcModel, BIMtoOSMCatalog.BIMObject.IfcSlab, filteredRawBIMData.getAreaObjects()));
         preparedBIMData.addAll(BIMtoOSMUtility.prepareBIMObjects(ifcModel, BIMtoOSMCatalog.BIMObject.IfcWall, filteredRawBIMData.getWallObjects()));
         preparedBIMData.addAll(BIMtoOSMUtility.prepareBIMObjects(ifcModel, BIMtoOSMCatalog.BIMObject.IfcColumn, filteredRawBIMData.getColumnObjects()));
-//        preparedBIMData.addAll(BIMtoOSMHelper.prepareBIMObjects(ifcModel, BIMtoOSMCatalog.BIMObject.IfcDoor, filteredRawBIMData.getDoorObjects()));
-//        preparedBIMData.addAll(BIMtoOSMHelper.prepareBIMObjects(ifcModel, BIMtoOSMCatalog.BIMObject.IfcWindow, filteredRawBIMData.getWindowObjects()));
+//        preparedBIMData.addAll(BIMtoOSMUtility.prepareBIMObjects(ifcModel, BIMtoOSMCatalog.BIMObject.IfcDoor, filteredRawBIMData.getDoorObjects()));
+//        preparedBIMData.addAll(BIMtoOSMUtility.prepareBIMObjects(ifcModel, BIMtoOSMCatalog.BIMObject.IfcWindow, filteredRawBIMData.getWindowObjects()));
         preparedBIMData.addAll(BIMtoOSMUtility.prepareBIMObjects(ifcModel, BIMtoOSMCatalog.BIMObject.IfcStair, filteredRawBIMData.getStairObjects()));
 
         // set units
