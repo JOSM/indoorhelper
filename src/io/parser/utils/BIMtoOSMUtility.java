@@ -28,7 +28,7 @@ public class BIMtoOSMUtility {
     /**
      * Types of geometry precision
      */
-    public enum GeometrySolution{
+    public enum GeometrySolution {
         BODY,
         BOUNDING_BOX
     }
@@ -94,9 +94,11 @@ public class BIMtoOSMUtility {
      * @param ifcModel   ifcModel
      * @param objectType relating BIMtoOSMCatalog.BIMObject
      * @param bimObjects All BIM objects of objectType
+     * @param solution   geometry solution type
      * @return Prepared BIM objects
      */
-    public static List<BIMObject3D> prepareBIMObjects(ModelPopulation ifcModel, BIMtoOSMCatalog.BIMObject objectType, List<EntityInstance> bimObjects) {
+    public static List<BIMObject3D> prepareBIMObjects(ModelPopulation ifcModel, BIMtoOSMCatalog.BIMObject objectType,
+                                                      List<EntityInstance> bimObjects, GeometrySolution solution) {
         ArrayList<BIMObject3D> preparedObjects = new ArrayList<>();
 
         for (EntityInstance objectEntity : bimObjects) {
@@ -108,8 +110,7 @@ public class BIMtoOSMUtility {
             Matrix3D rotMatrix = getObjectRotationMatrix(objectEntity);
 
             // get object geometry
-            GeometrySolution activeSolution = GeometrySolution.BOUNDING_BOX; // set for now
-            ArrayList<Vector3D> shapeDataOfObject = (ArrayList<Vector3D>) getShapeData(ifcModel, objectEntity, activeSolution);
+            ArrayList<Vector3D> shapeDataOfObject = (ArrayList<Vector3D>) getShapeData(ifcModel, objectEntity, solution);
 
             // transform and prepare
             if (cartesianOrigin != null && rotMatrix != null && (shapeDataOfObject != null && !shapeDataOfObject.isEmpty())) {
@@ -240,13 +241,12 @@ public class BIMtoOSMUtility {
         List<IfcRepresentation> repObjectIdentities = getIfcRepresentations(object);
         if (repObjectIdentities == null) return null;
 
-        if(solution.equals(GeometrySolution.BODY)){
+        if (solution.equals(GeometrySolution.BODY)) {
             IfcRepresentation bodyRepresentation = getIfcRepresentation(repObjectIdentities, RepresentationIdentifier.Body);
             if (bodyRepresentation != null) {
                 return IfcGeometryExtractor.getDataFromBodyRepresentation(ifcModel, bodyRepresentation);
             }
-        }
-        else if(solution.equals(GeometrySolution.BOUNDING_BOX)){
+        } else if (solution.equals(GeometrySolution.BOUNDING_BOX)) {
             IfcRepresentation boxRepresentation = getIfcRepresentation(repObjectIdentities, RepresentationIdentifier.Box);
             if (boxRepresentation != null) {
                 return IfcGeometryExtractor.getDataFromBoxRepresentation(ifcModel, boxRepresentation);

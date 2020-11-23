@@ -10,9 +10,9 @@ import io.parser.data.ifc.IfcRepresentationCatalog.IfcSpatialStructureElementTyp
 import io.parser.data.ifc.IfcRepresentationCatalog.RepresentationIdentifier;
 import io.parser.data.ifc.IfcUnitCatalog;
 import io.parser.math.Matrix3D;
-import io.parser.math.Vector3D;
 import io.parser.math.ParserGeoMath;
 import io.parser.math.ParserMath;
+import io.parser.math.Vector3D;
 import io.parser.utils.BIMtoOSMUtility;
 import io.parser.utils.FileOptimizer;
 import io.parser.utils.IfcGeometryExtractor;
@@ -36,7 +36,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Scanner;
 
 import static io.parser.utils.ParserUtility.prepareDoubleString;
 import static io.parser.utils.ParserUtility.stringVectorToVector3D;
@@ -67,6 +70,12 @@ public class BIMtoOSMParser {
 
     private final int defaultLevel = 999;
 
+    // configuration parameters
+    private BIMtoOSMUtility.GeometrySolution solutionType;
+    private boolean optimizeInputFile;
+    private boolean optimizeOutput;
+
+
     /**
      * Constructor
      *
@@ -82,8 +91,31 @@ public class BIMtoOSMParser {
         }
         ifcSchemaFilePath = resourcePathDir + IFC2X3_TC1_Schema;
         tagCatalog = new TagCatalog();
-        lengthUnit = IfcUnitCatalog.lengthUnit.M;    // default
-        angleUnit = IfcUnitCatalog.planeAngleUnit.RAD;    // default
+        lengthUnit = IfcUnitCatalog.lengthUnit.M;
+        angleUnit = IfcUnitCatalog.planeAngleUnit.RAD;
+        applyDefaultConfiguration();
+    }
+
+    /**
+     * Applies default configuration to parser
+     */
+    private void applyDefaultConfiguration() {
+        solutionType = BIMtoOSMUtility.GeometrySolution.BOUNDING_BOX;
+        optimizeInputFile = true;
+        optimizeOutput = true;
+    }
+
+    /**
+     * Sets configuration values of parser
+     *
+     * @param solution       type of parsed data. {@link BIMtoOSMUtility.GeometrySolution} represents precision of parsed data
+     * @param optimizeInput  true if IFC file should be pre-optimized (comments will be removed before loading), else false
+     * @param optimizeOutput true if OSM output should be optimized (optimization rules see operating method)
+     */
+    public void configure(BIMtoOSMUtility.GeometrySolution solution, boolean optimizeInput, boolean optimizeOutput) {
+        solutionType = solution;
+        optimizeInputFile = optimizeInput;
+        this.optimizeOutput = optimizeOutput;
     }
 
     /**
@@ -111,6 +143,10 @@ public class BIMtoOSMParser {
         ArrayList<Node> nodes = packedOSMData.a;
         ArrayList<Way> ways = packedOSMData.b;
 
+        if(optimizeOutput){
+            // TODO optimizer OSM output
+        }
+
         if (preparedData.size() != rawFilteredData.getSize()) {
             showParsingErrorView(filepath, "Caution!\nImported data might include errors!", false);
         }
@@ -131,11 +167,17 @@ public class BIMtoOSMParser {
     private boolean loadFile(String filepath) {
         try {
             // pre-optimize and load IFC file
-            File optimizedFile = FileOptimizer.optimizeIfcFile(filepath);
-            inputfs = new FileInputStream(optimizedFile);
+            File file;
+            if (optimizeInputFile) {
+                file = FileOptimizer.optimizeIfcFile(filepath);
+            } else {
+                file = new File(filepath);
+            }
+
+            inputfs = new FileInputStream(file);
 
             // find used IFC schema
-            String usedIfcSchema = chooseSchemaFile(optimizedFile);
+            String usedIfcSchema = chooseSchemaFile(file);
             if (usedIfcSchema.isEmpty()) {
                 showLoadingErrorView(filepath, "Could not load IFC file.\nIFC schema is no supported.");
                 return false;
@@ -221,17 +263,24 @@ public class BIMtoOSMParser {
 
     /**
      * Extracts the BIM object geometry and prepares data as {@link BIMObject3D}
+     *
      * @param rawBIMData to prepare
      * @return prepared data for rendering
      */
-    private List<BIMObject3D> prepareRawBIMData(BIMDataCollection rawBIMData){
+    private List<BIMObject3D> prepareRawBIMData(BIMDataCollection rawBIMData) {
         List<BIMObject3D> preparedData = new ArrayList<>();
-        preparedData.addAll(BIMtoOSMUtility.prepareBIMObjects(ifcModel, BIMtoOSMCatalog.BIMObject.IfcSlab, rawBIMData.getAreaObjects()));
-        preparedData.addAll(BIMtoOSMUtility.prepareBIMObjects(ifcModel, BIMtoOSMCatalog.BIMObject.IfcWall, rawBIMData.getWallObjects()));
-        preparedData.addAll(BIMtoOSMUtility.prepareBIMObjects(ifcModel, BIMtoOSMCatalog.BIMObject.IfcColumn, rawBIMData.getColumnObjects()));
-//        preparedData.addAll(BIMtoOSMUtility.prepareBIMObjects(ifcModel, BIMtoOSMCatalog.BIMObject.IfcDoor, rawBIMData.getDoorObjects()));
-//        preparedData.addAll(BIMtoOSMUtility.prepareBIMObjects(ifcModel, BIMtoOSMCatalog.BIMObject.IfcWindow, rawBIMData.getWindowObjects()));
-        preparedData.addAll(BIMtoOSMUtility.prepareBIMObjects(ifcModel, BIMtoOSMCatalog.BIMObject.IfcStair, rawBIMData.getStairObjects()));
+        List<BIMObject3D> slabs = BIMtoOSMUtility.prepareBIMObjects(ifcModel, BIMtoOSMCatalog.BIMObject.IfcSlab, rawBIMData.getAreaObjects(), solutionType);
+        List<BIMObject3D> walls = BIMtoOSMUtility.prepareBIMObjects(ifcModel, BIMtoOSMCatalog.BIMObject.IfcWall, rawBIMData.getWallObjects(), solutionType);
+        List<BIMObject3D> columns = BIMtoOSMUtility.prepareBIMObjects(ifcModel, BIMtoOSMCatalog.BIMObject.IfcColumn, rawBIMData.getColumnObjects(), solutionType);
+        List<BIMObject3D> doors = BIMtoOSMUtility.prepareBIMObjects(ifcModel, BIMtoOSMCatalog.BIMObject.IfcDoor, rawBIMData.getDoorObjects(), solutionType);
+        List<BIMObject3D> windows = BIMtoOSMUtility.prepareBIMObjects(ifcModel, BIMtoOSMCatalog.BIMObject.IfcWindow, rawBIMData.getWindowObjects(), solutionType);
+        List<BIMObject3D> stairs = BIMtoOSMUtility.prepareBIMObjects(ifcModel, BIMtoOSMCatalog.BIMObject.IfcStair, rawBIMData.getStairObjects(), solutionType);
+        preparedData.addAll(slabs);
+        preparedData.addAll(walls);
+        preparedData.addAll(columns);
+//        preparedData.addAll(doors);
+//        preparedData.addAll(windows);
+        preparedData.addAll(stairs);
         return preparedData;
     }
 
@@ -363,7 +412,7 @@ public class BIMtoOSMParser {
      * Method sets geodetic shape coordinates of PreparedBIMObject3D
      *
      * @param llBuildingOrigin building origin latlon
-     * @param preparedBIMData      data to set the geodetic shapes
+     * @param preparedBIMData  data to set the geodetic shapes
      */
     private void transformToGeodetic(LatLon llBuildingOrigin, ArrayList<BIMObject3D> preparedBIMData) {
         if (llBuildingOrigin != null) {
