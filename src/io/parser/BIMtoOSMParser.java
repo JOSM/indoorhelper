@@ -405,11 +405,11 @@ public class BIMtoOSMParser {
         if (ifcSite.getAttributeValueBNasEntityInstance("Representation") != null) {
             // get the offset between IFCSITE geodetic coordinates and building origin coordinate
             // handle IFCSITE offset if IFCBOUNDINGBOX representation
-            List<IfcRepresentation> repObjectIdentities = BIMtoOSMUtility.identifyRepresentationsOfObject(ifcSite);
+            List<IfcRepresentation> repObjectIdentities = BIMtoOSMUtility.getIfcRepresentations(ifcSite);
             if (repObjectIdentities == null) return null;
 
             IfcRepresentation boxRepresentation =
-                    BIMtoOSMUtility.getRepresentationSpecificObjectType(repObjectIdentities, RepresentationIdentifier.Box);
+                    BIMtoOSMUtility.getIfcRepresentation(repObjectIdentities, RepresentationIdentifier.Box);
             if (boxRepresentation != null) {
                 // get offset
                 EntityInstance bb = boxRepresentation.getEntity();

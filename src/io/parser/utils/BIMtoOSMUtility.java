@@ -103,7 +103,7 @@ public class BIMtoOSMUtility {
             Matrix3D rotMatrix = getObjectRotationMatrix(objectEntity);
 
             // get local points representing shape of object
-            ArrayList<Vector3D> shapeDataOfObject = (ArrayList<Vector3D>) getShapeDataOfObject(ifcModel, objectEntity);
+            ArrayList<Vector3D> shapeDataOfObject = (ArrayList<Vector3D>) getShapeData(ifcModel, objectEntity);
 
             // transform and prepare objects
             if (cartesianOrigin != null && rotMatrix != null && (shapeDataOfObject != null && !shapeDataOfObject.isEmpty())) {
@@ -119,7 +119,7 @@ public class BIMtoOSMUtility {
                 }
 
                 // Workaround: Check data set for closed loops (separated by defaultPoint). If closed loop in data set, extract and add as own way
-                List<List<Vector3D>> loops = splitClosedLoopsInDataSet(shapeDataOfObject);
+                List<List<Vector3D>> loops = splitClosedLoops(shapeDataOfObject);
                 loops.forEach(l -> {
                     object.setCartesianShapeCoordinates(l);
                     preparedObjects.add(object);
@@ -230,27 +230,27 @@ public class BIMtoOSMUtility {
      * @param object   BIM object
      * @return Array including points of shape representation
      */
-    public static List<Vector3D> getShapeDataOfObject(ModelPopulation ifcModel, EntityInstance object) {
+    public static List<Vector3D> getShapeData(ModelPopulation ifcModel, EntityInstance object) {
         ArrayList<Vector3D> shapeData = new ArrayList<>();
 
         // identify and keep types of IFCPRODUCTDEFINITIONSHAPE.REPRESENTATIONS objects
-        List<IfcRepresentation> repObjectIdentities = identifyRepresentationsOfObject(object);
+        List<IfcRepresentation> repObjectIdentities = getIfcRepresentations(object);
         if (repObjectIdentities == null) return null;
 
-        // first check if IFCPRODUCTDEFINITIONSHAPE.REPRESENTATIONS include IFCSHAPEREPRESENTATION of type "body"
+        // get data from body representation
 //        IFCShapeRepresentationIdentity bodyRepresentation = getRepresentationSpecificObjectType(repObjectIdentities, RepresentationIdentifier.Body);
 //        if (bodyRepresentation != null && !IFCShapeRepresentationIdentifier.isIfcWindowOrIfcDoor(ifcModel, object)) {
 //            return IFCShapeDataExtractor.getDataFromBodyRepresentation(ifcModel, bodyRepresentation);
 //        }
 
-        // if no IFCSHAPEREPRESENTATION of type "body" check if IFCSHAPEREPRESENTATION of type "box" exists
-        IfcRepresentation boxRepresentation = getRepresentationSpecificObjectType(repObjectIdentities, RepresentationIdentifier.Box);
+        // get data from bounding box representation
+        IfcRepresentation boxRepresentation = getIfcRepresentation(repObjectIdentities, RepresentationIdentifier.Box);
         if (boxRepresentation != null) {
             return IfcRepresentationExtractor.getDataFromBoxRepresentation(ifcModel, boxRepresentation);
         }
 
         // if no IFCSHAPEREPRESENTATION of type "box" check if IFCSHAPEREPRESENTATION of type "axis" exists
-        IfcRepresentation axisRepresentation = getRepresentationSpecificObjectType(repObjectIdentities, RepresentationIdentifier.Axis);
+        IfcRepresentation axisRepresentation = getIfcRepresentation(repObjectIdentities, RepresentationIdentifier.Axis);
         if (axisRepresentation != null) {
             return IfcRepresentationExtractor.getDataFromAxisRepresentation(ifcModel, axisRepresentation);
         }
@@ -266,9 +266,7 @@ public class BIMtoOSMUtility {
      * @param identifier          RepresentationIdentifier
      * @return returns IfcShapeRepresentation "identifier" or null if not in list
      */
-    public static IfcRepresentation getRepresentationSpecificObjectType(
-            List<IfcRepresentation> repObjectIdentities,
-            RepresentationIdentifier identifier) {
+    public static IfcRepresentation getIfcRepresentation(List<IfcRepresentation> repObjectIdentities, RepresentationIdentifier identifier) {
         for (IfcRepresentation repObject : repObjectIdentities) {
             if (repObject.getIdentifier().equals(identifier)) return repObject;
         }
@@ -365,30 +363,19 @@ public class BIMtoOSMUtility {
     }
 
     /**
-     * Get EntityInstances of IFCSHAPEREPRESENTATIONs of object
-     *
-     * @param object to find origin for
-     * @return List with EntityInstances of IFCSHAPEREPRESENTATIONs
-     */
-    private static ArrayList<EntityInstance> getRepresentationsOfObject(EntityInstance object) {
-        // get IFCPRODUCTDEFINITIONSHAPE of object
-        EntityInstance objectIFCPDS = object.getAttributeValueBNasEntityInstance("Representation");
-
-        // get all IFCSHAPEREPRESENTATIONS of IFCOBJECT
-        return objectIFCPDS.getAttributeValueBNasEntityInstanceList("Representations");
-    }
-
-    /**
      * Identifies the type of an IFCREPRESENTATION object.
      *
      * @param object object to get the IFCPRODUCTDEFINITIONSHAPE.REPRESENTATIONS from which will be identified
      * @return List of IFCShapeRepresentationIdentity holding an IFC representation object and it's identifier
      */
-    public static List<IfcRepresentation> identifyRepresentationsOfObject(EntityInstance object) {
+    public static List<IfcRepresentation> getIfcRepresentations(EntityInstance object) {
         ArrayList<IfcRepresentation> repObjectIdentities = new ArrayList<>();
 
-        // get representation objects
-        ArrayList<EntityInstance> objectRepresentations = getRepresentationsOfObject(object);
+        // get IFCPRODUCTDEFINITIONSHAPE of object
+        EntityInstance objectIFCPDS = object.getAttributeValueBNasEntityInstance("Representation");
+        // get all IFCSHAPEREPRESENTATIONS of IFCOBJECT
+        ArrayList<EntityInstance> objectRepresentations =
+                objectIFCPDS.getAttributeValueBNasEntityInstanceList("Representations");
 
         // identify each object
         for (EntityInstance repObject : objectRepresentations) {
@@ -438,7 +425,7 @@ public class BIMtoOSMUtility {
      * @param data to check for loops
      * @return list with data for each loop
      */
-    private static List<List<Vector3D>> splitClosedLoopsInDataSet(List<Vector3D> data) {
+    private static List<List<Vector3D>> splitClosedLoops(List<Vector3D> data) {
         List<List<Vector3D>> loops = new ArrayList<>();
         ArrayList<Vector3D> loop = new ArrayList<>();
         for (Vector3D point : data) {
