@@ -415,7 +415,7 @@ public class BIMtoOSMParser {
                 EntityInstance bb = boxRepresentation.getEntity();
                 EntityInstance bbItem = bb.getAttributeValueBNasEntityInstanceList("Items").get(0);
                 EntityInstance cartesianCorner = bbItem.getAttributeValueBNasEntityInstance("Corner");
-                ifcSiteOffset = IfcRepresentationExtractor.ifcCartesianCoordinateToVector3D(cartesianCorner);
+                ifcSiteOffset = IfcRepresentationExtractor.ifcCoordinatesToVector3D(cartesianCorner);
             }
         }
 
