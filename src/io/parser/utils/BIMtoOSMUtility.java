@@ -118,7 +118,7 @@ public class BIMtoOSMUtility {
 
                 // Check if data includes IFCShapeDataExtractor.defaultPoint. IFCShapeDataExtractor.defaultPoint got added
                 // for workaround handling multiple closed loops in data set
-                if (!shapeDataOfObject.contains(IfcRepresentationExtractor.defaultPoint)) {
+                if (!shapeDataOfObject.contains(IfcGeometryExtractor.defaultPoint)) {
                     preparedObjects.add(object);
                     continue;
                 }
@@ -243,13 +243,13 @@ public class BIMtoOSMUtility {
         if(solution.equals(GeometrySolution.BODY)){
             IfcRepresentation bodyRepresentation = getIfcRepresentation(repObjectIdentities, RepresentationIdentifier.Body);
             if (bodyRepresentation != null) {
-                return IfcRepresentationExtractor.getDataFromBodyRepresentation(ifcModel, bodyRepresentation);
+                return IfcGeometryExtractor.getDataFromBodyRepresentation(ifcModel, bodyRepresentation);
             }
         }
         else if(solution.equals(GeometrySolution.BOUNDING_BOX)){
             IfcRepresentation boxRepresentation = getIfcRepresentation(repObjectIdentities, RepresentationIdentifier.Box);
             if (boxRepresentation != null) {
-                return IfcRepresentationExtractor.getDataFromBoxRepresentation(ifcModel, boxRepresentation);
+                return IfcGeometryExtractor.getDataFromBoxRepresentation(ifcModel, boxRepresentation);
             }
         }
         return null;
@@ -377,7 +377,7 @@ public class BIMtoOSMUtility {
         // identify each object
         for (EntityInstance repObject : objectRepresentations) {
             //identify IFCSHAPEREPRESENTATION type
-            IfcRepresentation repIdentity = IfcRepresentationIdentifier.identifyShapeRepresentation(repObject);
+            IfcRepresentation repIdentity = IfcObjectIdentifier.identifyShapeRepresentation(repObject);
             repIdentity.setRootEntity(object);
             if (!repIdentity.isFilled()) return null;
             repObjectIdentities.add(repIdentity);
@@ -426,10 +426,10 @@ public class BIMtoOSMUtility {
         List<List<Vector3D>> loops = new ArrayList<>();
         ArrayList<Vector3D> loop = new ArrayList<>();
         for (Vector3D point : data) {
-            if (point.equalsVector(IfcRepresentationExtractor.defaultPoint) && !loop.isEmpty()) {
+            if (point.equalsVector(IfcGeometryExtractor.defaultPoint) && !loop.isEmpty()) {
                 loops.add(loop);
                 loop = new ArrayList<>();
-            } else if (!point.equalsVector(IfcRepresentationExtractor.defaultPoint)) {
+            } else if (!point.equalsVector(IfcGeometryExtractor.defaultPoint)) {
                 loop.add(point);
             }
             if (data.indexOf(point) == data.size() - 1 && !loop.isEmpty()) {

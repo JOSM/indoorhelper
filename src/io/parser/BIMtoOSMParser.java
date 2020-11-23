@@ -15,8 +15,8 @@ import io.parser.math.ParserGeoMath;
 import io.parser.math.ParserMath;
 import io.parser.utils.BIMtoOSMUtility;
 import io.parser.utils.FileOptimizer;
-import io.parser.utils.IfcRepresentationExtractor;
-import io.parser.utils.IfcRepresentationIdentifier;
+import io.parser.utils.IfcGeometryExtractor;
+import io.parser.utils.IfcObjectIdentifier;
 import model.TagCatalog;
 import nl.tue.buildingsmart.express.population.EntityInstance;
 import nl.tue.buildingsmart.express.population.ModelPopulation;
@@ -298,7 +298,7 @@ public class BIMtoOSMParser {
                     // if part of contained elements get Elevation entity from object
                     EntityInstance relatingStructure = entity.getAttributeValueBNasEntityInstance("RelatingStructure");
 
-                    String relatingStructureType = IfcRepresentationIdentifier.getSpatialStructureElementType(ifcModel, relatingStructure);
+                    String relatingStructureType = IfcObjectIdentifier.getSpatialStructureElementType(ifcModel, relatingStructure);
                     // get type of relatingStructure
                     if (!relatingStructureType.equals(IfcSpatialStructureElementTypes.IfcBuildingStorey.name()))
                         return 0;
@@ -415,7 +415,7 @@ public class BIMtoOSMParser {
                 EntityInstance bb = boxRepresentation.getEntity();
                 EntityInstance bbItem = bb.getAttributeValueBNasEntityInstanceList("Items").get(0);
                 EntityInstance cartesianCorner = bbItem.getAttributeValueBNasEntityInstance("Corner");
-                ifcSiteOffset = IfcRepresentationExtractor.ifcCoordinatesToVector3D(cartesianCorner);
+                ifcSiteOffset = IfcGeometryExtractor.ifcCoordinatesToVector3D(cartesianCorner);
             }
         }
 

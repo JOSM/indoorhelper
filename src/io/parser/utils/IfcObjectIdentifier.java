@@ -15,7 +15,7 @@ import java.util.ArrayList;
  *
  * @author rebsc
  */
-public class IfcRepresentationIdentifier {
+public class IfcObjectIdentifier {
 
     /**
      * Method gets IFCSHAPEREPRESENTATION.REPRESENTATIONIDENTIFIER and IFCSHAPEREPRESENTATION.REPRESENTATIONTYPE of object
@@ -69,7 +69,7 @@ public class IfcRepresentationIdentifier {
             ArrayList<EntityInstance> ifcFacetedBrep = new ArrayList<>(ifcModel.getInstancesOfType(AdvancedBrepRepresentationTypeItems.IfcFacetedBrep.name()));
             if (ifcFacetedBrep.contains(item)) return AdvancedBrepRepresentationTypeItems.IfcFacetedBrep.name();
 
-            Logging.info(IfcRepresentationIdentifier.class.getName() + ": " + item.getEntityDefinition() + " is not supported");
+            Logging.info(IfcObjectIdentifier.class.getName() + ": " + item.getEntityDefinition() + " is not supported");
             return null;
         }
 
@@ -84,7 +84,7 @@ public class IfcRepresentationIdentifier {
             if (ifcSweptDiskSolidPolygonals.contains(item))
                 return AdvancedSweptSolidRepresentationTypeItems.IfcSweptDiskSolidPolygonal.name();
 
-            Logging.info(IfcRepresentationIdentifier.class.getName() + ": " + item.getEntityDefinition() + " is not supported");
+            Logging.info(IfcObjectIdentifier.class.getName() + ": " + item.getEntityDefinition() + " is not supported");
             return null;
         }
 
@@ -93,7 +93,7 @@ public class IfcRepresentationIdentifier {
             if (ifcModel.getInstancesOfType(BrepRepresentationTypeItems.IfcFacetedBrep.name()).contains(item)) {
                 return BrepRepresentationTypeItems.IfcFacetedBrep.name();
             }
-            Logging.info(IfcRepresentationIdentifier.class.getName() + ": " + item.getEntityDefinition() + " is not supported");
+            Logging.info(IfcObjectIdentifier.class.getName() + ": " + item.getEntityDefinition() + " is not supported");
             return null;
         }
 
@@ -109,7 +109,7 @@ public class IfcRepresentationIdentifier {
             ArrayList<EntityInstance> ifcPrimitive3Ds = new ArrayList<>(ifcModel.getInstancesOfType(CSGRepresentationTypeItems.IfcPrimitive3D.name()));
             if (ifcPrimitive3Ds.contains(item)) return CSGRepresentationTypeItems.IfcPrimitive3D.name();
 
-            Logging.info(IfcRepresentationIdentifier.class.getName() + ": " + item.getEntityDefinition() + " is not supported");
+            Logging.info(IfcObjectIdentifier.class.getName() + ": " + item.getEntityDefinition() + " is not supported");
             return null;
         }
 
@@ -118,7 +118,7 @@ public class IfcRepresentationIdentifier {
             if (ifcModel.getInstancesOfType(TessellationRepresentationTypeItems.IfcTessellatedFaceSet.name()).contains(item)) {
                 return TessellationRepresentationTypeItems.IfcTessellatedFaceSet.name();
             }
-            Logging.info(IfcRepresentationIdentifier.class.getName() + ": " + item.getEntityDefinition() + " is not supported");
+            Logging.info(IfcObjectIdentifier.class.getName() + ": " + item.getEntityDefinition() + " is not supported");
             return null;
         }
 
@@ -127,7 +127,7 @@ public class IfcRepresentationIdentifier {
             if (ifcModel.getInstancesOfType(ClippingRepresentationTypeItems.IfcBooleanClippingResult.name()).contains(item)) {
                 return ClippingRepresentationTypeItems.IfcBooleanClippingResult.name();
             }
-            Logging.info(IfcRepresentationIdentifier.class.getName() + ": " + item.getEntityDefinition() + " is not supported");
+            Logging.info(IfcObjectIdentifier.class.getName() + ": " + item.getEntityDefinition() + " is not supported");
             return null;
         }
 
@@ -140,7 +140,7 @@ public class IfcRepresentationIdentifier {
             ArrayList<EntityInstance> ifcPolylines = new ArrayList<>(ifcModel.getInstancesOfType(CurveRepresentationTypeItems.IfcPolyline.name()));
             if (ifcPolylines.contains(item)) return CurveRepresentationTypeItems.IfcPolyline.name();
 
-            Logging.info(IfcRepresentationIdentifier.class.getName() + ": " + item.getEntityDefinition() + " is not supported");
+            Logging.info(IfcObjectIdentifier.class.getName() + ": " + item.getEntityDefinition() + " is not supported");
             return null;
         }
 
@@ -163,7 +163,7 @@ public class IfcRepresentationIdentifier {
             ArrayList<EntityInstance> ifcFacetedBreps = new ArrayList<>(ifcModel.getInstancesOfType(SurfaceModelRepresentationTypeItems.IfcFacetedBrep.name()));
             if (ifcFacetedBreps.contains(item)) return SurfaceModelRepresentationTypeItems.IfcFacetedBrep.name();
 
-            Logging.info(IfcRepresentationIdentifier.class.getName() + ": " + item.getEntityDefinition() + " is not supported");
+            Logging.info(IfcObjectIdentifier.class.getName() + ": " + item.getEntityDefinition() + " is not supported");
             return null;
         }
 
@@ -178,7 +178,7 @@ public class IfcRepresentationIdentifier {
             if (ifcRevolvedAreaSolid.contains(item))
                 return SweptSolidRepresentationTypeItems.IfcRevolvedAreaSolid.name();
 
-            Logging.info(IfcRepresentationIdentifier.class.getName() + ": " + item.getEntityDefinition() + " is not supported");
+            Logging.info(IfcObjectIdentifier.class.getName() + ": " + item.getEntityDefinition() + " is not supported");
             return null;
         }
 
@@ -187,7 +187,7 @@ public class IfcRepresentationIdentifier {
             if (ifcModel.getInstancesOfType(BoundingBoxRepresentationTypeItems.IfcBoundingBox.name()).contains(item)) {
                 return BoundingBoxRepresentationTypeItems.IfcBoundingBox.name();
             }
-            Logging.info(IfcRepresentationIdentifier.class.getName() + ": " + item.getEntityDefinition() + " is not supported");
+            Logging.info(IfcObjectIdentifier.class.getName() + ": " + item.getEntityDefinition() + " is not supported");
             return null;
         }
 
@@ -196,11 +196,11 @@ public class IfcRepresentationIdentifier {
             if (ifcModel.getInstancesOfType(MappedRepresentatiobTypeItems.IfcMappedItem.name()).contains(item)) {
                 return MappedRepresentatiobTypeItems.IfcMappedItem.name();
             }
-            Logging.info(IfcRepresentationIdentifier.class.getName() + ": " + item.getEntityDefinition() + " is not supported");
+            Logging.info(IfcObjectIdentifier.class.getName() + ": " + item.getEntityDefinition() + " is not supported");
             return null;
         }
 
-        Logging.info(IfcRepresentationIdentifier.class.getName() + ": " + ident.getType() + " RepresentationType is not supported");
+        Logging.info(IfcObjectIdentifier.class.getName() + ": " + ident.getType() + " RepresentationType is not supported");
         return null;
     }
 
@@ -223,7 +223,7 @@ public class IfcRepresentationIdentifier {
         ArrayList<EntityInstance> vertexLoops = new ArrayList<>(ifcModel.getInstancesOfType(LoopSubRepresentationTypeItems.IfcVertexLoop.name()));
         if (vertexLoops.contains(loop)) return LoopSubRepresentationTypeItems.IfcVertexLoop.name();
 
-        Logging.info(IfcRepresentationIdentifier.class.getName() + ": " + loop.getEntityDefinition() + " LoopRepresentationType is not supported");
+        Logging.info(IfcObjectIdentifier.class.getName() + ": " + loop.getEntityDefinition() + " LoopRepresentationType is not supported");
         return null;
     }
 
@@ -258,7 +258,7 @@ public class IfcRepresentationIdentifier {
         if (arbitraryPD.contains(profileDef))
             return ProfileDefRepresentationTypeItems.IfcArbitraryClosedProfileDef.name();
 
-        Logging.info(IfcRepresentationIdentifier.class.getName() + ": " + profileDef.getEntityDefinition() + " ProfileDefRepresentationType is not supported");
+        Logging.info(IfcObjectIdentifier.class.getName() + ": " + profileDef.getEntityDefinition() + " ProfileDefRepresentationType is not supported");
         return null;
     }
 
@@ -326,7 +326,7 @@ public class IfcRepresentationIdentifier {
         ArrayList<EntityInstance> spheres = new ArrayList<>(ifcModel.getInstancesOfType(IfcBooleanOperandType.IfcSphere.name()));
         if (spheres.contains(entity)) return IfcBooleanOperandType.IfcSphere.name();
 
-        Logging.info(IfcRepresentationIdentifier.class.getName() + ": " + entity.getEntityDefinition() + " is not supported as IfcBooleanOperand");
+        Logging.info(IfcObjectIdentifier.class.getName() + ": " + entity.getEntityDefinition() + " is not supported as IfcBooleanOperand");
         return null;
     }
 
@@ -373,7 +373,7 @@ public class IfcRepresentationIdentifier {
         ArrayList<EntityInstance> indexesCurves = new ArrayList<>(ifcModel.getInstancesOfType(CurveRepresentationTypeItems.IfcIndexedPolyCurve.name()));
         if (indexesCurves.contains(entity)) return CurveRepresentationTypeItems.IfcIndexedPolyCurve.name();
 
-        Logging.info(IfcRepresentationIdentifier.class.getName() + ": " + entity.getEntityDefinition() + " is not supported as IfcBoundedCurveType");
+        Logging.info(IfcObjectIdentifier.class.getName() + ": " + entity.getEntityDefinition() + " is not supported as IfcBoundedCurveType");
         return null;
     }
 
@@ -397,7 +397,7 @@ public class IfcRepresentationIdentifier {
         ArrayList<EntityInstance> sites = new ArrayList<>(ifcModel.getInstancesOfType(IfcSpatialStructureElementTypes.IfcSite.name()));
         if (sites.contains(entity)) return IfcSpatialStructureElementTypes.IfcSite.name();
 
-        Logging.info(IfcRepresentationIdentifier.class.getName() + ": " + entity.getEntityDefinition() + " is not supported as IfcSpatialStructureElement");
+        Logging.info(IfcObjectIdentifier.class.getName() + ": " + entity.getEntityDefinition() + " is not supported as IfcSpatialStructureElement");
         return null;
     }
 
