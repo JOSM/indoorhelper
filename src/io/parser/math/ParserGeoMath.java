@@ -2,7 +2,6 @@
 package io.parser.math;
 
 import io.parser.data.ifc.IfcUnitCatalog;
-import io.parser.data.math.Vector3D;
 import org.openstreetmap.gui.jmapviewer.OsmMercator;
 import org.openstreetmap.josm.data.coor.LatLon;
 

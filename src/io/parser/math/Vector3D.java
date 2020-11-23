@@ -1,4 +1,4 @@
-package io.parser.data.math;
+package io.parser.math;
 
 /**
  * Class keeping/handling data of 3D vector

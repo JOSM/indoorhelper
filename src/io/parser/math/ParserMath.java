@@ -1,8 +1,6 @@
 // License: AGPL. For details, see LICENSE file.
 package io.parser.math;
 
-import io.parser.data.math.Matrix3D;
-
 /**
  * Class providing transformation and rotation methods
  *

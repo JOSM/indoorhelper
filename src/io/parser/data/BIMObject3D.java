@@ -2,8 +2,8 @@
 package io.parser.data;
 
 import io.model.BIMtoOSMCatalog;
-import io.parser.data.math.Matrix3D;
-import io.parser.data.math.Vector3D;
+import io.parser.math.Matrix3D;
+import io.parser.math.Vector3D;
 import nl.tue.buildingsmart.express.population.EntityInstance;
 import org.openstreetmap.josm.data.coor.LatLon;
 

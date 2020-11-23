@@ -3,7 +3,7 @@ package io.parser.utils;
 
 import io.parser.data.ifc.IfcRepresentation;
 import io.parser.data.ifc.IfcRepresentationCatalog.*;
-import io.parser.data.math.Vector3D;
+import io.parser.math.Vector3D;
 import nl.tue.buildingsmart.express.population.EntityInstance;
 import nl.tue.buildingsmart.express.population.ModelPopulation;
 import org.openstreetmap.josm.tools.Logging;

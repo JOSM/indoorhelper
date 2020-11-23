@@ -1,6 +1,6 @@
 package io.parser.utils;
 
-import io.parser.data.math.Vector3D;
+import io.parser.math.Vector3D;
 import org.openstreetmap.josm.tools.Logging;
 
 import java.util.List;
