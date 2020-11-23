@@ -61,7 +61,7 @@ public class BIMtoOSMParser {
     private FileInputStream inputfs = null;
 
     private ModelPopulation ifcModel;
-    private TagCatalog tagCatalog;
+    private final TagCatalog tagCatalog;
     private IfcUnitCatalog.LENGTHUNIT lengthUnit;
     private IfcUnitCatalog.PLANEANGLEUNIT angleUnit;
 
@@ -92,45 +92,29 @@ public class BIMtoOSMParser {
      * @param filepath of IFC file
      */
     public boolean parse(String filepath) {
-        // load data into IFC model
         if (!loadFile(filepath)) return false;
 
-        // extract important data and put them into internal data structure
-        BIMDataCollection BIMDataCollection = BIMtoOSMUtility.extractMajorBIMData(ifcModel);
+        BIMDataCollection rawFilteredData = BIMtoOSMUtility.extractMajorBIMData(ifcModel);
 
-        // check for IFCSITE element in file
-        if (!checkForIFCSITE(BIMDataCollection)) {
+        if (!checkForIFCSITE(rawFilteredData)) {
             showParsingErrorView(filepath, "Could not import IFC file.\nIFC file does not contains IFCSITE element.", true);
             return false;
         }
 
-        // prepare filtered BIM data - find global object coordinates and other attributes like object height, width etc.
-        ArrayList<BIMObject3D> preparedBIMData = new ArrayList<>();
-        preparedBIMData.addAll(BIMtoOSMUtility.prepareBIMObjects(ifcModel, BIMtoOSMCatalog.BIMObject.IfcSlab, BIMDataCollection.getAreaObjects()));
-        preparedBIMData.addAll(BIMtoOSMUtility.prepareBIMObjects(ifcModel, BIMtoOSMCatalog.BIMObject.IfcWall, BIMDataCollection.getWallObjects()));
-        preparedBIMData.addAll(BIMtoOSMUtility.prepareBIMObjects(ifcModel, BIMtoOSMCatalog.BIMObject.IfcColumn, BIMDataCollection.getColumnObjects()));
-//        preparedBIMData.addAll(BIMtoOSMUtility.prepareBIMObjects(ifcModel, BIMtoOSMCatalog.BIMObject.IfcDoor, filteredRawBIMData.getDoorObjects()));
-//        preparedBIMData.addAll(BIMtoOSMUtility.prepareBIMObjects(ifcModel, BIMtoOSMCatalog.BIMObject.IfcWindow, filteredRawBIMData.getWindowObjects()));
-        preparedBIMData.addAll(BIMtoOSMUtility.prepareBIMObjects(ifcModel, BIMtoOSMCatalog.BIMObject.IfcStair, BIMDataCollection.getStairObjects()));
-
-        // set units
+        ArrayList<BIMObject3D> preparedData = (ArrayList<BIMObject3D>) prepareRawBIMData(rawFilteredData);
         setUnits();
 
-        // transform coordinates from local system to geodetic
-        LatLon latlonBuildingOrigin = getLatLonOriginOfBuilding(BIMDataCollection.getIfcSite());
-        transformCoordinatesToLatLon(latlonBuildingOrigin, preparedBIMData);
+        LatLon llBuildingOrigin = getLatLonBuildingOrigin(rawFilteredData.getIfcSite());
+        transformToGeodetic(llBuildingOrigin, preparedData);
 
-        // pack FilteredBIMData into OSM data
-        Pair<ArrayList<Node>, ArrayList<Way>> packedOSMData = packIntoOSMData(preparedBIMData);
+        Pair<ArrayList<Node>, ArrayList<Way>> packedOSMData = packIntoOSMData(preparedData);
         ArrayList<Node> nodes = packedOSMData.a;
         ArrayList<Way> ways = packedOSMData.b;
 
-        // check if file is corrupted. File is corrupted if some data could not pass the preparation steps
-        if (preparedBIMData.size() != BIMDataCollection.getSize()) {
+        if (preparedData.size() != rawFilteredData.getSize()) {
             showParsingErrorView(filepath, "Caution!\nImported data might include errors!", false);
         }
 
-        // send parsed data to controller
         if (importListener != null) {
             importListener.onDataParsed(ways, nodes);
         }
@@ -236,6 +220,22 @@ public class BIMtoOSMParser {
     }
 
     /**
+     * Extracts the BIM object geometry and prepares data as {@link BIMObject3D}
+     * @param rawBIMData to prepare
+     * @return prepared data for rendering
+     */
+    private List<BIMObject3D> prepareRawBIMData(BIMDataCollection rawBIMData){
+        List<BIMObject3D> preparedData = new ArrayList<>();
+        preparedData.addAll(BIMtoOSMUtility.prepareBIMObjects(ifcModel, BIMtoOSMCatalog.BIMObject.IfcSlab, rawBIMData.getAreaObjects()));
+        preparedData.addAll(BIMtoOSMUtility.prepareBIMObjects(ifcModel, BIMtoOSMCatalog.BIMObject.IfcWall, rawBIMData.getWallObjects()));
+        preparedData.addAll(BIMtoOSMUtility.prepareBIMObjects(ifcModel, BIMtoOSMCatalog.BIMObject.IfcColumn, rawBIMData.getColumnObjects()));
+//        preparedData.addAll(BIMtoOSMUtility.prepareBIMObjects(ifcModel, BIMtoOSMCatalog.BIMObject.IfcDoor, rawBIMData.getDoorObjects()));
+//        preparedData.addAll(BIMtoOSMUtility.prepareBIMObjects(ifcModel, BIMtoOSMCatalog.BIMObject.IfcWindow, rawBIMData.getWindowObjects()));
+        preparedData.addAll(BIMtoOSMUtility.prepareBIMObjects(ifcModel, BIMtoOSMCatalog.BIMObject.IfcStair, rawBIMData.getStairObjects()));
+        return preparedData;
+    }
+
+    /**
      * Method packs prepared BIM data into OSM ways and nodes
      *
      * @param preparedBIMData to transform to OSM data
@@ -247,7 +247,7 @@ public class BIMtoOSMParser {
         ArrayList<Pair<Double, Integer>> levelIdentifier = extractAndIdentifyLevels();
 
         for (BIMObject3D object : preparedBIMData) {
-            int level = getLevelTagOfPreparedBIMObject(object, levelIdentifier);
+            int level = getLevelTag(object, levelIdentifier);
 
             ArrayList<Node> tmpNodes = new ArrayList<>();
             for (LatLon point : object.getGeodeticShapeCoordinates()) {
@@ -281,7 +281,7 @@ public class BIMtoOSMParser {
      * @param levelIdentifierList with identified levels
      * @return level
      */
-    private int getLevelTagOfPreparedBIMObject(BIMObject3D object, ArrayList<Pair<Double, Integer>> levelIdentifierList) {
+    private int getLevelTag(BIMObject3D object, ArrayList<Pair<Double, Integer>> levelIdentifierList) {
         int level = defaultLevel;
 
         // get all IfcRelContainedInSpatialStructure elements
@@ -362,11 +362,11 @@ public class BIMtoOSMParser {
     /**
      * Method sets geodetic shape coordinates of PreparedBIMObject3D
      *
-     * @param latlonBuildingOrigin building origin latlon
-     * @param preparedBIMdata      data to set the geodetic shapes
+     * @param llBuildingOrigin building origin latlon
+     * @param preparedBIMData      data to set the geodetic shapes
      */
-    private void transformCoordinatesToLatLon(LatLon latlonBuildingOrigin, ArrayList<BIMObject3D> preparedBIMdata) {
-        if (latlonBuildingOrigin != null) {
+    private void transformToGeodetic(LatLon llBuildingOrigin, ArrayList<BIMObject3D> preparedBIMData) {
+        if (llBuildingOrigin != null) {
 
             // get building rotation matrix
             Vector3D projectNorth = getProjectNorth();
@@ -379,13 +379,13 @@ public class BIMtoOSMParser {
 
             if (rotationMatrix == null) return;
 
-            for (BIMObject3D object : preparedBIMdata) {
+            for (BIMObject3D object : preparedBIMData) {
                 ArrayList<LatLon> transformedCoordinates = new ArrayList<>();
                 for (Vector3D point : object.getCartesianShapeCoordinates()) {
                     // rotate point
                     rotationMatrix.transform(point);
                     // transform point
-                    LatLon llPoint = ParserGeoMath.cartesianToGeodetic(point, new Vector3D(0.0, 0.0, 0.0), latlonBuildingOrigin, lengthUnit);
+                    LatLon llPoint = ParserGeoMath.cartesianToGeodetic(point, new Vector3D(0.0, 0.0, 0.0), llBuildingOrigin, lengthUnit);
                     transformedCoordinates.add(llPoint);
                 }
                 object.setGeodeticShapeCoordinates(transformedCoordinates);
@@ -400,7 +400,7 @@ public class BIMtoOSMParser {
      * @return latlon coordinates of building corner
      */
     @SuppressWarnings("unchecked")
-    private LatLon getLatLonOriginOfBuilding(EntityInstance ifcSite) {
+    private LatLon getLatLonBuildingOrigin(EntityInstance ifcSite) {
         Vector3D ifcSiteOffset = null;
         if (ifcSite.getAttributeValueBNasEntityInstance("Representation") != null) {
             // get the offset between IFCSITE geodetic coordinates and building origin coordinate
