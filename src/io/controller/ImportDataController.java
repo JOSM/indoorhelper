@@ -4,7 +4,7 @@ package io.controller;
 import io.model.ImportDataModel;
 import io.parser.BIMtoOSMParser;
 import io.renderer.ImportDataRenderer;
-import io.views.ImportBIMDataAction;
+import io.actions.ImportBIMDataAction;
 import org.openstreetmap.josm.actions.JosmAction;
 import org.openstreetmap.josm.data.Preferences;
 import org.openstreetmap.josm.data.osm.Node;

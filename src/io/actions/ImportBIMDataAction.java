@@ -1,5 +1,5 @@
 // License: AGPL. For details, see LICENSE file.
-package io.views;
+package io.actions;
 
 import io.controller.ImportEventListener;
 import org.openstreetmap.josm.actions.JosmAction;
