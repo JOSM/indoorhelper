@@ -62,8 +62,8 @@ public class BIMtoOSMParser {
 
     private ModelPopulation ifcModel;
     private final TagCatalog tagCatalog;
-    private IfcUnitCatalog.LENGTHUNIT lengthUnit;
-    private IfcUnitCatalog.PLANEANGLEUNIT angleUnit;
+    private IfcUnitCatalog.lengthUnit lengthUnit;
+    private IfcUnitCatalog.planeAngleUnit angleUnit;
 
     private final int defaultLevel = 999;
 
@@ -82,8 +82,8 @@ public class BIMtoOSMParser {
         }
         ifcSchemaFilePath = resourcePathDir + IFC2X3_TC1_Schema;
         tagCatalog = new TagCatalog();
-        lengthUnit = IfcUnitCatalog.LENGTHUNIT.M;    // default
-        angleUnit = IfcUnitCatalog.PLANEANGLEUNIT.RAD;    // default
+        lengthUnit = IfcUnitCatalog.lengthUnit.M;    // default
+        angleUnit = IfcUnitCatalog.planeAngleUnit.RAD;    // default
     }
 
     /**
@@ -502,8 +502,8 @@ public class BIMtoOSMParser {
                     if (unitLabel.equals(".METRE.")) {
                         try {
                             String unitPrefix = (String) unit.getAttributeValueBN("Prefix");
-                            if (unitPrefix.equals(".CENTI.")) lengthUnit = IfcUnitCatalog.LENGTHUNIT.CM;
-                            if (unitPrefix.equals(".MILLI.")) lengthUnit = IfcUnitCatalog.LENGTHUNIT.MM;
+                            if (unitPrefix.equals(".CENTI.")) lengthUnit = IfcUnitCatalog.lengthUnit.CM;
+                            if (unitPrefix.equals(".MILLI.")) lengthUnit = IfcUnitCatalog.lengthUnit.MM;
                             break;
                             // TODO handle more prefixes
                         } catch (NullPointerException e) {
@@ -514,7 +514,7 @@ public class BIMtoOSMParser {
                 }
                 if (unitType.equals(".PLANEANGLEUNIT.")) {
                     if (unitLabel.equals(".DEGREE.")) {
-                        angleUnit = IfcUnitCatalog.PLANEANGLEUNIT.DEG;
+                        angleUnit = IfcUnitCatalog.planeAngleUnit.DEG;
                         break;
                     }
                 }
