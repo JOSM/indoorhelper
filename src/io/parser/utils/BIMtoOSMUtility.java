@@ -29,8 +29,8 @@ public class BIMtoOSMUtility {
      * Types of geometry precision
      */
     public enum GeometrySolution{
-        Body,
-        BoundingBox
+        BODY,
+        BOUNDING_BOX
     }
 
     /**
@@ -108,7 +108,7 @@ public class BIMtoOSMUtility {
             Matrix3D rotMatrix = getObjectRotationMatrix(objectEntity);
 
             // get object geometry
-            GeometrySolution activeSolution = GeometrySolution.BoundingBox; // set for now
+            GeometrySolution activeSolution = GeometrySolution.BOUNDING_BOX; // set for now
             ArrayList<Vector3D> shapeDataOfObject = (ArrayList<Vector3D>) getShapeData(ifcModel, objectEntity, activeSolution);
 
             // transform and prepare
@@ -240,13 +240,13 @@ public class BIMtoOSMUtility {
         List<IfcRepresentation> repObjectIdentities = getIfcRepresentations(object);
         if (repObjectIdentities == null) return null;
 
-        if(solution.equals(GeometrySolution.Body)){
+        if(solution.equals(GeometrySolution.BODY)){
             IfcRepresentation bodyRepresentation = getIfcRepresentation(repObjectIdentities, RepresentationIdentifier.Body);
             if (bodyRepresentation != null) {
                 return IfcRepresentationExtractor.getDataFromBodyRepresentation(ifcModel, bodyRepresentation);
             }
         }
-        else if(solution.equals(GeometrySolution.BoundingBox)){
+        else if(solution.equals(GeometrySolution.BOUNDING_BOX)){
             IfcRepresentation boxRepresentation = getIfcRepresentation(repObjectIdentities, RepresentationIdentifier.Box);
             if (boxRepresentation != null) {
                 return IfcRepresentationExtractor.getDataFromBoxRepresentation(ifcModel, boxRepresentation);
