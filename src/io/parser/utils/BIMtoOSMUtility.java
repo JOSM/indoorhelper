@@ -249,12 +249,6 @@ public class BIMtoOSMUtility {
             return IfcRepresentationExtractor.getDataFromBoxRepresentation(ifcModel, boxRepresentation);
         }
 
-        // if no IFCSHAPEREPRESENTATION of type "box" check if IFCSHAPEREPRESENTATION of type "axis" exists
-        IfcRepresentation axisRepresentation = getIfcRepresentation(repObjectIdentities, RepresentationIdentifier.Axis);
-        if (axisRepresentation != null) {
-            return IfcRepresentationExtractor.getDataFromAxisRepresentation(ifcModel, axisRepresentation);
-        }
-
         return shapeData;
     }
 
