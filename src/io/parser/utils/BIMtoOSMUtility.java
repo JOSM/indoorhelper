@@ -26,6 +26,14 @@ import static io.parser.utils.ParserUtility.stringVectorToVector3D;
 public class BIMtoOSMUtility {
 
     /**
+     * Types of geometry precision
+     */
+    public enum GeometrySolution{
+        Body,
+        BoundingBox
+    }
+
+    /**
      * Filters important OSM data into internal data structure
      *
      * @param ifcModel ifcModel
@@ -96,18 +104,15 @@ public class BIMtoOSMUtility {
             EntityInstance objectIFCLP = objectEntity.getAttributeValueBNasEntityInstance("ObjectPlacement");
             BIMObject3D object = resolveObjectPlacement(objectIFCLP, new BIMObject3D(objectEntity.getId()));
             object.setType(objectType);
-
-            // get IFCLOCALPLACEMENT of object (origin of object)
             Vector3D cartesianOrigin = object.getTranslation();
-            // get rotation matrix of object
             Matrix3D rotMatrix = getObjectRotationMatrix(objectEntity);
 
-            // get local points representing shape of object
-            ArrayList<Vector3D> shapeDataOfObject = (ArrayList<Vector3D>) getShapeData(ifcModel, objectEntity);
+            // get object geometry
+            GeometrySolution activeSolution = GeometrySolution.BoundingBox; // set for now
+            ArrayList<Vector3D> shapeDataOfObject = (ArrayList<Vector3D>) getShapeData(ifcModel, objectEntity, activeSolution);
 
-            // transform and prepare objects
+            // transform and prepare
             if (cartesianOrigin != null && rotMatrix != null && (shapeDataOfObject != null && !shapeDataOfObject.isEmpty())) {
-                // transform points
                 transformPoints(shapeDataOfObject, rotMatrix, cartesianOrigin);
                 object.setCartesianShapeCoordinates(shapeDataOfObject);
 
@@ -230,26 +235,24 @@ public class BIMtoOSMUtility {
      * @param object   BIM object
      * @return Array including points of shape representation
      */
-    public static List<Vector3D> getShapeData(ModelPopulation ifcModel, EntityInstance object) {
-        ArrayList<Vector3D> shapeData = new ArrayList<>();
+    public static List<Vector3D> getShapeData(ModelPopulation ifcModel, EntityInstance object, GeometrySolution solution) {
 
-        // identify and keep types of IFCPRODUCTDEFINITIONSHAPE.REPRESENTATIONS objects
         List<IfcRepresentation> repObjectIdentities = getIfcRepresentations(object);
         if (repObjectIdentities == null) return null;
 
-        // get data from body representation
-//        IFCShapeRepresentationIdentity bodyRepresentation = getRepresentationSpecificObjectType(repObjectIdentities, RepresentationIdentifier.Body);
-//        if (bodyRepresentation != null && !IFCShapeRepresentationIdentifier.isIfcWindowOrIfcDoor(ifcModel, object)) {
-//            return IFCShapeDataExtractor.getDataFromBodyRepresentation(ifcModel, bodyRepresentation);
-//        }
-
-        // get data from bounding box representation
-        IfcRepresentation boxRepresentation = getIfcRepresentation(repObjectIdentities, RepresentationIdentifier.Box);
-        if (boxRepresentation != null) {
-            return IfcRepresentationExtractor.getDataFromBoxRepresentation(ifcModel, boxRepresentation);
+        if(solution.equals(GeometrySolution.Body)){
+            IfcRepresentation bodyRepresentation = getIfcRepresentation(repObjectIdentities, RepresentationIdentifier.Body);
+            if (bodyRepresentation != null) {
+                return IfcRepresentationExtractor.getDataFromBodyRepresentation(ifcModel, bodyRepresentation);
+            }
         }
-
-        return shapeData;
+        else if(solution.equals(GeometrySolution.BoundingBox)){
+            IfcRepresentation boxRepresentation = getIfcRepresentation(repObjectIdentities, RepresentationIdentifier.Box);
+            if (boxRepresentation != null) {
+                return IfcRepresentationExtractor.getDataFromBoxRepresentation(ifcModel, boxRepresentation);
+            }
+        }
+        return null;
     }
 
     /**

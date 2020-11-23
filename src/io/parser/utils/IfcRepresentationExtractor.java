@@ -589,7 +589,8 @@ public class IfcRepresentationExtractor {
 
         if (IfcRepresentationIdentifier.isIfcOpeningElement(ifcModel, openingElement)) {
             // get shape data of RelatedOpeningElement and RelatingBuildingObject
-            List<Vector3D> shapeDataOfRelatedOpeningElement = BIMtoOSMUtility.getShapeData(ifcModel, openingElement);
+            BIMtoOSMUtility.GeometrySolution activeSolution = BIMtoOSMUtility.GeometrySolution.BoundingBox; // set for now
+            List<Vector3D> shapeDataOfRelatedOpeningElement = BIMtoOSMUtility.getShapeData(ifcModel, openingElement, activeSolution);
             // subtract points of shapeDataOfRelatinBuildingElement from shapeDataOfRelatinBuildingElement
             return getShapeDataFromIfcFeatureElementSubtraction(shapeDataOfEntity, (ArrayList<Vector3D>) shapeDataOfRelatedOpeningElement);
         }
