@@ -50,7 +50,7 @@ public class IfcRepresentationExtractor {
         // extract informations from IfcRepresentationItems
         for (EntityInstance item : bodyItems) {
             // get type of item
-            String repItemType = IfcShapeRepresentationIdentifier.getRepresentationItemType(ifcModel, bodyRepresentation, item);
+            String repItemType = IfcRepresentationIdentifier.getRepresentationItemType(ifcModel, bodyRepresentation, item);
             if (repItemType == null) return null;
 
             // handle types
@@ -151,7 +151,7 @@ public class IfcRepresentationExtractor {
         // extract informations from IfcRepresentationItems
         for (EntityInstance item : boxItems) {
             // get type of IfcRepresentationItem
-            String repItemType = IfcShapeRepresentationIdentifier.getRepresentationItemType(ifcModel, boxRepresentation, item);
+            String repItemType = IfcRepresentationIdentifier.getRepresentationItemType(ifcModel, boxRepresentation, item);
             if (repItemType == null) return null;
 
             if (repItemType.equals(BoundingBoxRepresentationTypeItems.IfcBoundingBox.name())) {
@@ -196,7 +196,7 @@ public class IfcRepresentationExtractor {
         // extract informations from IfcRepresentationItems
         for (EntityInstance item : axisItems) {
             // get type of IfcRepresentationItem
-            String repItemType = IfcShapeRepresentationIdentifier.getRepresentationItemType(ifcModel, axisRepresentation, item);
+            String repItemType = IfcRepresentationIdentifier.getRepresentationItemType(ifcModel, axisRepresentation, item);
             if (repItemType == null) return null;
 
             if (repItemType.equals(CurveRepresentationTypeItems.IfcBoundedCurve.name())) {
@@ -267,7 +267,7 @@ public class IfcRepresentationExtractor {
      */
     private static ArrayList<Vector3D> getShapeDataFromIfcLoop(ModelPopulation ifcModel, EntityInstance loop) {
         // get loop type
-        String loopType = IfcShapeRepresentationIdentifier.getIFCLoopType(ifcModel, loop);
+        String loopType = IfcRepresentationIdentifier.getIFCLoopType(ifcModel, loop);
         if (loopType == null) return null;
 
         if (loopType.equals(LoopSubRepresentationTypeItems.IfcPolyLoop.name())) {
@@ -294,21 +294,21 @@ public class IfcRepresentationExtractor {
      * @return points representing shape of IFCCURVE
      */
     private static ArrayList<Vector3D> getShapeDataFromIfcCurve(ModelPopulation ifcModel, EntityInstance curve) {
-        if (IfcShapeRepresentationIdentifier.isIfcPolyline(ifcModel, curve)) {
+        if (IfcRepresentationIdentifier.isIfcPolyline(ifcModel, curve)) {
             return getShapeDataFromIfcPolyline(curve);
-        } else if (IfcShapeRepresentationIdentifier.isIfcCompositeCurve(ifcModel, curve)) {
+        } else if (IfcRepresentationIdentifier.isIfcCompositeCurve(ifcModel, curve)) {
             return getShapeDataFromIfcCompositeCurve(ifcModel, curve);
-        } else if (IfcShapeRepresentationIdentifier.isIfcTrimmedCurve(ifcModel, curve)) {
+        } else if (IfcRepresentationIdentifier.isIfcTrimmedCurve(ifcModel, curve)) {
             // TODO implement proper; handle trim of basis curve
             EntityInstance basisCurve = curve.getAttributeValueBNasEntityInstance("BasisCurve");
             if (basisCurve == null) return null;
             return getShapeDataFromIfcCurve(ifcModel, basisCurve);
-        } else if (IfcShapeRepresentationIdentifier.isIfcCircle(ifcModel, curve)) {
+        } else if (IfcRepresentationIdentifier.isIfcCircle(ifcModel, curve)) {
             // TODO implement
-            logNotSupportedRepresentationTypeInfo(IfcShapeRepresentationIdentifier.getIfcCurveType(ifcModel, curve));
+            logNotSupportedRepresentationTypeInfo(IfcRepresentationIdentifier.getIfcCurveType(ifcModel, curve));
             return new ArrayList<>();
         } else {
-            logNotSupportedRepresentationTypeInfo(IfcShapeRepresentationIdentifier.getIfcCurveType(ifcModel, curve));
+            logNotSupportedRepresentationTypeInfo(IfcRepresentationIdentifier.getIfcCurveType(ifcModel, curve));
         }
         return null;
     }
@@ -405,7 +405,7 @@ public class IfcRepresentationExtractor {
      * @return points representing shape of operand
      */
     private static ArrayList<Vector3D> getShapeDataFromBooleanOperand(ModelPopulation ifcModel, EntityInstance operand) {
-        String operandType = IfcShapeRepresentationIdentifier.getIfcBooleanOperandType(ifcModel, operand);
+        String operandType = IfcRepresentationIdentifier.getIfcBooleanOperandType(ifcModel, operand);
 
         if (operandType == null) return null;
 
@@ -505,7 +505,7 @@ public class IfcRepresentationExtractor {
         }
 
         // other types are not supported right now
-        logNotSupportedRepresentationTypeInfo(IfcShapeRepresentationIdentifier.getIfcCurveType(ifcModel, localPolygonBoundary));
+        logNotSupportedRepresentationTypeInfo(IfcRepresentationIdentifier.getIfcCurveType(ifcModel, localPolygonBoundary));
         return null;
     }
 
@@ -527,7 +527,7 @@ public class IfcRepresentationExtractor {
         // get IFCPROFILEDEF attribute
         EntityInstance profileDef = extrudedArea.getAttributeValueBNasEntityInstance("SweptArea");
         // handle different SweptArea types
-        String sweptAreaType = IfcShapeRepresentationIdentifier.getIFCProfileDefType(ifcModel, profileDef);
+        String sweptAreaType = IfcRepresentationIdentifier.getIFCProfileDefType(ifcModel, profileDef);
         if (sweptAreaType == null) return null;
 
         if (sweptAreaType.equals(ProfileDefRepresentationTypeItems.IfcRectangleProfileDef.name())) {
@@ -578,16 +578,16 @@ public class IfcRepresentationExtractor {
     private static ArrayList<Vector3D> handleOpeningsInEntityShape(ModelPopulation ifcModel, ArrayList<Vector3D> shapeDataOfEntity, EntityInstance rootEntityOfShapeDataEntity) {
         if (shapeDataOfEntity == null) return null;
         // for now opening handling supported for IFCSLAB only
-        if (!IfcShapeRepresentationIdentifier.isIfcSlab(ifcModel, rootEntityOfShapeDataEntity)) return null;
+        if (!IfcRepresentationIdentifier.isIfcSlab(ifcModel, rootEntityOfShapeDataEntity)) return null;
 
         // get relVoidsElement which describes the opening
-        EntityInstance relVoidsElement = IfcShapeRepresentationIdentifier.getRelVoidsElementOfEntity(ifcModel, rootEntityOfShapeDataEntity);
+        EntityInstance relVoidsElement = IfcRepresentationIdentifier.getRelVoidsElementOfEntity(ifcModel, rootEntityOfShapeDataEntity);
         if (relVoidsElement == null) return null;
 
         // get element which describes the opening
         EntityInstance openingElement = relVoidsElement.getAttributeValueBNasEntityInstance("RelatedOpeningElement");
 
-        if (IfcShapeRepresentationIdentifier.isIfcOpeningElement(ifcModel, openingElement)) {
+        if (IfcRepresentationIdentifier.isIfcOpeningElement(ifcModel, openingElement)) {
             // get shape data of RelatedOpeningElement and RelatingBuildingObject
             List<Vector3D> shapeDataOfRelatedOpeningElement = BIMtoOSMUtility.getShapeDataOfObject(ifcModel, openingElement);
             // subtract points of shapeDataOfRelatinBuildingElement from shapeDataOfRelatinBuildingElement

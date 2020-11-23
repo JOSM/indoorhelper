@@ -393,7 +393,7 @@ public class BIMtoOSMUtility {
         // identify each object
         for (EntityInstance repObject : objectRepresentations) {
             //identify IFCSHAPEREPRESENTATION type
-            IfcRepresentation repIdentity = IfcShapeRepresentationIdentifier.identifyShapeRepresentation(repObject);
+            IfcRepresentation repIdentity = IfcRepresentationIdentifier.identifyShapeRepresentation(repObject);
             repIdentity.setRootEntity(object);
             if (!repIdentity.isFilled()) return null;
             repObjectIdentities.add(repIdentity);

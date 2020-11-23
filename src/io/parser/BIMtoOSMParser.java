@@ -16,7 +16,7 @@ import io.parser.math.ParserMath;
 import io.parser.utils.BIMtoOSMUtility;
 import io.parser.utils.FileOptimizer;
 import io.parser.utils.IfcRepresentationExtractor;
-import io.parser.utils.IfcShapeRepresentationIdentifier;
+import io.parser.utils.IfcRepresentationIdentifier;
 import model.TagCatalog;
 import nl.tue.buildingsmart.express.population.EntityInstance;
 import nl.tue.buildingsmart.express.population.ModelPopulation;
@@ -298,7 +298,7 @@ public class BIMtoOSMParser {
                     // if part of contained elements get Elevation entity from object
                     EntityInstance relatingStructure = entity.getAttributeValueBNasEntityInstance("RelatingStructure");
 
-                    String relatingStructureType = IfcShapeRepresentationIdentifier.getSpatialStructureElementType(ifcModel, relatingStructure);
+                    String relatingStructureType = IfcRepresentationIdentifier.getSpatialStructureElementType(ifcModel, relatingStructure);
                     // get type of relatingStructure
                     if (!relatingStructureType.equals(IfcSpatialStructureElementTypes.IfcBuildingStorey.name()))
                         return 0;
