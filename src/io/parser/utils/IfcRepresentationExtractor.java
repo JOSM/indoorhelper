@@ -56,13 +56,13 @@ public class IfcRepresentationExtractor {
             // handle types
             if (repItemType.equals(AdvancedBrepRepresentationTypeItems.IfcAdvancedBrep.name())) {
                 // TODO extract data
-                logNotSupportedRepresentationTypeInfo(repItemType);
+                logUnsupportedRepresentationInfo(repItemType);
             } else if (repItemType.equals(AdvancedSweptSolidRepresentationTypeItems.IfcSweptDiskSolid.name())) {
                 // TODO extract data
-                logNotSupportedRepresentationTypeInfo(repItemType);
+                logUnsupportedRepresentationInfo(repItemType);
             } else if (repItemType.equals(AdvancedSweptSolidRepresentationTypeItems.IfcSweptDiskSolidPolygonal.name())) {
                 // TODO extract data
-                logNotSupportedRepresentationTypeInfo(repItemType);
+                logUnsupportedRepresentationInfo(repItemType);
             } else if (repItemType.equals(BrepRepresentationTypeItems.IfcFacetedBrep.name())) {
                 ArrayList<Vector3D> shapeData = getShapeDataFromIfcFacetedBrep(ifcModel, item);
                 // check if entity includes(floor-)openings and handle them
@@ -88,13 +88,13 @@ public class IfcRepresentationExtractor {
                 else if (shapeData != null) shapeRep.addAll(shapeData);
             } else if (repItemType.equals(CSGRepresentationTypeItems.IfcCsgSolid.name())) {
                 // TODO extract data
-                logNotSupportedRepresentationTypeInfo(repItemType);
+                logUnsupportedRepresentationInfo(repItemType);
             } else if (repItemType.equals(CSGRepresentationTypeItems.IfcPrimitive3D.name())) {
                 // TODO extract data
-                logNotSupportedRepresentationTypeInfo(repItemType);
+                logUnsupportedRepresentationInfo(repItemType);
             } else if (repItemType.equals(TessellationRepresentationTypeItems.IfcTessellatedFaceSet.name())) {
                 // TODO extract data
-                logNotSupportedRepresentationTypeInfo(repItemType);
+                logUnsupportedRepresentationInfo(repItemType);
             } else if (repItemType.equals(ClippingRepresentationTypeItems.IfcBooleanClippingResult.name())) {
                 ArrayList<Vector3D> shapeData = getShapeDataFromIfcBooleanResult(ifcModel, item, IfcBooleanOperator.DIFFERENCE);
                 // check if entity includes(floor-)openings and handle them
@@ -104,13 +104,13 @@ public class IfcRepresentationExtractor {
                 else if (shapeData != null) shapeRep.addAll(shapeData);
             } else if (repItemType.equals(SurfaceModelRepresentationTypeItems.IfcTessellatedItem.name())) {
                 // TODO extract data
-                logNotSupportedRepresentationTypeInfo(repItemType);
+                logUnsupportedRepresentationInfo(repItemType);
             } else if (repItemType.equals(SurfaceModelRepresentationTypeItems.IfcShellBasedSurfaceModel.name())) {
                 // TODO extract data
-                logNotSupportedRepresentationTypeInfo(repItemType);
+                logUnsupportedRepresentationInfo(repItemType);
             } else if (repItemType.equals(SurfaceModelRepresentationTypeItems.IfcFaceBasedSurfaceModel.name())) {
                 // TODO extract data
-                logNotSupportedRepresentationTypeInfo(repItemType);
+                logUnsupportedRepresentationInfo(repItemType);
             } else if (repItemType.equals(SweptSolidRepresentationTypeItems.IfcExtrudedAreaSolid.name())) {
                 ArrayList<Vector3D> shapeData = getShapeDataFromIfcExtrudedAreaSolid(ifcModel, item);
                 // check if entity includes(floor-)openings and handle them
@@ -120,12 +120,12 @@ public class IfcRepresentationExtractor {
                 else if (shapeData != null) shapeRep.addAll(shapeData);
             } else if (repItemType.equals(SweptSolidRepresentationTypeItems.IfcRevolvedAreaSolid.name())) {
                 // TODO extract data
-                logNotSupportedRepresentationTypeInfo(repItemType);
+                logUnsupportedRepresentationInfo(repItemType);
             } else if (repItemType.equals(MappedRepresentatiobTypeItems.IfcMappedItem.name())) {
                 // TODO extract data
-                logNotSupportedRepresentationTypeInfo(repItemType);
+                logUnsupportedRepresentationInfo(repItemType);
             } else {
-                logNotSupportedRepresentationTypeInfo(repItemType);
+                logUnsupportedRepresentationInfo(repItemType);
             }
         }
 
@@ -170,7 +170,7 @@ public class IfcRepresentationExtractor {
                 cartesianPointsOfBB.add(new Vector3D(cPointAsVector3D.getX(), cPointAsVector3D.getY(), cPointAsVector3D.getZ()));
                 shapeRep.addAll(cartesianPointsOfBB);
             } else {
-                logNotSupportedRepresentationTypeInfo(repItemType);
+                logUnsupportedRepresentationInfo(repItemType);
             }
         }
 
@@ -201,12 +201,12 @@ public class IfcRepresentationExtractor {
 
             if (repItemType.equals(CurveRepresentationTypeItems.IfcBoundedCurve.name())) {
                 // TODO extract data
-                logNotSupportedRepresentationTypeInfo(repItemType);
+                logUnsupportedRepresentationInfo(repItemType);
             } else if (repItemType.equals(CurveRepresentationTypeItems.IfcPolyline.name())) {
                 // TODO extract data
-                logNotSupportedRepresentationTypeInfo(repItemType);
+                logUnsupportedRepresentationInfo(repItemType);
             } else {
-                logNotSupportedRepresentationTypeInfo(repItemType);
+                logUnsupportedRepresentationInfo(repItemType);
             }
         }
 
@@ -282,7 +282,7 @@ public class IfcRepresentationExtractor {
         }
 
         // other loop types are not supported right now
-        logNotSupportedRepresentationTypeInfo(loopType);
+        logUnsupportedRepresentationInfo(loopType);
         return null;
     }
 
@@ -305,10 +305,10 @@ public class IfcRepresentationExtractor {
             return getShapeDataFromIfcCurve(ifcModel, basisCurve);
         } else if (IfcRepresentationIdentifier.isIfcCircle(ifcModel, curve)) {
             // TODO implement
-            logNotSupportedRepresentationTypeInfo(IfcRepresentationIdentifier.getIfcCurveType(ifcModel, curve));
+            logUnsupportedRepresentationInfo(IfcRepresentationIdentifier.getIfcCurveType(ifcModel, curve));
             return new ArrayList<>();
         } else {
-            logNotSupportedRepresentationTypeInfo(IfcRepresentationIdentifier.getIfcCurveType(ifcModel, curve));
+            logUnsupportedRepresentationInfo(IfcRepresentationIdentifier.getIfcCurveType(ifcModel, curve));
         }
         return null;
     }
@@ -385,14 +385,14 @@ public class IfcRepresentationExtractor {
         }
         if (operator.equals(IfcBooleanOperator.INTERSECTION)) {
             // TODO implement
-            logNotSupportedRepresentationTypeInfo(operator.name());
+            logUnsupportedRepresentationInfo(operator.name());
         }
         if (operator.equals(IfcBooleanOperator.UNION)) {
             // TODO implement
-            logNotSupportedRepresentationTypeInfo(operator.name());
+            logUnsupportedRepresentationInfo(operator.name());
         }
 
-        logNotSupportedRepresentationTypeInfo(operator.name());
+        logUnsupportedRepresentationInfo(operator.name());
         return null;
     }
 
@@ -411,11 +411,11 @@ public class IfcRepresentationExtractor {
 
         if (operandType.equals(IfcBooleanOperandType.IfcSolidModel.name())) {
             // TODO implement
-            logNotSupportedRepresentationTypeInfo(operandType);
+            logUnsupportedRepresentationInfo(operandType);
         }
         if (operandType.equals(IfcBooleanOperandType.IfcHalfSpaceSolid.name())) {
             // TODO implement
-            logNotSupportedRepresentationTypeInfo(operandType);
+            logUnsupportedRepresentationInfo(operandType);
         }
         if (operandType.equals(IfcBooleanOperandType.IfcPolygonalBoundedHalfSpace.name())) {
             return getShapeDataFromIfcPolygonalBoundedHalfSpace(ifcModel, operand);
@@ -434,7 +434,7 @@ public class IfcRepresentationExtractor {
         }
         if (operandType.equals(IfcBooleanOperandType.IfcCsgPrimitive3D.name())) {
             // TODO implement
-            logNotSupportedRepresentationTypeInfo(operandType);
+            logUnsupportedRepresentationInfo(operandType);
         }
         if (operandType.equals(SweptSolidRepresentationTypeItems.IfcExtrudedAreaSolid.name())) {
             return getShapeDataFromIfcExtrudedAreaSolid(ifcModel, operand);
@@ -444,7 +444,7 @@ public class IfcRepresentationExtractor {
         }
 
         // other types are not supported right now
-        logNotSupportedRepresentationTypeInfo(operandType);
+        logUnsupportedRepresentationInfo(operandType);
         return null;
     }
 
@@ -505,7 +505,7 @@ public class IfcRepresentationExtractor {
         }
 
         // other types are not supported right now
-        logNotSupportedRepresentationTypeInfo(IfcRepresentationIdentifier.getIfcCurveType(ifcModel, localPolygonBoundary));
+        logUnsupportedRepresentationInfo(IfcRepresentationIdentifier.getIfcCurveType(ifcModel, localPolygonBoundary));
         return null;
     }
 
@@ -558,12 +558,12 @@ public class IfcRepresentationExtractor {
             }
             if (profileType.equals(".CURVE.")) {
                 // TODO implement
-                logNotSupportedRepresentationTypeInfo(sweptAreaType);
+                logUnsupportedRepresentationInfo(sweptAreaType);
             }
         }
 
         // other types are not supported right now
-        logNotSupportedRepresentationTypeInfo(sweptAreaType);
+        logUnsupportedRepresentationInfo(sweptAreaType);
         return null;
     }
 
@@ -627,7 +627,7 @@ public class IfcRepresentationExtractor {
      *
      * @param representationItemType representation item as string
      */
-    private static void logNotSupportedRepresentationTypeInfo(String representationItemType) {
+    private static void logUnsupportedRepresentationInfo(String representationItemType) {
         Logging.info(IfcRepresentationExtractor.class.getName() + ": " + representationItemType + " is not supported right now");
     }
 
