@@ -2,8 +2,8 @@
 package io.parser.utils;
 
 import io.model.BIMtoOSMCatalog;
+import io.parser.data.BIMDataCollection;
 import io.parser.data.BIMObject3D;
-import io.parser.data.FilteredRawBIMData;
 import io.parser.data.ifc.IfcRepresentation;
 import io.parser.data.ifc.IfcRepresentationCatalog.IfcSlabTypeEnum;
 import io.parser.data.ifc.IfcRepresentationCatalog.RepresentationIdentifier;
@@ -31,8 +31,8 @@ public class BIMtoOSMUtility {
      * @param ifcModel ifcModel
      * @return FilteredBIMData including BIM objects of ways, rooms, etc.
      */
-    public static FilteredRawBIMData extractMajorBIMData(ModelPopulation ifcModel) {
-        FilteredRawBIMData bimData = new FilteredRawBIMData();
+    public static BIMDataCollection extractMajorBIMData(ModelPopulation ifcModel) {
+        BIMDataCollection bimData = new BIMDataCollection();
 
         // get the root element IFCSITE
         List<EntityInstance> ifcSiteObjects = new ArrayList<>();

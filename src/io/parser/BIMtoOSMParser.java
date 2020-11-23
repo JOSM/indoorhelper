@@ -3,8 +3,8 @@ package io.parser;
 
 import io.controller.ImportEventListener;
 import io.model.BIMtoOSMCatalog;
+import io.parser.data.BIMDataCollection;
 import io.parser.data.BIMObject3D;
-import io.parser.data.FilteredRawBIMData;
 import io.parser.data.ifc.IfcRepresentation;
 import io.parser.data.ifc.IfcRepresentationCatalog.IfcSpatialStructureElementTypes;
 import io.parser.data.ifc.IfcRepresentationCatalog.RepresentationIdentifier;
@@ -96,28 +96,28 @@ public class BIMtoOSMParser {
         if (!loadFile(filepath)) return false;
 
         // extract important data and put them into internal data structure
-        FilteredRawBIMData filteredRawBIMData = BIMtoOSMUtility.extractMajorBIMData(ifcModel);
+        BIMDataCollection BIMDataCollection = BIMtoOSMUtility.extractMajorBIMData(ifcModel);
 
         // check for IFCSITE element in file
-        if (!checkForIFCSITE(filteredRawBIMData)) {
+        if (!checkForIFCSITE(BIMDataCollection)) {
             showParsingErrorView(filepath, "Could not import IFC file.\nIFC file does not contains IFCSITE element.", true);
             return false;
         }
 
         // prepare filtered BIM data - find global object coordinates and other attributes like object height, width etc.
         ArrayList<BIMObject3D> preparedBIMData = new ArrayList<>();
-        preparedBIMData.addAll(BIMtoOSMUtility.prepareBIMObjects(ifcModel, BIMtoOSMCatalog.BIMObject.IfcSlab, filteredRawBIMData.getAreaObjects()));
-        preparedBIMData.addAll(BIMtoOSMUtility.prepareBIMObjects(ifcModel, BIMtoOSMCatalog.BIMObject.IfcWall, filteredRawBIMData.getWallObjects()));
-        preparedBIMData.addAll(BIMtoOSMUtility.prepareBIMObjects(ifcModel, BIMtoOSMCatalog.BIMObject.IfcColumn, filteredRawBIMData.getColumnObjects()));
+        preparedBIMData.addAll(BIMtoOSMUtility.prepareBIMObjects(ifcModel, BIMtoOSMCatalog.BIMObject.IfcSlab, BIMDataCollection.getAreaObjects()));
+        preparedBIMData.addAll(BIMtoOSMUtility.prepareBIMObjects(ifcModel, BIMtoOSMCatalog.BIMObject.IfcWall, BIMDataCollection.getWallObjects()));
+        preparedBIMData.addAll(BIMtoOSMUtility.prepareBIMObjects(ifcModel, BIMtoOSMCatalog.BIMObject.IfcColumn, BIMDataCollection.getColumnObjects()));
 //        preparedBIMData.addAll(BIMtoOSMUtility.prepareBIMObjects(ifcModel, BIMtoOSMCatalog.BIMObject.IfcDoor, filteredRawBIMData.getDoorObjects()));
 //        preparedBIMData.addAll(BIMtoOSMUtility.prepareBIMObjects(ifcModel, BIMtoOSMCatalog.BIMObject.IfcWindow, filteredRawBIMData.getWindowObjects()));
-        preparedBIMData.addAll(BIMtoOSMUtility.prepareBIMObjects(ifcModel, BIMtoOSMCatalog.BIMObject.IfcStair, filteredRawBIMData.getStairObjects()));
+        preparedBIMData.addAll(BIMtoOSMUtility.prepareBIMObjects(ifcModel, BIMtoOSMCatalog.BIMObject.IfcStair, BIMDataCollection.getStairObjects()));
 
         // set units
         setUnits();
 
         // transform coordinates from local system to geodetic
-        LatLon latlonBuildingOrigin = getLatLonOriginOfBuilding(filteredRawBIMData.getIfcSite());
+        LatLon latlonBuildingOrigin = getLatLonOriginOfBuilding(BIMDataCollection.getIfcSite());
         transformCoordinatesToLatLon(latlonBuildingOrigin, preparedBIMData);
 
         // pack FilteredBIMData into OSM data
@@ -126,7 +126,7 @@ public class BIMtoOSMParser {
         ArrayList<Way> ways = packedOSMData.b;
 
         // check if file is corrupted. File is corrupted if some data could not pass the preparation steps
-        if (preparedBIMData.size() != filteredRawBIMData.getSize()) {
+        if (preparedBIMData.size() != BIMDataCollection.getSize()) {
             showParsingErrorView(filepath, "Caution!\nImported data might include errors!", false);
         }
 
@@ -226,7 +226,7 @@ public class BIMtoOSMParser {
      * @param data to check
      * @return true if exists, else false
      */
-    private boolean checkForIFCSITE(FilteredRawBIMData data) {
+    private boolean checkForIFCSITE(BIMDataCollection data) {
         try {
             data.getIfcSite().getAttributeValueBNasEntityInstance("ObjectPlacement").getId();
             return true;

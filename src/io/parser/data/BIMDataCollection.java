@@ -10,7 +10,7 @@ import java.util.List;
  *
  * @author rebsc
  */
-public class FilteredRawBIMData {
+public class BIMDataCollection {
     private EntityInstance ifcSite;    // root of data set
     private List<EntityInstance> areaObjects;
     private List<EntityInstance> wallObjects;
