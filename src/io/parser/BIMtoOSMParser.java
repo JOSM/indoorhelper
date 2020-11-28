@@ -76,7 +76,6 @@ public class BIMtoOSMParser {
     private boolean optimizeInputFile;
     private boolean optimizeOutput;
 
-
     /**
      * Constructor
      *
@@ -141,12 +140,11 @@ public class BIMtoOSMParser {
         transformToGeodetic(llBuildingOrigin, preparedData);
 
         Pair<ArrayList<Node>, ArrayList<Way>> packedOSMData = packIntoOSMData(preparedData);
+        if (optimizeOutput) {
+            packedOSMData = OutputOptimizer.optimize(packedOSMData);
+        }
         ArrayList<Node> nodes = packedOSMData.a;
         ArrayList<Way> ways = packedOSMData.b;
-
-        if (optimizeOutput) {
-            // TODO optimizer OSM output
-        }
 
         if (preparedData.size() != rawFilteredData.getSize()) {
             showParsingErrorView(filepath, "Caution!\nImported data might include errors!", false);
@@ -272,7 +270,7 @@ public class BIMtoOSMParser {
         List<BIMObject3D> preparedData = new ArrayList<>();
         List<BIMObject3D> slabs = BIMtoOSMUtility.prepareBIMObjects(ifcModel, solutionType, BIMtoOSMCatalog.BIMObject.IfcSlab, rawBIMData.getAreaObjects());
         List<BIMObject3D> walls = BIMtoOSMUtility.prepareBIMObjects(ifcModel, solutionType, BIMtoOSMCatalog.BIMObject.IfcWall, rawBIMData.getWallObjects());
-        List<BIMObject3D> columns = BIMtoOSMUtility.prepareBIMObjects(ifcModel,solutionType, BIMtoOSMCatalog.BIMObject.IfcColumn, rawBIMData.getColumnObjects());
+        List<BIMObject3D> columns = BIMtoOSMUtility.prepareBIMObjects(ifcModel, solutionType, BIMtoOSMCatalog.BIMObject.IfcColumn, rawBIMData.getColumnObjects());
         List<BIMObject3D> doors = BIMtoOSMUtility.prepareBIMObjects(ifcModel, solutionType, BIMtoOSMCatalog.BIMObject.IfcDoor, rawBIMData.getDoorObjects());
         List<BIMObject3D> windows = BIMtoOSMUtility.prepareBIMObjects(ifcModel, solutionType, BIMtoOSMCatalog.BIMObject.IfcWindow, rawBIMData.getWindowObjects());
         List<BIMObject3D> stairs = BIMtoOSMUtility.prepareBIMObjects(ifcModel, solutionType, BIMtoOSMCatalog.BIMObject.IfcStair, rawBIMData.getStairObjects());
