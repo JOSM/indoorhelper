@@ -1,3 +1,4 @@
+// License: AGPL. For details, see LICENSE file.
 package io.parser.utils;
 
 import io.parser.math.Vector3D;
