@@ -1,5 +1,5 @@
 // License: AGPL. For details, see LICENSE file.
-package io.parser.utils;
+package io.parser.utils.ifc;
 
 import io.model.BIMtoOSMCatalog.BIMObject;
 import io.parser.data.ifc.IfcRepresentationCatalog.*;
