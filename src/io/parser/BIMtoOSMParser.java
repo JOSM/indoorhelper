@@ -143,7 +143,7 @@ public class BIMtoOSMParser {
         ArrayList<Node> nodes = packedOSMData.a;
         ArrayList<Way> ways = packedOSMData.b;
 
-        if(optimizeOutput){
+        if (optimizeOutput) {
             // TODO optimizer OSM output
         }
 
@@ -269,12 +269,12 @@ public class BIMtoOSMParser {
      */
     private List<BIMObject3D> prepareRawBIMData(BIMDataCollection rawBIMData) {
         List<BIMObject3D> preparedData = new ArrayList<>();
-        List<BIMObject3D> slabs = BIMtoOSMUtility.prepareBIMObjects(ifcModel, BIMtoOSMCatalog.BIMObject.IfcSlab, rawBIMData.getAreaObjects(), solutionType);
-        List<BIMObject3D> walls = BIMtoOSMUtility.prepareBIMObjects(ifcModel, BIMtoOSMCatalog.BIMObject.IfcWall, rawBIMData.getWallObjects(), solutionType);
-        List<BIMObject3D> columns = BIMtoOSMUtility.prepareBIMObjects(ifcModel, BIMtoOSMCatalog.BIMObject.IfcColumn, rawBIMData.getColumnObjects(), solutionType);
-        List<BIMObject3D> doors = BIMtoOSMUtility.prepareBIMObjects(ifcModel, BIMtoOSMCatalog.BIMObject.IfcDoor, rawBIMData.getDoorObjects(), solutionType);
-        List<BIMObject3D> windows = BIMtoOSMUtility.prepareBIMObjects(ifcModel, BIMtoOSMCatalog.BIMObject.IfcWindow, rawBIMData.getWindowObjects(), solutionType);
-        List<BIMObject3D> stairs = BIMtoOSMUtility.prepareBIMObjects(ifcModel, BIMtoOSMCatalog.BIMObject.IfcStair, rawBIMData.getStairObjects(), solutionType);
+        List<BIMObject3D> slabs = BIMtoOSMUtility.prepareBIMObjects(ifcModel, solutionType, BIMtoOSMCatalog.BIMObject.IfcSlab, rawBIMData.getAreaObjects());
+        List<BIMObject3D> walls = BIMtoOSMUtility.prepareBIMObjects(ifcModel, solutionType, BIMtoOSMCatalog.BIMObject.IfcWall, rawBIMData.getWallObjects());
+        List<BIMObject3D> columns = BIMtoOSMUtility.prepareBIMObjects(ifcModel,solutionType, BIMtoOSMCatalog.BIMObject.IfcColumn, rawBIMData.getColumnObjects());
+        List<BIMObject3D> doors = BIMtoOSMUtility.prepareBIMObjects(ifcModel, solutionType, BIMtoOSMCatalog.BIMObject.IfcDoor, rawBIMData.getDoorObjects());
+        List<BIMObject3D> windows = BIMtoOSMUtility.prepareBIMObjects(ifcModel, solutionType, BIMtoOSMCatalog.BIMObject.IfcWindow, rawBIMData.getWindowObjects());
+        List<BIMObject3D> stairs = BIMtoOSMUtility.prepareBIMObjects(ifcModel, solutionType, BIMtoOSMCatalog.BIMObject.IfcStair, rawBIMData.getStairObjects());
         preparedData.addAll(slabs);
         preparedData.addAll(walls);
         preparedData.addAll(columns);

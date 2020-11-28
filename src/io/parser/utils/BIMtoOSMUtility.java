@@ -92,48 +92,68 @@ public class BIMtoOSMUtility {
      * Prepares BIM objects for further operations. Extracts OSM relevant information and puts it into {@link BIMObject3D}
      *
      * @param ifcModel   ifcModel
+     * @param solution   geometry solution type
      * @param objectType relating BIMtoOSMCatalog.BIMObject
      * @param bimObjects All BIM objects of objectType
-     * @param solution   geometry solution type
      * @return Prepared BIM objects
      */
-    public static List<BIMObject3D> prepareBIMObjects(ModelPopulation ifcModel, BIMtoOSMCatalog.BIMObject objectType,
-                                                      List<EntityInstance> bimObjects, GeometrySolution solution) {
+    public static List<BIMObject3D> prepareBIMObjects(ModelPopulation ifcModel, GeometrySolution solution,
+                                                      BIMtoOSMCatalog.BIMObject objectType, List<EntityInstance> bimObjects) {
         ArrayList<BIMObject3D> preparedObjects = new ArrayList<>();
 
         for (EntityInstance objectEntity : bimObjects) {
-            // resolve placement
-            EntityInstance objectIFCLP = objectEntity.getAttributeValueBNasEntityInstance("ObjectPlacement");
-            BIMObject3D object = resolveObjectPlacement(objectIFCLP, new BIMObject3D(objectEntity.getId()));
-            object.setType(objectType);
-            Vector3D cartesianOrigin = object.getTranslation();
-            Matrix3D rotMatrix = getObjectRotationMatrix(objectEntity);
 
-            // get object geometry
-            ArrayList<Vector3D> shapeDataOfObject = (ArrayList<Vector3D>) getShapeData(ifcModel, objectEntity, solution);
+            BIMObject3D object = prepareBIMObject(ifcModel, solution, objectType, objectEntity);
+            if (object == null) {
+                continue;
+            }
 
-            // transform and prepare
-            if (cartesianOrigin != null && rotMatrix != null && (shapeDataOfObject != null && !shapeDataOfObject.isEmpty())) {
-                transformPoints(shapeDataOfObject, rotMatrix, cartesianOrigin);
-                object.setCartesianShapeCoordinates(shapeDataOfObject);
-
-                // Check if data includes IFCShapeDataExtractor.defaultPoint. IFCShapeDataExtractor.defaultPoint got added
-                // for workaround handling multiple closed loops in data set
-                if (!shapeDataOfObject.contains(IfcGeometryExtractor.defaultPoint)) {
-                    preparedObjects.add(object);
-                    continue;
-                }
-
-                // Workaround: Check data set for closed loops (separated by defaultPoint). If closed loop in data set, extract and add as own way
-                List<List<Vector3D>> loops = splitClosedLoops(shapeDataOfObject);
+            // check for loops in data set
+            List<Vector3D> objectGeometry = object.getCartesianShapeCoordinates();
+            if (!objectGeometry.contains(IfcGeometryExtractor.defaultPoint)) {
+                List<List<Vector3D>> loops = splitClosedLoops(objectGeometry);
                 loops.forEach(l -> {
                     object.setCartesianShapeCoordinates(l);
                     preparedObjects.add(object);
                 });
+            } else {
+                preparedObjects.add(object);
             }
         }
 
         return preparedObjects;
+    }
+
+    /**
+     * Prepares BIM object for further operations. Extracts OSM relevant information and puts it into {@link BIMObject3D}
+     *
+     * @param ifcModel   ifcModel
+     * @param solution   geometry solution type
+     * @param objectType relating BIMtoOSMCatalog.BIMObject
+     * @param objectEntity BIM object of objectType
+     * @return Prepared BIM object
+     */
+    public static BIMObject3D prepareBIMObject(ModelPopulation ifcModel, GeometrySolution solution,
+                                               BIMtoOSMCatalog.BIMObject objectType, EntityInstance objectEntity) {
+
+        EntityInstance objectIFCLP = objectEntity.getAttributeValueBNasEntityInstance("ObjectPlacement");
+        BIMObject3D object = resolveObjectPlacement(objectIFCLP, new BIMObject3D(objectEntity.getId()));
+        object.setType(objectType);
+        Vector3D cartesianOrigin = object.getTranslation();
+        Matrix3D rotMatrix = getObjectRotationMatrix(objectEntity);
+
+        // get object geometry
+        ArrayList<Vector3D> shapeDataOfObject = (ArrayList<Vector3D>) getShapeData(ifcModel, objectEntity, solution);
+
+        // transform and prepare
+        if (cartesianOrigin != null && rotMatrix != null && (shapeDataOfObject != null && !shapeDataOfObject.isEmpty())) {
+            transformPoints(shapeDataOfObject, rotMatrix, cartesianOrigin);
+            object.setCartesianShapeCoordinates(shapeDataOfObject);
+        } else {
+            return null;
+        }
+
+        return object;
     }
 
     /**
