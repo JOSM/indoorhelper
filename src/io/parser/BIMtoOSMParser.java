@@ -299,7 +299,7 @@ public class BIMtoOSMParser {
             int level = getLevelTag(object, levelIdentifier);
 
             ArrayList<Node> tmpNodes = new ArrayList<>();
-            for (LatLon point : object.getGeodeticShapeCoordinates()) {
+            for (LatLon point : object.getGeodeticGeometryCoordinates()) {
                 Node n = new Node(point);
                 tmpNodes.add(n);
             }
@@ -430,14 +430,14 @@ public class BIMtoOSMParser {
 
             for (BIMObject3D object : preparedBIMData) {
                 ArrayList<LatLon> transformedCoordinates = new ArrayList<>();
-                for (Vector3D point : object.getCartesianShapeCoordinates()) {
+                for (Vector3D point : object.getCartesianGeometryCoordinates()) {
                     // rotate point
                     rotationMatrix.transform(point);
                     // transform point
                     LatLon llPoint = ParserGeoMath.cartesianToGeodetic(point, new Vector3D(0.0, 0.0, 0.0), llBuildingOrigin, lengthUnit);
                     transformedCoordinates.add(llPoint);
                 }
-                object.setGeodeticShapeCoordinates(transformedCoordinates);
+                object.setGeodeticGeometryCoordinates(transformedCoordinates);
             }
         }
     }

@@ -25,8 +25,8 @@ public class BIMObject3D {
     private EntityInstance representationEntity;
 
     // object representation data
-    private List<Vector3D> cartesianShapeCoordinates;
-    private List<LatLon> geodeticShapeCoordinates;
+    private List<Vector3D> cartesianGeometryCoordinates;
+    private List<LatLon> geodeticGeometryCoordinates;
 
     // transformation matrices
     private Vector3D translation;
@@ -34,8 +34,8 @@ public class BIMObject3D {
 
     public BIMObject3D(int id) {
         this.id = id;
-        cartesianShapeCoordinates = new ArrayList<>();
-        geodeticShapeCoordinates = new ArrayList<>();
+        cartesianGeometryCoordinates = new ArrayList<>();
+        geodeticGeometryCoordinates = new ArrayList<>();
         translation = new Vector3D();
         rotation = new Matrix3D();
         rotation.setIdentity();
@@ -48,8 +48,8 @@ public class BIMObject3D {
             List<Vector3D> shapeCoordinates) {
         this.id = id;
         this.type = type;
-        cartesianShapeCoordinates = shapeCoordinates;
-        geodeticShapeCoordinates = new ArrayList<>();
+        cartesianGeometryCoordinates = shapeCoordinates;
+        geodeticGeometryCoordinates = new ArrayList<>();
         translation = cartesianOrigin;
         rotation = new Matrix3D();
         rotation.setIdentity();
@@ -100,12 +100,12 @@ public class BIMObject3D {
         throw new UnsupportedOperationException();
     }
 
-    public List<Vector3D> getCartesianShapeCoordinates() {
-        return cartesianShapeCoordinates;
+    public List<Vector3D> getCartesianGeometryCoordinates() {
+        return cartesianGeometryCoordinates;
     }
 
-    public void setCartesianShapeCoordinates(List<Vector3D> cartesianShapeCoordinates) {
-        this.cartesianShapeCoordinates = cartesianShapeCoordinates;
+    public void setCartesianGeometryCoordinates(List<Vector3D> cartesianGeometryCoordinates) {
+        this.cartesianGeometryCoordinates = cartesianGeometryCoordinates;
     }
 
     public LatLon getGeodeticPlacement() {
@@ -113,12 +113,12 @@ public class BIMObject3D {
         throw new UnsupportedOperationException();
     }
 
-    public List<LatLon> getGeodeticShapeCoordinates() {
-        return geodeticShapeCoordinates;
+    public List<LatLon> getGeodeticGeometryCoordinates() {
+        return geodeticGeometryCoordinates;
     }
 
-    public void setGeodeticShapeCoordinates(List<LatLon> geodeticShapeCoordinates) {
-        this.geodeticShapeCoordinates = geodeticShapeCoordinates;
+    public void setGeodeticGeometryCoordinates(List<LatLon> geodeticGeometryCoordinates) {
+        this.geodeticGeometryCoordinates = geodeticGeometryCoordinates;
     }
 
     public Vector3D getTranslation() {

@@ -109,11 +109,11 @@ public class BIMtoOSMUtility {
             }
 
             // check for loops in data set
-            List<Vector3D> objectGeometry = object.getCartesianShapeCoordinates();
+            List<Vector3D> objectGeometry = object.getCartesianGeometryCoordinates();
             if (!objectGeometry.contains(IfcGeometryExtractor.defaultPoint)) {
                 List<List<Vector3D>> loops = splitClosedLoops(objectGeometry);
                 loops.forEach(l -> {
-                    object.setCartesianShapeCoordinates(l);
+                    object.setCartesianGeometryCoordinates(l);
                     preparedObjects.add(object);
                 });
             } else {
@@ -148,7 +148,7 @@ public class BIMtoOSMUtility {
         // transform and prepare
         if (cartesianOrigin != null && rotMatrix != null && (shapeDataOfObject != null && !shapeDataOfObject.isEmpty())) {
             transformPoints(shapeDataOfObject, rotMatrix, cartesianOrigin);
-            object.setCartesianShapeCoordinates(shapeDataOfObject);
+            object.setCartesianGeometryCoordinates(shapeDataOfObject);
         } else {
             return null;
         }
