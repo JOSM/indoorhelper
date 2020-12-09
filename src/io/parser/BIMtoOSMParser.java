@@ -1,6 +1,34 @@
 // License: AGPL. For details, see LICENSE file.
 package io.parser;
 
+import static io.parser.utils.ParserUtility.prepareDoubleString;
+import static io.parser.utils.ParserUtility.stringVectorToVector3D;
+import static org.openstreetmap.josm.tools.I18n.tr;
+
+import java.awt.GraphicsEnvironment;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Scanner;
+
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+
+import org.openstreetmap.josm.data.Preferences;
+import org.openstreetmap.josm.data.coor.LatLon;
+import org.openstreetmap.josm.data.osm.Node;
+import org.openstreetmap.josm.data.osm.Tag;
+import org.openstreetmap.josm.data.osm.Way;
+import org.openstreetmap.josm.gui.MainApplication;
+import org.openstreetmap.josm.tools.Logging;
+import org.openstreetmap.josm.tools.Pair;
+
 import io.controller.ImportEventListener;
 import io.model.BIMtoOSMCatalog;
 import io.parser.data.BIMDataCollection;
@@ -14,37 +42,13 @@ import io.parser.math.ParserGeoMath;
 import io.parser.math.ParserMath;
 import io.parser.math.Vector3D;
 import io.parser.utils.ifc.BIMtoOSMUtility;
-import io.parser.utils.optimizer.FileOptimizer;
 import io.parser.utils.ifc.IfcGeometryExtractor;
 import io.parser.utils.ifc.IfcObjectIdentifier;
+import io.parser.utils.optimizer.FileOptimizer;
 import io.parser.utils.optimizer.OutputOptimizer;
 import model.TagCatalog;
 import nl.tue.buildingsmart.express.population.EntityInstance;
 import nl.tue.buildingsmart.express.population.ModelPopulation;
-import org.openstreetmap.josm.data.Preferences;
-import org.openstreetmap.josm.data.coor.LatLon;
-import org.openstreetmap.josm.data.osm.Node;
-import org.openstreetmap.josm.data.osm.Tag;
-import org.openstreetmap.josm.data.osm.Way;
-import org.openstreetmap.josm.gui.MainApplication;
-import org.openstreetmap.josm.tools.Logging;
-import org.openstreetmap.josm.tools.Pair;
-
-import javax.swing.*;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Scanner;
-
-import static io.parser.utils.ParserUtility.prepareDoubleString;
-import static io.parser.utils.ParserUtility.stringVectorToVector3D;
-import static org.openstreetmap.josm.tools.I18n.tr;
 
 /**
  * Parser for BIM data. Extracts major BIM elements and transforms coordinates into OSM convenient format
@@ -631,10 +635,13 @@ public class BIMtoOSMParser {
      * @param msg Error message
      */
     private void showErrorView(String msg) {
-        SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(MainApplication.getMainFrame(),
-                msg,
-                "Error",
-                JOptionPane.ERROR_MESSAGE));
+        Logging.error(msg);
+        if (!GraphicsEnvironment.isHeadless()) {
+            SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(MainApplication.getMainFrame(),
+                    msg,
+                    tr("Error"),
+                    JOptionPane.ERROR_MESSAGE));
+        }
     }
 
 }
