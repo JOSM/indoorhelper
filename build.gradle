@@ -1,13 +1,15 @@
 plugins {
   id "java"
   id "eclipse"
+  id("com.github.spotbugs") version "4.2.0"
   id "org.openstreetmap.josm" version "0.7.0"
 }
 
 sourceCompatibility = 1.8
 
 def versions = [
-  junit: "5.6.2"
+  junit: "5.6.2",
+  spotbugs: "4.2.0"
 ]
 
 repositories {
@@ -22,6 +24,7 @@ dependencies {
   testImplementation("org.openstreetmap.josm:josm-unittest:"){changing=true}
   testImplementation("com.github.tomakehurst:wiremock-jre8:2.26.3")
   testImplementation("org.awaitility:awaitility:4.0.2")
+  testImplementation("com.github.spotbugs:spotbugs-annotations:${versions["spotbugs"]}")
   compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
   compile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.25'
   packIntoJar("org.opensourcebim:BuildingSMARTLibrary:1.0.9")
