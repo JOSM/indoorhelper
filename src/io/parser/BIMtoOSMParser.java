@@ -426,7 +426,7 @@ public class BIMtoOSMParser {
             Matrix3D rotationMatrix = null;
             if (projectNorth != null && trueNorth != null) {
                 double rotationAngle = trueNorth.angleBetween(projectNorth);
-                rotationMatrix = ParserMath.getRotationMatrixAboutZAxis(rotationAngle);
+                rotationMatrix = ParserMath.getRotationMatrixZ(rotationAngle);
             }
 
             if (rotationMatrix == null) return;

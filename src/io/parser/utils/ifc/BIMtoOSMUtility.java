@@ -351,8 +351,8 @@ public class BIMtoOSMUtility {
             parentZVector.setZ(zAxis.getZ());
         }
 
-        Matrix3D xMatrix = ParserMath.getRotationMatrixAboutZAxis(rotAngleX);
-        Matrix3D zMatrix = ParserMath.getRotationMatrixAboutXAxis(rotAngleZ);
+        Matrix3D xMatrix = ParserMath.getRotationMatrixZ(rotAngleX);
+        Matrix3D zMatrix = ParserMath.getRotationMatrixX(rotAngleZ);
         xMatrix.multiply(zMatrix);
 
         return xMatrix;
