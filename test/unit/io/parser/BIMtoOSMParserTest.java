@@ -1,12 +1,14 @@
 // License: AGPL. For details, see LICENSE file.
 package io.parser;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.Rule;
+import org.junit.Test;
+import org.openstreetmap.josm.testutils.JOSMTestRules;
 
 import java.io.File;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests of {@link BIMtoOSMParser} class.
@@ -18,11 +20,11 @@ public class BIMtoOSMParserTest {
     /**
      * Setup test.
      */
-//    @Rule
-//    public JOSMTestRules test = new JOSMTestRules().preferences();
+    @Rule
+    public JOSMTestRules test = new JOSMTestRules().preferences();
 
     String pluginDir = System.getProperty("user.dir");
-    String resourcePathDir = pluginDir + File.separator + "test" + File.separator + "resources" + File.separator;
+    String resourcePathDir = pluginDir + File.separator + "test" + File.separator + "data" + File.separator;
 
     /**
      * Test case for {@link BIMtoOSMParser#parse} method.
