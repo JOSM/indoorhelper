@@ -1,5 +1,6 @@
 package io.parser.utils.optimizer;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.junit.Test;
 import org.junit.jupiter.api.Disabled;
 import org.openstreetmap.josm.data.coor.LatLon;
@@ -18,8 +19,8 @@ public class OutputOptimizerTest {
      * Setup test.
      */
 //    @Rule
-//    @SuppressFBWarnings(value = "URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD")
 //    public JOSMTestRules test = new JOSMTestRules().preferences();
+    @SuppressFBWarnings(value = "URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD")
 
     public ArrayList<LatLon> testNodes1 = new ArrayList<LatLon>() {
         {
