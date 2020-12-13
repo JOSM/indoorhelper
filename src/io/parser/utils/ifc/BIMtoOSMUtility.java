@@ -89,21 +89,21 @@ public class BIMtoOSMUtility {
     }
 
     /**
-     * Prepares BIM objects for further operations. Extracts OSM relevant information and puts it into {@link BIMObject3D}
+     * Transforms BIM objects for further operations. Extracts OSM relevant information and puts it into {@link BIMObject3D}
      *
      * @param ifcModel   ifcModel
      * @param solution   geometry solution type
      * @param objectType relating BIMtoOSMCatalog.BIMObject
      * @param bimObjects All BIM objects of objectType
-     * @return Prepared BIM objects
+     * @return Transformed BIM objects
      */
-    public static List<BIMObject3D> prepareBIMObjects(ModelPopulation ifcModel, GeometrySolution solution,
-                                                      BIMtoOSMCatalog.BIMObject objectType, List<EntityInstance> bimObjects) {
-        ArrayList<BIMObject3D> preparedObjects = new ArrayList<>();
+    public static List<BIMObject3D> transformBIMObjects(ModelPopulation ifcModel, GeometrySolution solution,
+                                                        BIMtoOSMCatalog.BIMObject objectType, List<EntityInstance> bimObjects) {
+        ArrayList<BIMObject3D> transformedObjects = new ArrayList<>();
 
         for (EntityInstance objectEntity : bimObjects) {
 
-            BIMObject3D object = prepareBIMObject(ifcModel, solution, objectType, objectEntity);
+            BIMObject3D object = transformBIMObject(ifcModel, solution, objectType, objectEntity);
             if (object == null) {
                 continue;
             }
@@ -114,27 +114,27 @@ public class BIMtoOSMUtility {
                 List<List<Vector3D>> loops = splitClosedLoops(objectGeometry);
                 loops.forEach(l -> {
                     object.setCartesianGeometryCoordinates(l);
-                    preparedObjects.add(object);
+                    transformedObjects.add(object);
                 });
             } else {
-                preparedObjects.add(object);
+                transformedObjects.add(object);
             }
         }
 
-        return preparedObjects;
+        return transformedObjects;
     }
 
     /**
-     * Prepares BIM object for further operations. Extracts OSM relevant information and puts it into {@link BIMObject3D}
+     * Transform BIM object for further operations. Extracts OSM relevant information and puts it into {@link BIMObject3D}
      *
      * @param ifcModel   ifcModel
      * @param solution   geometry solution type
      * @param objectType relating BIMtoOSMCatalog.BIMObject
      * @param objectEntity BIM object of objectType
-     * @return Prepared BIM object
+     * @return Transformed BIM object
      */
-    public static BIMObject3D prepareBIMObject(ModelPopulation ifcModel, GeometrySolution solution,
-                                               BIMtoOSMCatalog.BIMObject objectType, EntityInstance objectEntity) {
+    public static BIMObject3D transformBIMObject(ModelPopulation ifcModel, GeometrySolution solution,
+                                                 BIMtoOSMCatalog.BIMObject objectType, EntityInstance objectEntity) {
 
         EntityInstance objectIFCLP = objectEntity.getAttributeValueBNasEntityInstance("ObjectPlacement");
         BIMObject3D object = resolveObjectPlacement(objectIFCLP, new BIMObject3D(objectEntity.getId()));
