@@ -103,7 +103,8 @@ public class BIMtoOSMParser {
     private void applyDefaultConfiguration() {
         configure(BIMtoOSMUtility.GeometrySolution.BOUNDING_BOX,
                 new FileOptimizer.Configuration(true),
-                new OutputOptimizer.Configuration(true, 0.5));
+                // default: merge overlapping nodes only (distance < 0.01)
+                new OutputOptimizer.Configuration(true, 0.01));
     }
 
     /**
@@ -166,9 +167,10 @@ public class BIMtoOSMParser {
         transformToGeodetic(llBuildingOrigin, preparedData);
 
         Pair<ArrayList<Node>, ArrayList<Way>> packedOSMData = packIntoOSMData(preparedData);
-        if (optimizeOutput) {
-            packedOSMData = OutputOptimizer.optimize(optimizeOutputConfig, packedOSMData);
-        }
+        // disable until the implementation has finished
+//        if (optimizeOutput) {
+//            packedOSMData = OutputOptimizer.optimize(optimizeOutputConfig, packedOSMData);
+//        }
         ArrayList<Node> nodes = packedOSMData.a;
         ArrayList<Way> ways = packedOSMData.b;
 

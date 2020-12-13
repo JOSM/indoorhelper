@@ -2,8 +2,11 @@
 package io.parser.utils;
 
 import io.parser.math.Vector3D;
+import org.openstreetmap.josm.data.osm.Node;
+import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.tools.Logging;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -57,5 +60,31 @@ public class ParserUtility {
         }
     }
 
+    /**
+     * Returns a deep copy of the node list
+     * @param listToCopy to create copy of
+     * @return deep copy list
+     */
+    public static List<Node> deepCopyNodeList(List<Node> listToCopy){
+        ArrayList<Node> nodesCopy = new ArrayList<>();
+        listToCopy.forEach(n -> nodesCopy.add(new Node(n)));
+        return nodesCopy;
+    }
+
+    /**
+     * Returns a deep copy of the ways list
+     * @param listToCopy to create copy of
+     * @return deep copy list
+     */
+    public static List<Way> deepCopyWayList(List<Way> listToCopy){
+        ArrayList<Way> waysCopy = new ArrayList<>();
+        listToCopy.forEach(w -> {
+            Way nW = new Way();
+            nW.setOsmId(w.getId(), w.getVersion());
+            w.getNodes().forEach(n -> nW.addNode(new Node(n)));
+            waysCopy.add(nW);
+        });
+        return waysCopy;
+    }
 
 }
