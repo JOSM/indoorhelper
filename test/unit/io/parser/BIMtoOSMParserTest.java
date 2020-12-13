@@ -1,9 +1,7 @@
 // License: AGPL. For details, see LICENSE file.
 package io.parser;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.openstreetmap.josm.testutils.JOSMTestRules;
 
 import java.io.File;
 
@@ -20,8 +18,8 @@ public class BIMtoOSMParserTest {
     /**
      * Setup test.
      */
-    @Rule
-    public JOSMTestRules test = new JOSMTestRules().preferences();
+//    @Rule
+//    public JOSMTestRules test = new JOSMTestRules().preferences();
 
     String pluginDir = System.getProperty("user.dir");
     String resourcePathDir = pluginDir + File.separator + "test" + File.separator + "data" + File.separator;
