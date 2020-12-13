@@ -54,9 +54,9 @@ public class Vector3D {
     }
 
     public boolean equalsVector(Vector3D vec) {
-        if (Math.abs(this.x - vec.x) < .0000001) return false;
-        if (Math.abs(this.y - vec.y) < .0000001) return false;
-        if (Math.abs(this.z - vec.z) < .0000001) return false;
+        if (Math.abs(this.x - vec.x) > .0000001) return false;
+        if (Math.abs(this.y - vec.y) > .0000001) return false;
+        if (Math.abs(this.z - vec.z) > .0000001) return false;
 
         return true;
     }
