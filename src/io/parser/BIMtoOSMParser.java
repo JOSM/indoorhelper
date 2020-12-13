@@ -74,7 +74,9 @@ public class BIMtoOSMParser {
     // configuration parameters
     private BIMtoOSMUtility.GeometrySolution solutionType;
     private boolean optimizeInputFile;
+    private FileOptimizer.Configuration optimizeInputConfig;
     private boolean optimizeOutput;
+    private OutputOptimizer.Configuration optimizeOutputConfig;
 
     /**
      * Constructor
@@ -99,22 +101,47 @@ public class BIMtoOSMParser {
      * Applies default configuration to parser
      */
     private void applyDefaultConfiguration() {
-        solutionType = BIMtoOSMUtility.GeometrySolution.BOUNDING_BOX;
-        optimizeInputFile = true;
-        optimizeOutput = true;
+        configure(BIMtoOSMUtility.GeometrySolution.BOUNDING_BOX,
+                new FileOptimizer.Configuration(true),
+                new OutputOptimizer.Configuration(true, 0.5));
     }
 
     /**
      * Sets configuration values of parser
      *
-     * @param solution       type of parsed data. {@link BIMtoOSMUtility.GeometrySolution} represents precision of parsed data
-     * @param optimizeInput  true if IFC file should be pre-optimized (comments will be removed before loading), else false
-     * @param optimizeOutput true if OSM output should be optimized (optimization rules see operating method)
+     * @param solution             type of parsed data. {@link BIMtoOSMUtility.GeometrySolution} represents
+     *                             precision of parsed data
+     * @param optimizeInputConfig  not null if IFC file should be pre-optimized, else null
+     * @param optimizeOutputConfig null if OSM output should be optimized, else null
      */
-    public void configure(BIMtoOSMUtility.GeometrySolution solution, boolean optimizeInput, boolean optimizeOutput) {
+    public void configure(BIMtoOSMUtility.GeometrySolution solution,
+                          FileOptimizer.Configuration optimizeInputConfig,
+                          OutputOptimizer.Configuration optimizeOutputConfig) {
+        if (solution == null) {
+            Logging.info(BIMtoOSMParser.class.getName()
+                    + ": Failed to set parser configuration. Solution equals null!");
+            return;
+        }
         solutionType = solution;
-        optimizeInputFile = optimizeInput;
-        this.optimizeOutput = optimizeOutput;
+        Logging.info(String.format("%s-ConfigurationReport: solution set to %s",
+                BIMtoOSMParser.class.getName(), solutionType.name()));
+
+        if (optimizeInputConfig != null) {
+            optimizeInputFile = true;
+            this.optimizeInputConfig = optimizeInputConfig;
+            Logging.info(String.format("%s-ConfigurationReport: optimizeInputFile enabled; RemoveBlockCommands %s",
+                    BIMtoOSMParser.class.getName(),
+                    optimizeInputConfig.REMOVE_BLOCK_COMMENTS ? "enabled" : "disabled"));
+        }
+        if (optimizeOutputConfig != null) {
+            optimizeOutput = true;
+            this.optimizeOutputConfig = optimizeOutputConfig;
+            Logging.info(String.format("%s-ConfigurationReport: optimizeOutput enabled; MergeCloseNodes %s; " +
+                            "MergeDistance set to %f",
+                    BIMtoOSMParser.class.getName(),
+                    optimizeOutputConfig.MERGE_CLOSE_NODES ? "enabled" : "disabled",
+                    optimizeOutputConfig.MERGE_DISTANCE));
+        }
     }
 
     /**
@@ -140,7 +167,7 @@ public class BIMtoOSMParser {
 
         Pair<ArrayList<Node>, ArrayList<Way>> packedOSMData = packIntoOSMData(preparedData);
         if (optimizeOutput) {
-            packedOSMData = OutputOptimizer.optimize(packedOSMData);
+            packedOSMData = OutputOptimizer.optimize(optimizeOutputConfig, packedOSMData);
         }
         ArrayList<Node> nodes = packedOSMData.a;
         ArrayList<Way> ways = packedOSMData.b;
@@ -167,7 +194,7 @@ public class BIMtoOSMParser {
             // pre-optimize and load IFC file
             File file;
             if (optimizeInputFile) {
-                file = FileOptimizer.optimizeIfcFile(filepath);
+                file = FileOptimizer.optimizeIfcFile(optimizeInputConfig, filepath);
             } else {
                 file = new File(filepath);
             }
