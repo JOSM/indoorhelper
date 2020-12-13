@@ -112,7 +112,7 @@ public class BIMtoOSMParser {
      * @param solution             type of parsed data. {@link BIMtoOSMUtility.GeometrySolution} represents
      *                             precision of parsed data
      * @param optimizeInputConfig  not null if IFC file should be pre-optimized, else null
-     * @param optimizeOutputConfig null if OSM output should be optimized, else null
+     * @param optimizeOutputConfig not null if OSM output should be optimized, else null
      */
     public void configure(BIMtoOSMUtility.GeometrySolution solution,
                           FileOptimizer.Configuration optimizeInputConfig,
@@ -159,7 +159,7 @@ public class BIMtoOSMParser {
             return false;
         }
 
-        ArrayList<BIMObject3D> preparedData = (ArrayList<BIMObject3D>) prepareRawBIMData(rawFilteredData);
+        ArrayList<BIMObject3D> preparedData = (ArrayList<BIMObject3D>) transformRawBIMData(rawFilteredData);
         setUnits();
 
         LatLon llBuildingOrigin = getLatLonBuildingOrigin(rawFilteredData.getIfcSite());
@@ -292,7 +292,7 @@ public class BIMtoOSMParser {
      * @param rawBIMData to prepare
      * @return prepared data for rendering
      */
-    private List<BIMObject3D> prepareRawBIMData(BIMDataCollection rawBIMData) {
+    private List<BIMObject3D> transformRawBIMData(BIMDataCollection rawBIMData) {
         List<BIMObject3D> preparedData = new ArrayList<>();
         List<BIMObject3D> slabs = BIMtoOSMUtility.prepareBIMObjects(ifcModel, solutionType, BIMtoOSMCatalog.BIMObject.IfcSlab, rawBIMData.getAreaObjects());
         List<BIMObject3D> walls = BIMtoOSMUtility.prepareBIMObjects(ifcModel, solutionType, BIMtoOSMCatalog.BIMObject.IfcWall, rawBIMData.getWallObjects());
