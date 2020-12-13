@@ -3,11 +3,11 @@ package io.parser.data.ifc;
 
 public class IfcUnitCatalog {
 
-    public enum lengthUnit {
+    public enum LengthUnit {
         M, CM, MM
     }
 
-    public enum planeAngleUnit {
+    public enum PlaneAngleUnit {
         RAD, DEG
     }
 }

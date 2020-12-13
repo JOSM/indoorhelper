@@ -22,7 +22,7 @@ public class ParserGeoMath {
      * @param cartesianUnit           m or cm
      * @return latlon of cartesian point
      */
-    public static LatLon cartesianToGeodetic(Vector3D cartesianPoint, Vector3D cartesianOrigin, LatLon latLonOfCartesianOrigin, IfcUnitCatalog.lengthUnit cartesianUnit) {
+    public static LatLon cartesianToGeodetic(Vector3D cartesianPoint, Vector3D cartesianOrigin, LatLon latLonOfCartesianOrigin, IfcUnitCatalog.LengthUnit cartesianUnit) {
         double originCartX = cartesianOrigin.getX();
         double originCartY = cartesianOrigin.getY();
         double originLat = Math.toRadians(latLonOfCartesianOrigin.lat());
@@ -35,10 +35,10 @@ public class ParserGeoMath {
         bearing = Math.toRadians(90.0) - bearing;
 
         // get distance
-        if (cartesianUnit.equals(IfcUnitCatalog.lengthUnit.CM)) {
+        if (cartesianUnit.equals(IfcUnitCatalog.LengthUnit.CM)) {
             pointX /= 100.0;
             pointY /= 100.0;
-        } else if (cartesianUnit.equals(IfcUnitCatalog.lengthUnit.MM)) {
+        } else if (cartesianUnit.equals(IfcUnitCatalog.LengthUnit.MM)) {
             pointX /= 1000.0;
             pointY /= 1000.0;
         }

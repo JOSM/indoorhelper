@@ -159,7 +159,7 @@ public class ImportDataController implements ImportEventListener {
     /**
      * Export resources embedded in jar into file system
      *
-     * @throws Exception
+     * @throws Exception IOException
      */
     private void exportPluginResource() throws Exception {
         File jarFile = new File(Preferences.main().getPluginsDirectory().toURI().getPath() + "/indoorhelper.jar");
@@ -170,7 +170,9 @@ public class ImportDataController implements ImportEventListener {
                 ZipEntry ze2 = jar.getEntry("resources/IFC4.exp");
                 InputStream is1 = jar.getInputStream(ze1);
                 InputStream is2 = jar.getInputStream(ze2);
-                new File(pluginDir + "/indoorhelper/resources").mkdirs();
+                if (!new File(pluginDir + "/indoorhelper/resources").mkdirs()) {
+                    return;
+                }
                 Files.copy(is1, Paths.get(pluginDir + "/indoorhelper/resources/IFC2X3_TC1.exp"));
                 Files.copy(is2, Paths.get(pluginDir + "/indoorhelper/resources/IFC4.exp"));
             }

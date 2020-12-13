@@ -128,32 +128,6 @@ public class Matrix3D {
         return m22;
     }
 
-    public void print() {
-        System.out.print(this.getM00() + ", ");
-        System.out.print(this.getM01() + ", ");
-        System.out.print(this.getM02() + "\n");
-        System.out.print(this.getM10() + ", ");
-        System.out.print(this.getM11() + ", ");
-        System.out.print(this.getM12() + "\n");
-        System.out.print(this.getM20() + ", ");
-        System.out.print(this.getM21() + ", ");
-        System.out.print(this.getM22() + "\n");
-    }
-
-    public boolean equalsMatrix(Matrix3D matrix) {
-        if (this.m00 != matrix.m00) return false;
-        if (this.m01 != matrix.m01) return false;
-        if (this.m02 != matrix.m02) return false;
-        if (this.m10 != matrix.m10) return false;
-        if (this.m11 != matrix.m11) return false;
-        if (this.m12 != matrix.m12) return false;
-        if (this.m20 != matrix.m20) return false;
-        if (this.m21 != matrix.m21) return false;
-        if (this.m22 != matrix.m22) return false;
-
-        return true;
-    }
-
     /**
      * Sets this matrix to identity
      */

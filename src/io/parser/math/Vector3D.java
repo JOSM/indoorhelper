@@ -53,16 +53,10 @@ public class Vector3D {
         return z;
     }
 
-    public void print() {
-        System.out.print(this.getX() + ",");
-        System.out.print(this.getY() + ",");
-        System.out.print(this.getZ() + "\n");
-    }
-
     public boolean equalsVector(Vector3D vec) {
-        if (this.x != vec.x) return false;
-        if (this.y != vec.y) return false;
-        if (this.z != vec.z) return false;
+        if (Math.abs(this.x - vec.x) < .0000001) return false;
+        if (Math.abs(this.y - vec.y) < .0000001) return false;
+        if (Math.abs(this.z - vec.z) < .0000001) return false;
 
         return true;
     }
@@ -143,7 +137,7 @@ public class Vector3D {
         this.z *= scalar;
     }
 
-    public double angleBetween(Vector3D vector){
+    public double angleBetween(Vector3D vector) {
         if (this.equalsVector(vector)) return 0.0;
 
         // check sign - vector order is important for rotation
@@ -155,7 +149,7 @@ public class Vector3D {
         double r;
         if (this.getZ() == 0.0 && vector.getZ() == 0.0) {
             return result2DWithSign;
-        } else{
+        } else {
             ab = this.getX() * vector.getX() + this.getY() * vector.getY() + this.getZ() * vector.getZ();
             a_abs = Math.sqrt(Math.pow(this.getX(), 2.0) + Math.pow(this.getY(), 2.0) + Math.pow(this.getZ(), 2.0));
             b_abs = Math.sqrt(Math.pow(vector.getX(), 2.0) + Math.pow(vector.getY(), 2.0) + Math.pow(vector.getZ(), 2.0));

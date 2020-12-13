@@ -33,11 +33,6 @@ public class Matrix3DTest {
             2, 4, 1,
             2, 1, 0);
 
-    Matrix3D matrix4 = new Matrix3D(
-            0, 1, 2,
-            3, 2, 1,
-            1, 1, 0);
-
     Vector3D matrix1TransformedPoint1 = new Vector3D(86.0, 105.8, 125.123);
 
     @Test

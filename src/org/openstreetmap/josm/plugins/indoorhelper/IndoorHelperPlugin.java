@@ -79,7 +79,9 @@ public class IndoorHelperPlugin extends Plugin implements PaintableInvalidationL
 
             String valDirPath = Config.getDirs().getUserDataDirectory(true) + sep + "styles";
             File valDir = new File(valDirPath);
-            valDir.mkdirs();
+            if(!valDir.mkdirs()){
+                return;
+            }
             outPath = valDir.getAbsolutePath() + sep + resourceName;
 
             try (OutputStream resStreamOut = new FileOutputStream(outPath)) {

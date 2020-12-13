@@ -71,8 +71,9 @@ public class IfcGeometryExtractor {
                 if (shapeDataWithOpeningHandling != null) shapeRep.addAll(shapeDataWithOpeningHandling);
                 else if (shapeData != null) shapeRep.addAll(shapeData);
             } else if (repItemType.equals(CSGRepresentationTypeItems.IfcBooleanResult.name())) {
-                String operator = item.getAttributeValueBN("Operator").toString();
-                if (operator == null) return null;
+                Object operatorObject = item.getAttributeValueBN("Operator");
+                if (operatorObject == null) return null;
+                String operator = operatorObject.toString();
                 ArrayList<Vector3D> shapeData = null;
                 if (operator.equals("." + IfcBooleanOperator.DIFFERENCE + ".")) {
                     shapeData = getIfcBooleanResultGeometry(ifcModel, item, IfcBooleanOperator.DIFFERENCE);

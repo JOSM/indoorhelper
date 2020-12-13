@@ -1,34 +1,6 @@
 // License: AGPL. For details, see LICENSE file.
 package io.parser;
 
-import static io.parser.utils.ParserUtility.prepareDoubleString;
-import static io.parser.utils.ParserUtility.stringVectorToVector3D;
-import static org.openstreetmap.josm.tools.I18n.tr;
-
-import java.awt.GraphicsEnvironment;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Scanner;
-
-import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
-
-import org.openstreetmap.josm.data.Preferences;
-import org.openstreetmap.josm.data.coor.LatLon;
-import org.openstreetmap.josm.data.osm.Node;
-import org.openstreetmap.josm.data.osm.Tag;
-import org.openstreetmap.josm.data.osm.Way;
-import org.openstreetmap.josm.gui.MainApplication;
-import org.openstreetmap.josm.tools.Logging;
-import org.openstreetmap.josm.tools.Pair;
-
 import io.controller.ImportEventListener;
 import io.model.BIMtoOSMCatalog;
 import io.parser.data.BIMDataCollection;
@@ -49,6 +21,31 @@ import io.parser.utils.optimizer.OutputOptimizer;
 import model.TagCatalog;
 import nl.tue.buildingsmart.express.population.EntityInstance;
 import nl.tue.buildingsmart.express.population.ModelPopulation;
+import org.openstreetmap.josm.data.Preferences;
+import org.openstreetmap.josm.data.coor.LatLon;
+import org.openstreetmap.josm.data.osm.Node;
+import org.openstreetmap.josm.data.osm.Tag;
+import org.openstreetmap.josm.data.osm.Way;
+import org.openstreetmap.josm.gui.MainApplication;
+import org.openstreetmap.josm.tools.Logging;
+import org.openstreetmap.josm.tools.Pair;
+
+import javax.swing.*;
+import java.awt.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Scanner;
+
+import static io.parser.utils.ParserUtility.prepareDoubleString;
+import static io.parser.utils.ParserUtility.stringVectorToVector3D;
+import static org.openstreetmap.josm.tools.I18n.tr;
 
 /**
  * Parser for BIM data. Extracts major BIM elements and transforms coordinates into OSM convenient format
@@ -57,23 +54,22 @@ import nl.tue.buildingsmart.express.population.ModelPopulation;
  */
 public class BIMtoOSMParser {
 
-    private final String FLAG_IFC2X3_TC1 = "FILE_SCHEMA(('IFC2X3_TC1'))";
-    private final String FLAG_IFC2X3 = "FILE_SCHEMA(('IFC2X3'))";
-    private final String FLAG_IFC4 = "FILE_SCHEMA(('IFC4'))";
-    private final String IFC2X3_TC1_Schema = "IFC2X3_TC1.exp";
-    private final String IFC4_Schema = "IFC4.exp";
+    private static final String FLAG_IFC2X3_TC1 = "FILE_SCHEMA(('IFC2X3_TC1'))";
+    private static final String FLAG_IFC2X3 = "FILE_SCHEMA(('IFC2X3'))";
+    private static final String FLAG_IFC4 = "FILE_SCHEMA(('IFC4'))";
+    private static final String IFC2X3_TC1_SCHEMA = "IFC2X3_TC1.exp";
+    private static final String IFC4_SCHEMA = "IFC4.exp";
     private final String resourcePathDir;
     private String ifcSchemaFilePath;
 
-    private ImportEventListener importListener;
-    private FileInputStream inputfs = null;
+    private final ImportEventListener importListener;
+    private FileInputStream inputFs = null;
 
     private ModelPopulation ifcModel;
     private final TagCatalog tagCatalog;
-    private IfcUnitCatalog.lengthUnit lengthUnit;
-    private IfcUnitCatalog.planeAngleUnit angleUnit;
+    private IfcUnitCatalog.LengthUnit lengthUnit;
 
-    private final int defaultLevel = 999;
+    private static final int DEFAULT_LEVEL = 999;
 
     // configuration parameters
     private BIMtoOSMUtility.GeometrySolution solutionType;
@@ -93,10 +89,9 @@ public class BIMtoOSMParser {
         } else {
             resourcePathDir = pluginDirectory + "/resources/";
         }
-        ifcSchemaFilePath = resourcePathDir + IFC2X3_TC1_Schema;
+        ifcSchemaFilePath = resourcePathDir + IFC2X3_TC1_SCHEMA;
         tagCatalog = new TagCatalog();
-        lengthUnit = IfcUnitCatalog.lengthUnit.M;
-        angleUnit = IfcUnitCatalog.planeAngleUnit.RAD;
+        lengthUnit = IfcUnitCatalog.LengthUnit.M;
         applyDefaultConfiguration();
     }
 
@@ -177,7 +172,7 @@ public class BIMtoOSMParser {
                 file = new File(filepath);
             }
 
-            inputfs = new FileInputStream(file);
+            inputFs = new FileInputStream(file);
 
             // find used IFC schema
             String usedIfcSchema = chooseSchemaFile(file);
@@ -186,11 +181,11 @@ public class BIMtoOSMParser {
                 return false;
             }
             if (usedIfcSchema.equals(FLAG_IFC4)) {
-                ifcSchemaFilePath = resourcePathDir + IFC4_Schema;
+                ifcSchemaFilePath = resourcePathDir + IFC4_SCHEMA;
             }
 
             // load IFC file data into model
-            ifcModel = new ModelPopulation(inputfs);
+            ifcModel = new ModelPopulation(inputFs);
             ifcModel.setSchemaFile(Paths.get(ifcSchemaFilePath));
             ifcModel.load();
 
@@ -203,9 +198,9 @@ public class BIMtoOSMParser {
             Logging.error(e.getMessage());
             return false;
         } finally {
-            if (inputfs != null) {
+            if (inputFs != null) {
                 try {
-                    inputfs.close();
+                    inputFs.close();
                 } catch (IOException ignored) {
                 }
             }
@@ -275,8 +270,8 @@ public class BIMtoOSMParser {
         List<BIMObject3D> slabs = BIMtoOSMUtility.prepareBIMObjects(ifcModel, solutionType, BIMtoOSMCatalog.BIMObject.IfcSlab, rawBIMData.getAreaObjects());
         List<BIMObject3D> walls = BIMtoOSMUtility.prepareBIMObjects(ifcModel, solutionType, BIMtoOSMCatalog.BIMObject.IfcWall, rawBIMData.getWallObjects());
         List<BIMObject3D> columns = BIMtoOSMUtility.prepareBIMObjects(ifcModel, solutionType, BIMtoOSMCatalog.BIMObject.IfcColumn, rawBIMData.getColumnObjects());
-        List<BIMObject3D> doors = BIMtoOSMUtility.prepareBIMObjects(ifcModel, solutionType, BIMtoOSMCatalog.BIMObject.IfcDoor, rawBIMData.getDoorObjects());
-        List<BIMObject3D> windows = BIMtoOSMUtility.prepareBIMObjects(ifcModel, solutionType, BIMtoOSMCatalog.BIMObject.IfcWindow, rawBIMData.getWindowObjects());
+//        List<BIMObject3D> doors = BIMtoOSMUtility.prepareBIMObjects(ifcModel, solutionType, BIMtoOSMCatalog.BIMObject.IfcDoor, rawBIMData.getDoorObjects());
+//        List<BIMObject3D> windows = BIMtoOSMUtility.prepareBIMObjects(ifcModel, solutionType, BIMtoOSMCatalog.BIMObject.IfcWindow, rawBIMData.getWindowObjects());
         List<BIMObject3D> stairs = BIMtoOSMUtility.prepareBIMObjects(ifcModel, solutionType, BIMtoOSMCatalog.BIMObject.IfcStair, rawBIMData.getStairObjects());
         preparedData.addAll(slabs);
         preparedData.addAll(walls);
@@ -319,7 +314,7 @@ public class BIMtoOSMParser {
             Way w = new Way();
             w.setNodes(tmpNodes);
             getObjectTags(object).forEach(w::put);
-            if (level != defaultLevel) w.put(new Tag("level", Integer.toString(level)));
+            if (level != DEFAULT_LEVEL) w.put(new Tag("level", Integer.toString(level)));
             ways.add(w);
         }
 
@@ -334,7 +329,7 @@ public class BIMtoOSMParser {
      * @return level
      */
     private int getLevelTag(BIMObject3D object, ArrayList<Pair<Double, Integer>> levelIdentifierList) {
-        int level = defaultLevel;
+        int level = DEFAULT_LEVEL;
 
         // get all IfcRelContainedInSpatialStructure elements
         List<EntityInstance> relContainedInSpatialStructureElements = ifcModel.getInstancesOfType("IfcRelContainedInSpatialStructure");
@@ -554,19 +549,13 @@ public class BIMtoOSMParser {
                     if (unitLabel.equals(".METRE.")) {
                         try {
                             String unitPrefix = (String) unit.getAttributeValueBN("Prefix");
-                            if (unitPrefix.equals(".CENTI.")) lengthUnit = IfcUnitCatalog.lengthUnit.CM;
-                            if (unitPrefix.equals(".MILLI.")) lengthUnit = IfcUnitCatalog.lengthUnit.MM;
+                            if (unitPrefix.equals(".CENTI.")) lengthUnit = IfcUnitCatalog.LengthUnit.CM;
+                            if (unitPrefix.equals(".MILLI.")) lengthUnit = IfcUnitCatalog.LengthUnit.MM;
                             break;
                             // TODO handle more prefixes
                         } catch (NullPointerException e) {
                             // do nothing
                         }
-                        break;
-                    }
-                }
-                if (unitType.equals(".PLANEANGLEUNIT.")) {
-                    if (unitLabel.equals(".DEGREE.")) {
-                        angleUnit = IfcUnitCatalog.planeAngleUnit.DEG;
                         break;
                     }
                 }
