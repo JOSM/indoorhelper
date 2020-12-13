@@ -1,3 +1,5 @@
+import com.github.spotbugs.snom.SpotBugsTask
+
 plugins {
   id "java"
   id "eclipse"
@@ -59,4 +61,17 @@ tasks.withType(JavaCompile) {
 	"-Xlint:all",
 	"-Xlint:-serial",
   ]
+}
+
+// Spotbugs config
+spotbugs {
+  toolVersion.set(versions.spotbugs)
+  ignoreFailures.set(true)
+  effort = "max"
+  reportLevel = "low"
+}
+tasks.withType(SpotBugsTask) {
+  reports {
+    html.enabled = true
+  }
 }
