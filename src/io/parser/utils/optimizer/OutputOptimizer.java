@@ -16,19 +16,26 @@ import java.util.List;
  */
 public class OutputOptimizer {
 
-    public static Pair<ArrayList<Node>, ArrayList<Way>> optimize(Pair<ArrayList<Node>, ArrayList<Way>> data) {
+    public static Pair<ArrayList<Node>, ArrayList<Way>> optimize(Configuration config, Pair<ArrayList<Node>, ArrayList<Way>> data) {
         ArrayList<Merge> merges = new ArrayList<>();
 
         // for each node find nodes that can be merged/replaced with/by it.
         OsmMercator mercator = new OsmMercator();
-        data.a.forEach(rootNode -> data.a.forEach(mergeCandidate -> {
+        data.a.forEach(rootNode -> {
             Merge merge = new Merge(rootNode);
-            if (mercator.getDistance(rootNode.lat(), rootNode.lon(), mergeCandidate.lat(), mergeCandidate.lon()) < 0.1) {
-                merge.mergeToRoot.add(mergeCandidate);
+            data.a.forEach(mergeCandidate -> {
+                if (rootNode.getId() != mergeCandidate.getId()
+                        && mercator.getDistance(rootNode.lat(), rootNode.lon(), mergeCandidate.lat(), mergeCandidate.lon()) < config.MERGE_DISTANCE) {
+                    merge.mergeToRoot.add(mergeCandidate);
+                }
+            });
+            if (!merge.mergeToRoot.isEmpty()) {
+                merges.add(merge);
             }
-        }));
+        });
 
         // TODO implement
+
 
         return data;
     }
@@ -40,6 +47,19 @@ public class OutputOptimizer {
         public Merge(Node root) {
             this.root = root;
             mergeToRoot = new ArrayList<>();
+        }
+    }
+
+    /**
+     * Configuration class for output optimization tasks
+     */
+    public static class Configuration {
+        public final boolean MERGE_CLOSE_NODES;
+        public final double MERGE_DISTANCE;
+
+        public Configuration(boolean mergeCloseNodes, double mergeDistance) {
+            MERGE_CLOSE_NODES = mergeCloseNodes;
+            MERGE_DISTANCE = mergeDistance;
         }
     }
 }
