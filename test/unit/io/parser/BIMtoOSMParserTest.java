@@ -2,8 +2,7 @@
 package io.parser;
 
 import org.junit.Test;
-
-import java.io.File;
+import org.openstreetmap.josm.TestUtils;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -22,7 +21,7 @@ public class BIMtoOSMParserTest {
 //    public JOSMTestRules test = new JOSMTestRules().preferences();
 
     String pluginDir = System.getProperty("user.dir");
-    String resourcePathDir = pluginDir + File.separator + "test" + File.separator + "data" + File.separator;
+    String resourcePathDir = TestUtils.getTestDataRoot();
 
     /**
      * Test case for {@link BIMtoOSMParser#parse} method.
