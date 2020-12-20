@@ -102,9 +102,9 @@ public class BIMtoOSMParser {
      */
     private void applyDefaultConfiguration() {
         configure(BIMtoOSMUtility.GeometrySolution.BOUNDING_BOX,
-                new FileOptimizer.Configuration(true),
+                new FileOptimizer.Configuration(false),
                 // default: merge overlapping nodes only (distance < 0.01)
-                new OutputOptimizer.Configuration(true, 0.01));
+                new OutputOptimizer.Configuration(false, 0.01));
     }
 
     /**
@@ -114,35 +114,48 @@ public class BIMtoOSMParser {
      *                             precision of parsed data
      * @param optimizeInputConfig  not null if IFC file should be pre-optimized, else null
      * @param optimizeOutputConfig not null if OSM output should be optimized, else null
+     * @return true if config set successfully, else false
      */
-    public void configure(BIMtoOSMUtility.GeometrySolution solution,
+    public boolean configure(BIMtoOSMUtility.GeometrySolution solution,
                           FileOptimizer.Configuration optimizeInputConfig,
                           OutputOptimizer.Configuration optimizeOutputConfig) {
         if (solution == null) {
             Logging.info(BIMtoOSMParser.class.getName()
                     + ": Failed to set parser configuration. Solution equals null!");
-            return;
+            return false;
         }
+        if(optimizeInputConfig == null){
+            Logging.info(BIMtoOSMParser.class.getName()
+                    + ": Failed to set parser configuration. optimizeInputConfig equals null!");
+            return false;
+        }
+        if(optimizeOutputConfig == null){
+            Logging.info(BIMtoOSMParser.class.getName()
+                    + ": Failed to set parser configuration. optimizeOutputConfig equals null!");
+            return false;
+        }
+
         solutionType = solution;
         Logging.info(String.format("%s-ConfigurationReport: solution set to %s",
                 BIMtoOSMParser.class.getName(), solutionType.name()));
 
-        if (optimizeInputConfig != null) {
-            optimizeInputFile = true;
-            this.optimizeInputConfig = optimizeInputConfig;
-            Logging.info(String.format("%s-ConfigurationReport: optimizeInputFile enabled; RemoveBlockCommands %s",
-                    BIMtoOSMParser.class.getName(),
-                    optimizeInputConfig.REMOVE_BLOCK_COMMENTS ? "enabled" : "disabled"));
-        }
-        if (optimizeOutputConfig != null) {
-            optimizeOutput = true;
-            this.optimizeOutputConfig = optimizeOutputConfig;
-            Logging.info(String.format("%s-ConfigurationReport: optimizeOutput enabled; MergeCloseNodes %s; " +
-                            "MergeDistance set to %f",
-                    BIMtoOSMParser.class.getName(),
-                    optimizeOutputConfig.MERGE_CLOSE_NODES ? "enabled" : "disabled",
-                    optimizeOutputConfig.MERGE_DISTANCE));
-        }
+        optimizeInputFile = optimizeInputConfig.REMOVE_BLOCK_COMMENTS;
+        this.optimizeInputConfig = optimizeInputConfig;
+        Logging.info(String.format("%s-ConfigurationReport: optimizeInputFile %s; RemoveBlockCommands %s",
+                BIMtoOSMParser.class.getName(),
+                optimizeInputConfig.REMOVE_BLOCK_COMMENTS ? "enabled" : "disabled",
+                optimizeInputConfig.REMOVE_BLOCK_COMMENTS ? "enabled" : "disabled"));
+
+        optimizeOutput = optimizeOutputConfig.MERGE_CLOSE_NODES;
+        this.optimizeOutputConfig = optimizeOutputConfig;
+        Logging.info(String.format("%s-ConfigurationReport: optimizeOutput %s; MergeCloseNodes %s; " +
+                        "MergeDistance set to %.2f m",
+                BIMtoOSMParser.class.getName(),
+                optimizeOutputConfig.MERGE_CLOSE_NODES ? "enabled" : "disabled",
+                optimizeOutputConfig.MERGE_CLOSE_NODES ? "enabled" : "disabled",
+                optimizeOutputConfig.MERGE_CLOSE_NODES ? optimizeOutputConfig.MERGE_DISTANCE : -999));
+
+        return true;
     }
 
     /**
@@ -168,9 +181,9 @@ public class BIMtoOSMParser {
 
         Pair<ArrayList<Node>, ArrayList<Way>> packedOSMData = packIntoOSMData(preparedData);
         // disable until the implementation has finished
-//        if (optimizeOutput) {
-//            packedOSMData = OutputOptimizer.optimize(optimizeOutputConfig, packedOSMData);
-//        }
+        if (optimizeOutput) {
+            packedOSMData = OutputOptimizer.optimize(optimizeOutputConfig, packedOSMData);
+        }
         ArrayList<Node> nodes = packedOSMData.a;
         ArrayList<Way> ways = packedOSMData.b;
 
@@ -206,7 +219,7 @@ public class BIMtoOSMParser {
             // find used IFC schema
             String usedIfcSchema = chooseSchemaFile(file);
             if (usedIfcSchema.isEmpty()) {
-                showLoadingErrorView(filepath, "Could not load IFC file.\nIFC schema is no supported.");
+                showLoadingErrorView(filepath, "Could not load IFC file.\nIFC schema is not supported.");
                 return false;
             }
             if (usedIfcSchema.equals(FLAG_IFC4)) {
@@ -653,7 +666,7 @@ public class BIMtoOSMParser {
      * @param msg Error message
      */
     private void showErrorView(String msg) {
-        Logging.error(msg);
+        Logging.error(msg.replaceAll("\n", " "));
         if (!GraphicsEnvironment.isHeadless()) {
             SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(MainApplication.getMainFrame(),
                     msg,
