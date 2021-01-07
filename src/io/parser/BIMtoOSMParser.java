@@ -102,9 +102,9 @@ public class BIMtoOSMParser {
      */
     private void applyDefaultConfiguration() {
         configure(BIMtoOSMUtility.GeometrySolution.BOUNDING_BOX,
-                new FileOptimizer.Configuration(false),
+                new FileOptimizer.Configuration(true),
                 // default: merge overlapping nodes only (distance < 0.01)
-                new OutputOptimizer.Configuration(false, 0.01));
+                new OutputOptimizer.Configuration(true, 0.01));
     }
 
     /**
@@ -117,19 +117,19 @@ public class BIMtoOSMParser {
      * @return true if config set successfully, else false
      */
     public boolean configure(BIMtoOSMUtility.GeometrySolution solution,
-                          FileOptimizer.Configuration optimizeInputConfig,
-                          OutputOptimizer.Configuration optimizeOutputConfig) {
+                             FileOptimizer.Configuration optimizeInputConfig,
+                             OutputOptimizer.Configuration optimizeOutputConfig) {
         if (solution == null) {
             Logging.info(BIMtoOSMParser.class.getName()
                     + ": Failed to set parser configuration. Solution equals null!");
             return false;
         }
-        if(optimizeInputConfig == null){
+        if (optimizeInputConfig == null) {
             Logging.info(BIMtoOSMParser.class.getName()
                     + ": Failed to set parser configuration. optimizeInputConfig equals null!");
             return false;
         }
-        if(optimizeOutputConfig == null){
+        if (optimizeOutputConfig == null) {
             Logging.info(BIMtoOSMParser.class.getName()
                     + ": Failed to set parser configuration. optimizeOutputConfig equals null!");
             return false;
