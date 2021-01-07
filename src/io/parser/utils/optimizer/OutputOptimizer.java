@@ -3,13 +3,12 @@ package io.parser.utils.optimizer;
 
 import io.parser.utils.ParserUtility;
 import org.openstreetmap.gui.jmapviewer.OsmMercator;
+import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.Node;
-import org.openstreetmap.josm.data.osm.Way;
-import org.openstreetmap.josm.tools.Pair;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Class optimizing OSM data to avoid unnecessary nodes/ways in data set
@@ -20,46 +19,49 @@ public class OutputOptimizer {
 
     /**
      * Method optimizes the osm data following the set configurations
+     *
      * @param config describes the optimization
-     * @param data to optimize
-     * @return optimized data
+     * @param ds     to optimize
      */
-    public static Pair<ArrayList<Node>, ArrayList<Way>> optimize(Configuration config, Pair<ArrayList<Node>, ArrayList<Way>> data) {
-        ArrayList<Node> nodes = data.a;
-        ArrayList<Way> ways = data.b;
+    public static void optimize(Configuration config, DataSet ds) {
+        // if merge close nodes enabled
+        if (config.MERGE_CLOSE_NODES) {
+            // for each node find merch candidates
+            ArrayList<Merge> merges = findMerges(ds, config.MERGE_DISTANCE);
+            Collections.reverse(merges);
 
-        Pair<ArrayList<Node>, ArrayList<Way>> optimizedData = data;
+            // merge candidates to target
+            ArrayList<Integer> levels = ParserUtility.getLevelList(ds);
+            levels.forEach(level -> mergeData(merges, ds, level));
+        }
+    }
 
-        if(config.MERGE_CLOSE_NODES){
-            // for each node find nodes that can be merged with it
-            ArrayList<Merge> merges = findMerges(data, config.MERGE_DISTANCE);
+    /**
+     * Method merges nodes in data set following the mergeLayout.
+     * This method only merges data on defined level.
+     * @param mergeLayout holding information about merge targets and candidates
+     * @param ds data set to merge data in
+     * @param level only consider data with this level tag
+     */
+    private static void mergeData(ArrayList<Merge> mergeLayout, DataSet ds, int level) {
+        mergeLayout.forEach(target -> {
+            Node dsTarget = (Node) ds.getPrimitiveById(target.target.getPrimitiveId());
+            if (ParserUtility.getLevelTag(dsTarget) != level) return;
 
-            // create deep copy of data
-            ArrayList<Node> nodesCopy = (ArrayList<Node>) ParserUtility.deepCopyNodeList(nodes);
-            ArrayList<Way> waysCopy = (ArrayList<Way>) ParserUtility.deepCopyWayList(ways);
-
-            // merge data
-            merges.forEach(merge -> {
-                nodes.forEach(node -> {
-                    if (merge.mergeToRoot.contains(node)) {
-                        AtomicInteger i = new AtomicInteger();
-                        ways.forEach(way -> {
-                            if (way.containsNode(node)) {
-                                // replace all merged nodes in way by merge.root
-                                mergeNodesInWay(waysCopy.get(i.get()), node, merge.root);
-                            }
-                            i.getAndIncrement();
-                        });
-                        // merge nodes, delete node from nodes list
-                        nodesCopy.remove(node);
+            target.mergeToTarget.forEach(candidate -> {
+                Node dsCandidate = (Node) ds.getPrimitiveById(candidate.getPrimitiveId());
+                if (ParserUtility.getLevelTag(dsCandidate) != level) return;
+                // find way containing dsCandidate and replace node
+                dsCandidate.getParentWays().forEach(way ->{
+                    while (way.containsNode(dsCandidate)) {
+                        way.addNode(way.getNodes().indexOf(dsCandidate), dsTarget);
+                        way.removeNode(dsCandidate);
                     }
                 });
+                ds.removePrimitive(dsCandidate);
             });
 
-            optimizedData = new Pair<>(nodesCopy, waysCopy);
-        }
-
-        return optimizedData;
+        });
     }
 
     /**
@@ -68,54 +70,40 @@ public class OutputOptimizer {
      * be merged to root node will be decided by the distance between root and node which needs to be
      * smaller than the param mergeDistance.
      *
-     * @param data          to find merges in
+     * @param ds            data set to find merges in
      * @param mergeDistance max. distance between nodes so that the nodes can be merged
      * @return Set of merges
      */
-    private static ArrayList<Merge> findMerges(Pair<ArrayList<Node>, ArrayList<Way>> data, double mergeDistance) {
+    private static ArrayList<Merge> findMerges(DataSet ds, double mergeDistance) {
         ArrayList<Merge> merges = new ArrayList<>();
         OsmMercator mercator = new OsmMercator();
+        ArrayList<Node> nodes = new ArrayList<>(ds.getNodes());
 
-        for (int i = 0; i < data.a.size(); ++i) {
-            Node rootNode = data.a.get(i);
-            Merge merge = new Merge(rootNode);
+        for (int i = 0; i < nodes.size(); ++i) {
+            Node targetNode = nodes.get(i);
+            Merge merge = new Merge(targetNode);
 
-            for (int j = i + 1; j < data.a.size(); ++j) {
-                Node mergeCandidate = data.a.get(j);
-                if (mercator.getDistance(rootNode.lat(), rootNode.lon(), mergeCandidate.lat(), mergeCandidate.lon()) < mergeDistance) {
-                    merge.mergeToRoot.add(mergeCandidate);
+            for (int j = i + 1; j < nodes.size(); ++j) {
+                Node mergeCandidate = nodes.get(j);
+                if (mercator.getDistance(targetNode.lat(), targetNode.lon(), mergeCandidate.lat(), mergeCandidate.lon()) < mergeDistance) {
+                    merge.mergeToTarget.add(mergeCandidate);
                 }
             }
 
-            if (!merge.mergeToRoot.isEmpty()) {
+            if (!merge.mergeToTarget.isEmpty()) {
                 merges.add(merge);
             }
         }
         return merges;
     }
 
-    /**
-     * Method replaces all nodes with coordinates equal to nodeToMerge by mergeRoot
-     *
-     * @param way         to merge nodes in
-     * @param nodeToMerge coordinates equals nodes to merge
-     * @param mergeRoot   node to use as merge root
-     */
-    private static void mergeNodesInWay(Way way, Node nodeToMerge, Node mergeRoot) {
-        way.getNodes().forEach(n -> {
-            if (n.getCoor().equalsEpsilon(nodeToMerge.getCoor())) {
-                n.cloneFrom(mergeRoot);
-            }
-        });
-    }
-
     private static class Merge {
-        public final Node root;
-        public final List<Node> mergeToRoot;
+        public final Node target;
+        public final List<Node> mergeToTarget;
 
         public Merge(Node root) {
-            this.root = root;
-            mergeToRoot = new ArrayList<>();
+            target = root;
+            mergeToTarget = new ArrayList<>();
         }
     }
 

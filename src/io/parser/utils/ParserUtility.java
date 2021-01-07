@@ -2,11 +2,12 @@
 package io.parser.utils;
 
 import io.parser.math.Vector3D;
+import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.Node;
-import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.tools.Logging;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -61,30 +62,49 @@ public class ParserUtility {
     }
 
     /**
-     * Returns a deep copy of the node list
-     * @param listToCopy to create copy of
-     * @return deep copy list
+     * Get level list of data set
+     *
+     * @param ds data set
+     * @return Level list as {@link ArrayList <Integer>}
      */
-    public static List<Node> deepCopyNodeList(List<Node> listToCopy){
-        ArrayList<Node> nodesCopy = new ArrayList<>();
-        listToCopy.forEach(n -> nodesCopy.add(new Node(n)));
-        return nodesCopy;
+    public static ArrayList<Integer> getLevelList(DataSet ds) {
+        ArrayList<Integer> l = new ArrayList<>();
+
+        // TODO optimize this to avoid running thru all nodes and ways
+        ds.getNodes().forEach(node -> {
+            try {
+                int level = Integer.parseInt(node.get("level"));
+                if (!l.contains(level)) l.add(level);
+            } catch (NumberFormatException e) {
+                // do nothing
+            }
+        });
+        ds.getWays().forEach(way -> {
+            try {
+                int level = Integer.parseInt(way.get("level"));
+                if (!l.contains(level)) l.add(level);
+            } catch (NumberFormatException e) {
+                // do nothing
+            }
+        });
+        Collections.sort(l);
+        return l;
     }
 
     /**
-     * Returns a deep copy of the ways list
-     * @param listToCopy to create copy of
-     * @return deep copy list
+     * Get level tag of node. Search in node tags and in tags of ways including the node
+     * @param node to get level tag
+     * @return level tag or default value -99
      */
-    public static List<Way> deepCopyWayList(List<Way> listToCopy){
-        ArrayList<Way> waysCopy = new ArrayList<>();
-        listToCopy.forEach(w -> {
-            Way nW = new Way();
-            nW.setOsmId(w.getId(), w.getVersion());
-            w.getNodes().forEach(n -> nW.addNode(new Node(n)));
-            waysCopy.add(nW);
-        });
-        return waysCopy;
+    public static int getLevelTag(Node node){
+        if(node == null)    return -99;
+        if(node.get("level") != null){
+            return Integer.parseInt(node.get("level"));
+        }
+        if(!node.getParentWays().isEmpty()){
+            return Integer.parseInt(node.getParentWays().get(0).get("level"));
+        }
+        return -99;
     }
 
 }
