@@ -1,10 +1,7 @@
 // License: AGPL. For details, see LICENSE file.
 package io.model;
 
-import java.util.ArrayList;
-
-import org.openstreetmap.josm.data.osm.Node;
-import org.openstreetmap.josm.data.osm.Way;
+import org.openstreetmap.josm.data.osm.DataSet;
 
 /**
  * Import data model class holding imported data
@@ -13,30 +10,14 @@ import org.openstreetmap.josm.data.osm.Way;
  */
 public class ImportDataModel {
 
-    private ArrayList<Way> ways;
-    private ArrayList<Node> nodes;
+    private DataSet ds;
 
-    public void setImportData(ArrayList<Way> ways, ArrayList<Node> nodes) {
-        this.setWays(ways);
-        this.setNodes(nodes);
+    public void setImportData(DataSet data) {
+        ds = data;
     }
 
-    public ArrayList<Way> getWays() {
-        if (ways.isEmpty()) return new ArrayList<>();
-        return ways;
-    }
-
-    public void setWays(ArrayList<Way> ways) {
-        this.ways = ways;
-    }
-
-    public ArrayList<Node> getNodes() {
-        if (nodes.isEmpty()) return new ArrayList<>();
-        return nodes;
-    }
-
-    public void setNodes(ArrayList<Node> nodes) {
-        this.nodes = nodes;
+    public DataSet getData(){
+        return ds;
     }
 
 

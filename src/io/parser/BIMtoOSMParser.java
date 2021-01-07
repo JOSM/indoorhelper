@@ -23,6 +23,7 @@ import nl.tue.buildingsmart.express.population.EntityInstance;
 import nl.tue.buildingsmart.express.population.ModelPopulation;
 import org.openstreetmap.josm.data.Preferences;
 import org.openstreetmap.josm.data.coor.LatLon;
+import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.Tag;
 import org.openstreetmap.josm.data.osm.Way;
@@ -166,6 +167,7 @@ public class BIMtoOSMParser {
     public boolean parse(String filepath) {
         if (!loadFile(filepath)) return false;
 
+        // get osm relevant data
         BIMDataCollection rawFilteredData = BIMtoOSMUtility.extractMajorBIMData(ifcModel);
 
         if (!checkForIFCSITE(rawFilteredData)) {
@@ -173,26 +175,29 @@ public class BIMtoOSMParser {
             return false;
         }
 
+        // transform osm relevant data into BIMObject3D
         ArrayList<BIMObject3D> preparedData = (ArrayList<BIMObject3D>) transformRawBIMData(rawFilteredData);
         setUnits();
 
+        // extract origin ll of building
         LatLon llBuildingOrigin = getLatLonBuildingOrigin(rawFilteredData.getIfcSite());
+
+        // transform BIMObject3D coordinates
         transformToGeodetic(llBuildingOrigin, preparedData);
 
-        Pair<ArrayList<Node>, ArrayList<Way>> packedOSMData = packIntoOSMData(preparedData);
-        // disable until the implementation has finished
+        // pack parsed data into osm format
+        DataSet packedOSMData = packIntoOSMData(preparedData);
         if (optimizeOutput) {
-            packedOSMData = OutputOptimizer.optimize(optimizeOutputConfig, packedOSMData);
+            OutputOptimizer.optimize(optimizeOutputConfig, packedOSMData);
         }
-        ArrayList<Node> nodes = packedOSMData.a;
-        ArrayList<Way> ways = packedOSMData.b;
 
         if (preparedData.size() != rawFilteredData.getSize()) {
             showParsingErrorView(filepath, "Caution!\nImported data might include errors!", false);
         }
 
+        // trigger rendering
         if (importListener != null) {
-            importListener.onDataParsed(ways, nodes);
+            importListener.onDataParsed(packedOSMData);
         }
         Logging.info(this.getClass().getName() + ": " + filepath + " parsed successfully");
         return true;
@@ -244,6 +249,7 @@ public class BIMtoOSMParser {
                 try {
                     inputFs.close();
                 } catch (IOException ignored) {
+                    // do nothing
                 }
             }
         }
@@ -328,9 +334,9 @@ public class BIMtoOSMParser {
      * Method packs prepared BIM data into OSM ways and nodes
      *
      * @param preparedBIMData to transform to OSM data
-     * @return packed data
+     * @return packed data as {@link DataSet}
      */
-    private Pair<ArrayList<Node>, ArrayList<Way>> packIntoOSMData(ArrayList<BIMObject3D> preparedBIMData) {
+    private DataSet packIntoOSMData(ArrayList<BIMObject3D> preparedBIMData) {
         ArrayList<Way> ways = new ArrayList<>();
         ArrayList<Node> nodes = new ArrayList<>();
         ArrayList<Pair<Double, Integer>> levelIdentifier = extractAndIdentifyLevels();
@@ -360,7 +366,10 @@ public class BIMtoOSMParser {
             ways.add(w);
         }
 
-        return new Pair<>(nodes, ways);
+        DataSet ds = new DataSet();
+        nodes.forEach(ds::addPrimitive);
+        ways.forEach(ds::addPrimitive);
+        return ds;
     }
 
     /**
