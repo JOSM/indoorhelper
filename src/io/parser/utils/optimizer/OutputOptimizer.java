@@ -5,6 +5,7 @@ import io.parser.utils.ParserUtility;
 import org.openstreetmap.gui.jmapviewer.OsmMercator;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.Node;
+import org.openstreetmap.josm.tools.Logging;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,19 +30,25 @@ public class OutputOptimizer {
             // for each node find merch candidates
             ArrayList<Merge> merges = findMerges(ds, config.MERGE_DISTANCE);
             Collections.reverse(merges);
+            int preCount = ds.getNodes().size() + ds.getWays().size();
 
             // merge candidates to target
             ArrayList<Integer> levels = ParserUtility.getLevelList(ds);
             levels.forEach(level -> mergeData(merges, ds, level));
+
+            Logging.info(String.format("%s-OutputOptimizerReport: OSM primitives reduced by factor %.2f",
+                    OutputOptimizer.class.getName(),
+                    1.0-((double)(ds.getNodes().size() + ds.getWays().size()) / preCount)));
         }
     }
 
     /**
      * Method merges nodes in data set following the mergeLayout.
      * This method only merges data on defined level.
+     *
      * @param mergeLayout holding information about merge targets and candidates
-     * @param ds data set to merge data in
-     * @param level only consider data with this level tag
+     * @param ds          data set to merge data in
+     * @param level       only consider data with this level tag
      */
     private static void mergeData(ArrayList<Merge> mergeLayout, DataSet ds, int level) {
         mergeLayout.forEach(target -> {
@@ -52,7 +59,7 @@ public class OutputOptimizer {
                 Node dsCandidate = (Node) ds.getPrimitiveById(candidate.getPrimitiveId());
                 if (ParserUtility.getLevelTag(dsCandidate) != level) return;
                 // find way containing dsCandidate and replace node
-                dsCandidate.getParentWays().forEach(way ->{
+                dsCandidate.getParentWays().forEach(way -> {
                     while (way.containsNode(dsCandidate)) {
                         way.addNode(way.getNodes().indexOf(dsCandidate), dsTarget);
                         way.removeNode(dsCandidate);
