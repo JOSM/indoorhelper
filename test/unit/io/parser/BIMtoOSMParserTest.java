@@ -38,9 +38,9 @@ public class BIMtoOSMParserTest {
 //        assertParseTrue("test1_IFC4.ifc");
 //        assertParseTrue("test2_IFC4.ifc");
 
-        // Pre-Optimize test
-        assertParseTrue("test1_IFC2X3_TC1_with_blockcomments.ifc");
-        assertParseFalse("test2_IFC2X3_TC1_with_blockcomments.ifc");
+        // Pre-Optimize test - files with block comments (_BC)
+        assertParseTrue("test1_IFC2X3_TC1_BC.ifc");
+        assertParseFalse("test2_IFC2X3_TC1_BC.ifc");
 
         // Cannot load because of missing IFCSITE element
         assertParseFalse("test3_IFC4.ifc");
