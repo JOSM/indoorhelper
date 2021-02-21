@@ -1,6 +1,7 @@
 // License: AGPL. For details, see LICENSE file.
 package io.parser;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.jupiter.api.Disabled;
 import org.openstreetmap.josm.TestUtils;
@@ -13,6 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @author rebsc
  */
+@Ignore("Causes unexpected error in Jenkins build")
 @Disabled("Causes unexpected error in Jenkins build\n")
 public class BIMtoOSMParserTest {
 
