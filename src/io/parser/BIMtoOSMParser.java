@@ -171,18 +171,16 @@ public class BIMtoOSMParser {
         BIMDataCollection rawFilteredData = BIMtoOSMUtility.extractMajorBIMData(ifcModel);
 
         if (!checkForIFCSITE(rawFilteredData)) {
-            showParsingErrorView(filepath, "Could not import IFC file.\nIFC file does not contains IFCSITE element.", true);
+            showParsingErrorView(filepath, "Could not import IFC file.\nIFC file does not contain IFCSITE element.", true);
             return false;
         }
 
         // transform osm relevant data into BIMObject3D
-        ArrayList<BIMObject3D> preparedData = (ArrayList<BIMObject3D>) transformRawBIMData(rawFilteredData);
+        ArrayList<BIMObject3D> preparedData = (ArrayList<BIMObject3D>) transformToBIMData(rawFilteredData);
+
+        // transform building coordinates to WCS
         setUnits();
-
-        // extract origin ll of building
         LatLon llBuildingOrigin = getLatLonBuildingOrigin(rawFilteredData.getIfcSite());
-
-        // transform BIMObject3D coordinates
         transformToGeodetic(llBuildingOrigin, preparedData);
 
         // pack parsed data into osm format
@@ -313,7 +311,7 @@ public class BIMtoOSMParser {
      * @param rawBIMData to transform
      * @return transformed data for rendering
      */
-    private List<BIMObject3D> transformRawBIMData(BIMDataCollection rawBIMData) {
+    private List<BIMObject3D> transformToBIMData(BIMDataCollection rawBIMData) {
         List<BIMObject3D> transformedData = new ArrayList<>();
         List<BIMObject3D> slabs = BIMtoOSMUtility.transformBIMObjects(ifcModel, solutionType, BIMtoOSMCatalog.BIMObject.IfcSlab, rawBIMData.getAreaObjects());
         List<BIMObject3D> walls = BIMtoOSMUtility.transformBIMObjects(ifcModel, solutionType, BIMtoOSMCatalog.BIMObject.IfcWall, rawBIMData.getWallObjects());
