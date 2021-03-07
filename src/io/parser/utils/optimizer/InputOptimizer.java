@@ -8,14 +8,14 @@ import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
 /**
- * Class holding methods to pre-optimize files before loading them
+ * Class holding methods to pre-optimize IFC files before loading them
  *
  * @author rebsc
  */
-public class FileOptimizer {
+public class InputOptimizer {
 
     /**
-     * Optimizes an ifc file following the given config parameters.
+     * Optimizes an ifc file following the given config parameters
      *
      * @param ifcFilepath to file to optimize
      * @return optimized file as {@link File}
@@ -26,7 +26,7 @@ public class FileOptimizer {
         File tempFile = File.createTempFile(getFileName(ifcFilepath) + "_optimized", ".ifc");
         tempFile.deleteOnExit();
 
-        if(config.REMOVE_BLOCK_COMMENTS){
+        if (config.REMOVE_BLOCK_COMMENTS) {
             StringBuilder optimizedInput = new StringBuilder("");
             try {
                 File file = new File(ifcFilepath);

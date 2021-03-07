@@ -16,7 +16,7 @@ import io.parser.math.Vector3D;
 import io.parser.utils.ifc.BIMtoOSMUtility;
 import io.parser.utils.ifc.IfcGeometryExtractor;
 import io.parser.utils.ifc.IfcObjectIdentifier;
-import io.parser.utils.optimizer.FileOptimizer;
+import io.parser.utils.optimizer.InputOptimizer;
 import io.parser.utils.optimizer.OutputOptimizer;
 import model.TagCatalog;
 import nl.tue.buildingsmart.express.population.EntityInstance;
@@ -75,7 +75,7 @@ public class BIMtoOSMParser {
     // configuration parameters
     private BIMtoOSMUtility.GeometrySolution solutionType;
     private boolean optimizeInputFile;
-    private FileOptimizer.Configuration optimizeInputConfig;
+    private InputOptimizer.Configuration optimizeInputConfig;
     private boolean optimizeOutput;
     private OutputOptimizer.Configuration optimizeOutputConfig;
 
@@ -103,7 +103,7 @@ public class BIMtoOSMParser {
      */
     private void applyDefaultConfiguration() {
         configure(BIMtoOSMUtility.GeometrySolution.BOUNDING_BOX,
-                new FileOptimizer.Configuration(true),
+                new InputOptimizer.Configuration(true),
                 // default: merge overlapping nodes only (distance < 0.01)
                 new OutputOptimizer.Configuration(true, 0.01));
     }
@@ -118,7 +118,7 @@ public class BIMtoOSMParser {
      * @return true if config set successfully, else false
      */
     public boolean configure(BIMtoOSMUtility.GeometrySolution solution,
-                             FileOptimizer.Configuration optimizeInputConfig,
+                             InputOptimizer.Configuration optimizeInputConfig,
                              OutputOptimizer.Configuration optimizeOutputConfig) {
         if (solution == null) {
             Logging.info(BIMtoOSMParser.class.getName()
@@ -212,7 +212,7 @@ public class BIMtoOSMParser {
             // pre-optimize and load IFC file
             File file;
             if (optimizeInputFile) {
-                file = FileOptimizer.optimizeIfcFile(optimizeInputConfig, filepath);
+                file = InputOptimizer.optimizeIfcFile(optimizeInputConfig, filepath);
             } else {
                 file = new File(filepath);
             }
