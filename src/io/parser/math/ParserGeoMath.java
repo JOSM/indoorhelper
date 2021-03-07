@@ -59,4 +59,22 @@ public class ParserGeoMath {
         return degrees + (minutes / 60.0) + (seconds / 3600.0);
     }
 
+    /**
+     * Method calculates distance between latlon in meter
+     * @param lat1 first point latitude
+     * @param lon1 first point longitude
+     * @param lat2 second point latitude
+     * @param lon2 second point longitude
+     * @return distance in meter
+     */
+    public static double getDistance(double lat1, double lon1, double lat2, double lon2) {
+        double dLat = Math.toRadians(lat2 - lat1);  // deg2rad below
+        double dLon = Math.toRadians(lon2 - lon1);
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return (OsmMercator.EARTH_RADIUS * c)*1e3;
+    }
+
 }

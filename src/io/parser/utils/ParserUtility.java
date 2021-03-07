@@ -4,6 +4,7 @@ package io.parser.utils;
 import io.parser.math.Vector3D;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.Node;
+import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.tools.Logging;
 
 import java.util.ArrayList;
@@ -94,17 +95,30 @@ public class ParserUtility {
     /**
      * Get level tag of node. Search in node tags and in tags of ways including the node
      * @param node to get level tag
-     * @return level tag or default value -99
+     * @return level tag or null
      */
-    public static int getLevelTag(Node node){
-        if(node == null)    return -99;
+    public static Number getLevelTag(Node node){
+        if(node == null)    return null;
         if(node.get("level") != null){
             return Integer.parseInt(node.get("level"));
         }
         if(!node.getParentWays().isEmpty()){
             return Integer.parseInt(node.getParentWays().get(0).get("level"));
         }
-        return -99;
+        return null;
+    }
+
+    /**
+     * Checks if both nodes are part of the same way
+     * @param node1 to check
+     * @param node2 to check
+     * @return true if both nodes are part of the same way, else false
+     */
+    public static boolean nodesPartOfSameWay(Node node1, Node node2){
+        for (Way way : node1.getParentWays()) {
+            if(way.containsNode(node2)) return true;
+        }
+        return false;
     }
 
 }

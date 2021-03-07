@@ -1,8 +1,8 @@
 // License: AGPL. For details, see LICENSE file.
 package io.parser.utils.optimizer;
 
+import io.parser.math.ParserGeoMath;
 import io.parser.utils.ParserUtility;
-import org.openstreetmap.gui.jmapviewer.OsmMercator;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.tools.Logging;
@@ -27,90 +27,110 @@ public class OutputOptimizer {
     public static void optimize(Configuration config, DataSet ds) {
         // if merge close nodes enabled
         if (config.MERGE_CLOSE_NODES) {
-            // for each node find merch candidates
-            ArrayList<Merge> merges = findMerges(ds, config.MERGE_DISTANCE);
-            Collections.reverse(merges);
             int preCount = ds.getNodes().size() + ds.getWays().size();
 
-            // merge candidates to target
+            // for each level merge possible nodes
             ArrayList<Integer> levels = ParserUtility.getLevelList(ds);
-            levels.forEach(level -> mergeData(merges, ds, level));
+            for (Integer level : levels) {
+                ArrayList<Merge> merges = findMerges(ds, config.MERGE_DISTANCE, level);
+                mergeData(merges, ds);
+            }
 
             Logging.info(String.format("%s-OutputOptimizerReport: OSM primitives reduced by factor %.2f",
                     OutputOptimizer.class.getName(),
-                    1.0-((double)(ds.getNodes().size() + ds.getWays().size()) / preCount)));
+                    1.0 - ((double) (ds.getNodes().size() + ds.getWays().size()) / preCount)));
         }
     }
 
     /**
      * Method merges nodes in data set following the mergeLayout.
-     * This method only merges data on defined level.
      *
      * @param mergeLayout holding information about merge targets and candidates
      * @param ds          data set to merge data in
-     * @param level       only consider data with this level tag
      */
-    private static void mergeData(ArrayList<Merge> mergeLayout, DataSet ds, int level) {
-        mergeLayout.forEach(target -> {
-            Node dsTarget = (Node) ds.getPrimitiveById(target.target.getPrimitiveId());
-            if (ParserUtility.getLevelTag(dsTarget) != level) return;
+    private static void mergeData(ArrayList<Merge> mergeLayout, DataSet ds) {
+        Collections.reverse(mergeLayout);
 
-            target.mergeToTarget.forEach(candidate -> {
+        for (Merge target : mergeLayout) {
+            Node dsTarget = (Node) ds.getPrimitiveById(target.target.getPrimitiveId());
+
+            for (Node candidate : target.mergeCandidates) {
                 Node dsCandidate = (Node) ds.getPrimitiveById(candidate.getPrimitiveId());
-                if (ParserUtility.getLevelTag(dsCandidate) != level) return;
-                // find way containing dsCandidate and replace node
+                if (dsCandidate == null) {
+                    //TODO Improve the merge to avoid this!
+                    Logging.info(String.format("%s-OutputOptimizerReport: Merge candidate is NULL, this should not happen!",
+                            OutputOptimizer.class.getName()));
+                    continue;
+                }
+                // replace nodes in parent ways
                 dsCandidate.getParentWays().forEach(way -> {
                     while (way.containsNode(dsCandidate)) {
                         way.addNode(way.getNodes().indexOf(dsCandidate), dsTarget);
                         way.removeNode(dsCandidate);
                     }
                 });
+                // remove primitive
                 ds.removePrimitive(dsCandidate);
-            });
+            }
+        }
 
-        });
+        Collections.reverse(mergeLayout);
     }
 
     /**
-     * Creates for each node a {@link Merge} object holding the node as root and
-     * other nodes in data which can be merged to root in mergeToRoot. If a node in data can
-     * be merged to root node will be decided by the distance between root and node which needs to be
-     * smaller than the param mergeDistance.
+     * This method creates a {@link Merge} object for each node in dataset on defined level.
+     * The {@link Merge} object holds the node as target and a list of other nodes (tagged with the same level tag)
+     * as merge candidates. Whether a node is a merge candidate or not will be determined by the distance between
+     * target and node which needs to be smaller than the mergeDistance.
+     * If a target has no merge candidates it will not be included in the returned list.
      *
      * @param ds            data set to find merges in
-     * @param mergeDistance max. distance between nodes so that the nodes can be merged
+     * @param mergeDistance distance between nodes so that the nodes can be merged
+     * @param level         only object with this level tag will be considered
      * @return Set of merges
      */
-    private static ArrayList<Merge> findMerges(DataSet ds, double mergeDistance) {
+    private static ArrayList<Merge> findMerges(DataSet ds, double mergeDistance, int level) {
         ArrayList<Merge> merges = new ArrayList<>();
-        OsmMercator mercator = new OsmMercator();
         ArrayList<Node> nodes = new ArrayList<>(ds.getNodes());
 
         for (int i = 0; i < nodes.size(); ++i) {
             Node targetNode = nodes.get(i);
+            // skip if node is part of another or none level
+            Number targetLevel = ParserUtility.getLevelTag(targetNode);
+            if (targetLevel == null || (int) targetLevel != level) continue;
             Merge merge = new Merge(targetNode);
 
             for (int j = i + 1; j < nodes.size(); ++j) {
                 Node mergeCandidate = nodes.get(j);
-                if (mercator.getDistance(targetNode.lat(), targetNode.lon(), mergeCandidate.lat(), mergeCandidate.lon()) < mergeDistance) {
-                    merge.mergeToTarget.add(mergeCandidate);
+                // skip if node is part of another or none level
+                Number candidateLevel = ParserUtility.getLevelTag(mergeCandidate);
+                if (candidateLevel == null || (int) candidateLevel != level) continue;
+                // skip (for now) if node is part of the same way
+                if (ParserUtility.nodesPartOfSameWay(targetNode, mergeCandidate)) continue;
+
+                // check distance between target and merge candidate
+                double distance = ParserGeoMath.getDistance(
+                        targetNode.lat(), targetNode.lon(), mergeCandidate.lat(), mergeCandidate.lon());
+                if (distance < mergeDistance) {
+                    merge.mergeCandidates.add(mergeCandidate);
                 }
             }
 
-            if (!merge.mergeToTarget.isEmpty()) {
+            if (!merge.mergeCandidates.isEmpty()) {
                 merges.add(merge);
             }
         }
+
         return merges;
     }
 
     private static class Merge {
         public final Node target;
-        public final List<Node> mergeToTarget;
+        public final List<Node> mergeCandidates; // merge to target
 
         public Merge(Node root) {
             target = root;
-            mergeToTarget = new ArrayList<>();
+            mergeCandidates = new ArrayList<>();
         }
     }
 
