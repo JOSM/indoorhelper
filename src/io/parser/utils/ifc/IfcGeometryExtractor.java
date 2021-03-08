@@ -14,7 +14,7 @@ import java.util.List;
 import static io.parser.utils.ParserUtility.prepareDoubleString;
 
 /**
- * Class helps parsing BIM data with providing methods to extract OSM relevant data
+ * Class providing methods to extract OSM data from BIM data
  *
  * @author rebsc
  */
@@ -23,7 +23,7 @@ public class IfcGeometryExtractor {
     public static final Vector3D defaultPoint = new Vector3D(-99.0, -99.0, -99.0);
 
     /**
-     * This type defines the three Boolean operators used in the definition of CSG solids.
+     * Three boolean operators used in definition of CSG solids.
      */
     private enum IfcBooleanOperator {
         UNION,
@@ -32,7 +32,7 @@ public class IfcGeometryExtractor {
     }
 
     /**
-     * Extract representation data from IFCREPRESENTATIONITEM body
+     * Extract representation data from IfcRepresentationItem body
      *
      * @param ifcModel           ifc Model
      * @param bodyRepresentation representation of body
@@ -41,13 +41,13 @@ public class IfcGeometryExtractor {
     public static List<Vector3D> getDataFromBodyRepresentation(ModelPopulation ifcModel, IfcRepresentation bodyRepresentation) {
         ArrayList<Vector3D> shapeRep = new ArrayList<>();
 
-        // get IFCOBJECT and REPRESENTATIONIDENTIFIER
+        // get IfcObject and RepresentationIdentifier
         EntityInstance repObject = bodyRepresentation.getEntity();
 
-        // get IFCREPRESENTATIONITEMS
+        // get IfcRepresentationItems
         ArrayList<EntityInstance> bodyItems = repObject.getAttributeValueBNasEntityInstanceList("Items");
 
-        // extract informations from IfcRepresentationItems
+        // extract information from IfcRepresentationItems
         for (EntityInstance item : bodyItems) {
             // get type of item
             String repItemType = IfcObjectIdentifier.getRepresentationItemType(ifcModel, bodyRepresentation, item);
@@ -122,7 +122,7 @@ public class IfcGeometryExtractor {
             } else if (repItemType.equals(SweptSolidRepresentationTypeItems.IfcRevolvedAreaSolid.name())) {
                 // TODO extract data
                 logUnsupportedRepresentationInfo(repItemType);
-            } else if (repItemType.equals(MappedRepresentatiobTypeItems.IfcMappedItem.name())) {
+            } else if (repItemType.equals(MappedRepresentationTypeItems.IfcMappedItem.name())) {
                 // TODO extract data
                 logUnsupportedRepresentationInfo(repItemType);
             } else {
@@ -143,13 +143,13 @@ public class IfcGeometryExtractor {
     public static List<Vector3D> getDataFromBoxRepresentation(ModelPopulation ifcModel, IfcRepresentation boxRepresentation) {
         ArrayList<Vector3D> shapeRep = new ArrayList<>();
 
-        // get IFCObject and RepresentationIdentifier
+        // get IfcObject and RepresentationIdentifier
         EntityInstance repObject = boxRepresentation.getEntity();
 
         // get IfcRepresentationItems
         ArrayList<EntityInstance> boxItems = repObject.getAttributeValueBNasEntityInstanceList("Items");
 
-        // extract informations from IfcRepresentationItems
+        // extract information from IfcRepresentationItems
         for (EntityInstance item : boxItems) {
             // get type of IfcRepresentationItem
             String repItemType = IfcObjectIdentifier.getRepresentationItemType(ifcModel, boxRepresentation, item);
@@ -179,43 +179,44 @@ public class IfcGeometryExtractor {
     }
 
     /**
-     * Method extracts shape representation coordinates from IFCFACETEDBREP object
+     * Method extracts shape representation coordinates from IfcFacetedBrep object
      *
      * @param ifcModel     ifc model
      * @param faceBrepItem to get shape representation coordinates for
-     * @return points representing shape of IFCFACETEDBREP
+     * @return points representing shape of IfcFacetedBrep
      */
     private static ArrayList<Vector3D> getIfcFacetedBrepGeometry(ModelPopulation ifcModel, EntityInstance faceBrepItem) {
-        // get IFCCLOSEDSHELL stored in IFCFACETEDBREP.OUTER
+        // get IfcClosedShell stored in IfcFacetedBrep.Outer
         EntityInstance closedShell = faceBrepItem.getAttributeValueBNasEntityInstance("Outer");
         return getIfcClosedShellGeometry(ifcModel, closedShell);
     }
 
     /**
-     * Method extracts shape representation coordinates from IFCCLOSEDSHELL object
+     * Method extracts shape representation coordinates from IfcClosedShell object
      *
      * @param ifcModel  ifc model
      * @param shellItem to get shape representation coordinates for
-     * @return points representing shape of IFCCLOSEDSHELL
+     * @return points representing shape of IfcClosedShell
      */
     private static ArrayList<Vector3D> getIfcClosedShellGeometry(ModelPopulation ifcModel, EntityInstance shellItem) {
-        // get IFCFACEs of IFCCLOSEDSHELL
+        // get IfcFaces of IfcClosedShell
         ArrayList<EntityInstance> facesOfClosedShell = shellItem.getAttributeValueBNasEntityInstanceList("CfsFaces");
 
-        // get IFCFACEBOUNDs of every IFCFACE
+        // get IfcFaceBounds of every IfcFace
         ArrayList<EntityInstance> faceBoundsOfClosedShell = new ArrayList<>();
         facesOfClosedShell.forEach(face -> faceBoundsOfClosedShell.addAll(face.getAttributeValueBNasEntityInstanceList("Bounds")));
 
-        // get IFCLOOPs of every IFCFACEBOUND
+        // get IfcLoop of every IfcFaceBounds
         ArrayList<EntityInstance> loopsOfClosedShell = new ArrayList<>();
         faceBoundsOfClosedShell.forEach(bound -> loopsOfClosedShell.addAll(bound.getAttributeValueBNasEntityInstanceList("Bound")));
 
-        // collect points of IFCLOOPs
+        // collect points of IfcLoops
         ArrayList<Vector3D> shapePoints = new ArrayList<>();
         for (EntityInstance loop : loopsOfClosedShell) {
             ArrayList<Vector3D> pointsOfLoop = getIfcLoopGeometry(ifcModel, loop);
             if (pointsOfLoop == null) return null;
-            // workaround: Add points of every loop to shapePoints but also add a default point after each loop as separator (needed later on for rendering)
+            // workaround: Add points of each loop to shapePoints. Also add a default point after each loop as separator
+            // (needed later on for rendering)
             shapePoints.addAll(pointsOfLoop);
             shapePoints.add(defaultPoint);
         }
@@ -224,11 +225,11 @@ public class IfcGeometryExtractor {
     }
 
     /**
-     * Method extracts shape representation coordinates from IFCLOOP object
+     * Method extracts shape representation coordinates from IfcLoop object
      *
      * @param ifcModel ifc model
      * @param loop     to get shape representation coordinates for
-     * @return points representing shape of IFCLOOP
+     * @return points representing shape of IfcLoop
      */
     private static ArrayList<Vector3D> getIfcLoopGeometry(ModelPopulation ifcModel, EntityInstance loop) {
         // get loop type
@@ -236,7 +237,7 @@ public class IfcGeometryExtractor {
         if (loopType == null) return null;
 
         if (loopType.equals(LoopSubRepresentationTypeItems.IfcPolyLoop.name())) {
-            // get all IFCCARTESIANPOINTs
+            // get all IfcCartesianPoints
             ArrayList<Vector3D> cartesianPointsOfClosedShell = new ArrayList<>();
             for (EntityInstance cPoint : loop.getAttributeValueBNasEntityInstanceList("Polygon")) {
                 Vector3D cPointAsVector3D = ifcCoordinatesToVector3D(cPoint);
@@ -252,11 +253,11 @@ public class IfcGeometryExtractor {
     }
 
     /**
-     * Method extracts shape representation coordinates from IFCCURVE object
+     * Method extracts shape representation coordinates from IfcCurve object
      *
      * @param ifcModel ifc model
      * @param curve    to get shape representation coordinates for
-     * @return points representing shape of IFCCURVE
+     * @return points representing shape of IfcCurve
      */
     private static ArrayList<Vector3D> getIfcCurveGeometry(ModelPopulation ifcModel, EntityInstance curve) {
         if (IfcObjectIdentifier.isIfcPolyline(ifcModel, curve)) {
@@ -300,7 +301,7 @@ public class IfcGeometryExtractor {
      *
      * @param ifcModel     ifc model
      * @param curveSegment to get coordinates from
-     * @return Extracts coordinate data from IFCCOMPOSITECURVE
+     * @return Extracts coordinate data from IfcCompositeCurve
      */
     private static ArrayList<Vector3D> getIfcCompositeCurveGeometry(ModelPopulation ifcModel, EntityInstance curveSegment) {
         ArrayList<Vector3D> shapeData = new ArrayList<>();
@@ -317,13 +318,13 @@ public class IfcGeometryExtractor {
     }
 
     /**
-     * Extracts coordinate data from IFCBOOLEANRESULT. If IFCBOOLEANRESULT holds operands of type IFCBOOLEANRESULT it will
+     * Extracts coordinate data from IfcBooleanResult. If IfcBooleanResult holds operands of type IfcBooleanResult it will
      * recursive run thru every operation.
      *
      * @param ifcModel     ifc model
      * @param resultEntity to get coordinates from
-     * @param operator     IFCBOOLEANOPERATOR
-     * @return Extracts coordinate data from IFCBOOLEANRESULT
+     * @param operator     IfcBooleanOperator
+     * @return Extracts coordinate data from IfcBooleanResult
      */
     private static ArrayList<Vector3D> getIfcBooleanResultGeometry(ModelPopulation ifcModel, EntityInstance resultEntity, IfcBooleanOperator operator) {
         // get and identify both operands
@@ -414,15 +415,15 @@ public class IfcGeometryExtractor {
     }
 
     /**
-     * Method gets result shape data from IFCFEATUREELEMENTSUBTRACTION operation
+     * Method gets result shape data from IfcFeatureElementSubtraction operation
      *
      * @param masterElement    of operation (RelatingBuildingElement)
      * @param dependentElement of operation (RelatedOpeningElement)
-     * @return result of IFCFEATUREELEMENTSUBTRACTION
+     * @return result of IfcFeatureElementSubtraction
      */
     private static ArrayList<Vector3D> getIfcFeatureElementSubtractionGeometry(ArrayList<Vector3D> masterElement, ArrayList<Vector3D> dependentElement) {
         ArrayList<Vector3D> masterElementsCopy = new ArrayList<>(masterElement);
-        // first remove all points from master which are in both lists
+        // remove all points from master which are in both lists
         for (Vector3D masterPoint : masterElementsCopy) {
             dependentElement.forEach(dependentPoint -> {
                 if (masterPoint.equalsVector(dependentPoint)) {
@@ -430,7 +431,7 @@ public class IfcGeometryExtractor {
                 }
             });
         }
-        // second add all points from dependent to master which are not already in master
+        // add all points from dependent to master which are not already in master
         // for workaround add default point
         masterElement.add(defaultPoint);
         dependentElement.forEach(dependentPoint -> {
@@ -443,11 +444,11 @@ public class IfcGeometryExtractor {
     }
 
     /**
-     * Method extracts shape representation coordinates from IFCPOLYGONALBUNDEDHALFSPACE object
+     * Method extracts shape representation coordinates from IfcPolygonalBoundedHalfSpace object
      *
      * @param ifcModel ifc model
      * @param polygon  object to get shape coordinates from
-     * @return points representing shape of IFCPOLYGONALBUNDEDHALFSPACE
+     * @return points representing shape of IfcPolygonalBoundedHalfSpace
      */
     private static ArrayList<Vector3D> getIfcPolygonalBoundedHalfSpaceGeometry(ModelPopulation ifcModel, EntityInstance polygon) {
         // TODO rotation to parent system necessary?
@@ -475,28 +476,28 @@ public class IfcGeometryExtractor {
     }
 
     /**
-     * Method extracts shape representation coordinates from IFCEXTRUDEDAREASOLID object
+     * Method extracts shape representation coordinates from IfcExtrudedAreaSolid object
      *
      * @param ifcModel     ifc model
      * @param extrudedArea to get shape representation for
-     * @return points representing shape of IFCEXTRUDEDAREASOLID
+     * @return points representing shape of IfcExtrudedAreaSolid
      */
     private static ArrayList<Vector3D> getIfcExtrudedAreaSolidGeometry(ModelPopulation ifcModel, EntityInstance extrudedArea) {
         // get POSITION attribute and extract local object origin coordinates
         EntityInstance axisPlacement = extrudedArea.getAttributeValueBNasEntityInstance("Position");
         EntityInstance locationPoint = axisPlacement.getAttributeValueBNasEntityInstance("Location");
-        //object axis origin
+        // object axis origin
         Vector3D locationVector3D = ifcCoordinatesToVector3D(locationPoint);
         if (locationVector3D == null) return null;
 
-        // get IFCPROFILEDEF attribute
+        // get IfcProfileDef attribute
         EntityInstance profileDef = extrudedArea.getAttributeValueBNasEntityInstance("SweptArea");
         // handle different SweptArea types
         String sweptAreaType = IfcObjectIdentifier.getIFCProfileDefType(ifcModel, profileDef);
         if (sweptAreaType == null) return null;
 
         if (sweptAreaType.equals(ProfileDefRepresentationTypeItems.IfcRectangleProfileDef.name())) {
-            // extract XDim, YDim
+            // extract xDim, yDim
             double xDim = prepareDoubleString((String) profileDef.getAttributeValueBN("XDim"));
             double yDim = prepareDoubleString((String) profileDef.getAttributeValueBN("YDim"));
             double halfxDim = xDim / 2.0;
@@ -533,7 +534,8 @@ public class IfcGeometryExtractor {
     }
 
     /**
-     * Helper method to handle (floor-)openings in entities. Adds opening coordinates to entity shape data. If no opening, returns null
+     * Helper method to handle (floor-)openings in entities.
+     * Adds opening coordinates to entity shape data. If no opening, returns null
      *
      * @param ifcModel                    ifc model
      * @param shapeDataOfEntity           shape data of entity without opening handling
@@ -566,7 +568,7 @@ public class IfcGeometryExtractor {
     }
 
     /**
-     * Transforms IFCCARTESIANCOORDINATE entity into {@link Vector3D}
+     * Transforms IfcCartesianCoordinate entity into {@link Vector3D}
      *
      * @param cartesianCoordinate to transform
      * @return coordinate as {@link Vector3D}

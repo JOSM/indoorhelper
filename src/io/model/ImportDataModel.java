@@ -4,7 +4,7 @@ package io.model;
 import org.openstreetmap.josm.data.osm.DataSet;
 
 /**
- * Import data model class holding imported data
+ * Class holding imported data
  *
  * @author rebsc
  */

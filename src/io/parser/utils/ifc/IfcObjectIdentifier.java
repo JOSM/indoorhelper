@@ -11,17 +11,17 @@ import org.openstreetmap.josm.tools.Logging;
 import java.util.ArrayList;
 
 /**
- * Class to identify the type on an IFCSHAPEREPRESENTATION object
+ * Class to identify the type on an IfcShapeRepresentation object
  *
  * @author rebsc
  */
 public class IfcObjectIdentifier {
 
     /**
-     * Method gets IFCSHAPEREPRESENTATION.REPRESENTATIONIDENTIFIER and IFCSHAPEREPRESENTATION.REPRESENTATIONTYPE of object
+     * Method gets IfcShapeRepresentation.RepresentationIdentifier and IfcShapeRepresentation.RepresentationType of object
      *
      * @param shapeRepresentation IFCShapeRepresentationIdentity
-     * @return Returns object containing IFCSHAPEREPRESENTATION.REPRESENTATIONIDENTIFIER and IFCSHAPEREPRESENTATION.REPRESENTATIONTYPE
+     * @return Returns object containing IfcShapeRepresentation.RepresentationIdentifier and IfcShapeRepresentation.RepresentationType
      */
     public static IfcRepresentation identifyShapeRepresentation(EntityInstance shapeRepresentation) {
         IfcRepresentation rep = new IfcRepresentation();
@@ -50,19 +50,17 @@ public class IfcObjectIdentifier {
     }
 
     /**
-     * Gets the type of specific IFCSHAPEREPRESENTATION.ITEM. If item type is not supported for IFCSHAPEREPRESENTATION.REPRESENTATIONTYPE
+     * Gets the type of specific IfcShapeRepresentation.ITEM. If item type is not supported for IfcShapeRepresentation.RepresentationType
      * method will return null.
      *
      * @param ifcModel ifcModel
-     * @param ident    IFCREPRESENTATIONTYPEOBJECT object
-     * @param item     to get the representation type for (IFCSHAPEREPRESENTATION.ITEM packed into EntityInstance object)
-     * @return String with IFCSHAPEREPRESENTATION.ITEM type definition or null if not allowed in standard
+     * @param ident    IfcRepresentationTypeObject object
+     * @param item     to get the representation type for (IfcShapeRepresentation.ITEM packed into EntityInstance object)
+     * @return String with IfcShapeRepresentation.ITEM type definition or null if not allowed in standard
      */
     public static String getRepresentationItemType(ModelPopulation ifcModel, IfcRepresentation ident, EntityInstance item) {
 
         if (ident.getType().equals(RepresentationType.AdvancedBrep)) {
-            // here IFC standard only allows IFCADVANCEDBREP and IFCFACETEDBREP as item
-
             ArrayList<EntityInstance> ifcAdvancedBrep = new ArrayList<>(ifcModel.getInstancesOfType(AdvancedBrepRepresentationTypeItems.IfcAdvancedBrep.name()));
             if (ifcAdvancedBrep.contains(item)) return AdvancedBrepRepresentationTypeItems.IfcAdvancedBrep.name();
 
@@ -74,8 +72,6 @@ public class IfcObjectIdentifier {
         }
 
         if (ident.getType().equals(RepresentationType.AdvancedSweptSolid)) {
-            // here IFC standard only allows IFCSWEPTDISKSOLID and IFCSWEPTDISKSOLIDPOLYGON as item
-
             ArrayList<EntityInstance> ifcSweptDiskSolids = new ArrayList<>(ifcModel.getInstancesOfType(AdvancedSweptSolidRepresentationTypeItems.IfcSweptDiskSolid.name()));
             if (ifcSweptDiskSolids.contains(item))
                 return AdvancedSweptSolidRepresentationTypeItems.IfcSweptDiskSolid.name();
@@ -89,7 +85,6 @@ public class IfcObjectIdentifier {
         }
 
         if (ident.getType().equals(RepresentationType.Brep)) {
-            // here IFC standard only allows IFCFACETEDBREP as item
             if (ifcModel.getInstancesOfType(BrepRepresentationTypeItems.IfcFacetedBrep.name()).contains(item)) {
                 return BrepRepresentationTypeItems.IfcFacetedBrep.name();
             }
@@ -98,8 +93,6 @@ public class IfcObjectIdentifier {
         }
 
         if (ident.getType().equals(RepresentationType.CSG)) {
-            // here IFC standard only allows IFCCSGSOLID, IFCBOOLEANRESULT and IFCPRIMITIVE3D as items
-
             ArrayList<EntityInstance> ifcBooleanResults = new ArrayList<>(ifcModel.getInstancesOfType(CSGRepresentationTypeItems.IfcBooleanResult.name()));
             if (ifcBooleanResults.contains(item)) return CSGRepresentationTypeItems.IfcBooleanResult.name();
 
@@ -114,7 +107,6 @@ public class IfcObjectIdentifier {
         }
 
         if (ident.getType().equals(RepresentationType.Tessellation)) {
-            // here IFC standard only allows IFCTESSELATEDFACESET as item
             if (ifcModel.getInstancesOfType(TessellationRepresentationTypeItems.IfcTessellatedFaceSet.name()).contains(item)) {
                 return TessellationRepresentationTypeItems.IfcTessellatedFaceSet.name();
             }
@@ -123,7 +115,6 @@ public class IfcObjectIdentifier {
         }
 
         if (ident.getType().equals(RepresentationType.Clipping)) {
-            // here IFC standard only allows IFCBOOLEANCLIPPINGRESULT as item
             if (ifcModel.getInstancesOfType(ClippingRepresentationTypeItems.IfcBooleanClippingResult.name()).contains(item)) {
                 return ClippingRepresentationTypeItems.IfcBooleanClippingResult.name();
             }
@@ -132,8 +123,6 @@ public class IfcObjectIdentifier {
         }
 
         if (ident.getType().equals(RepresentationType.Curve2D) || ident.getType().equals(RepresentationType.Curve3D)) {
-            // here IFC standard only allows IFCBOUNDEDCURVE as item
-
             ArrayList<EntityInstance> ifcBoundedCurves = new ArrayList<>(ifcModel.getInstancesOfType(CurveRepresentationTypeItems.IfcBoundedCurve.name()));
             if (ifcBoundedCurves.contains(item)) return CurveRepresentationTypeItems.IfcBoundedCurve.name();
 
@@ -145,9 +134,6 @@ public class IfcObjectIdentifier {
         }
 
         if (ident.getType().equals(RepresentationType.SurfaceModel)) {
-            // here IFC standard only allows IFCTESSELLATEDITEM, IFCSCHELLBASEDSURFACEMODEL and
-            // IFCFACEBASEDSURFACEMODEL as item
-
             ArrayList<EntityInstance> ifcTessellatedItems = new ArrayList<>(ifcModel.getInstancesOfType(SurfaceModelRepresentationTypeItems.IfcTessellatedItem.name()));
             if (ifcTessellatedItems.contains(item))
                 return SurfaceModelRepresentationTypeItems.IfcTessellatedItem.name();
@@ -168,8 +154,6 @@ public class IfcObjectIdentifier {
         }
 
         if (ident.getType().equals(RepresentationType.SweptSolid)) {
-            // here IFC standard only allows IFCEXTRUDEDAREASOLID, IFCREVOLVEDAREASOLID as item
-
             ArrayList<EntityInstance> ifcExtrudedAreaSolid = new ArrayList<>(ifcModel.getInstancesOfType(SweptSolidRepresentationTypeItems.IfcExtrudedAreaSolid.name()));
             if (ifcExtrudedAreaSolid.contains(item))
                 return SweptSolidRepresentationTypeItems.IfcExtrudedAreaSolid.name();
@@ -183,7 +167,6 @@ public class IfcObjectIdentifier {
         }
 
         if (ident.getType().equals(RepresentationType.BoundingBox)) {
-            // here IFC standard only allows IFCBOUNDINGBOX as item
             if (ifcModel.getInstancesOfType(BoundingBoxRepresentationTypeItems.IfcBoundingBox.name()).contains(item)) {
                 return BoundingBoxRepresentationTypeItems.IfcBoundingBox.name();
             }
@@ -192,9 +175,8 @@ public class IfcObjectIdentifier {
         }
 
         if (ident.getType().equals(RepresentationType.MappedRepresentation)) {
-            // here IFC standard only allows IFCMAPPEDITEM as item
-            if (ifcModel.getInstancesOfType(MappedRepresentatiobTypeItems.IfcMappedItem.name()).contains(item)) {
-                return MappedRepresentatiobTypeItems.IfcMappedItem.name();
+            if (ifcModel.getInstancesOfType(MappedRepresentationTypeItems.IfcMappedItem.name()).contains(item)) {
+                return MappedRepresentationTypeItems.IfcMappedItem.name();
             }
             Logging.info(IfcObjectIdentifier.class.getName() + ": " + item.getEntityDefinition() + " is not supported");
             return null;
@@ -206,14 +188,13 @@ public class IfcObjectIdentifier {
 
 
     /**
-     * Gets the type of IFCLOOP. Types can be IFCEDGELOOP, IFCPOLYLOOP, IFCVERTEXLOOP
+     * Gets the type of IfcLoop. Types can be IfcEdgeLoop, IfcPolyLoop, IfcPolyLoop
      *
      * @param ifcModel ifcModel
      * @param loop     to get type of
      * @return type as string
      */
     public static String getIFCLoopType(ModelPopulation ifcModel, EntityInstance loop) {
-        // here IFC standard only allows IFCEDGELOOP, IFCPOLYLOOP, IFCVERTEXLOOP as item
         ArrayList<EntityInstance> edgeLoops = new ArrayList<>(ifcModel.getInstancesOfType(LoopSubRepresentationTypeItems.IfcEdgeLoop.name()));
         if (edgeLoops.contains(loop)) return LoopSubRepresentationTypeItems.IfcEdgeLoop.name();
 
@@ -235,9 +216,6 @@ public class IfcObjectIdentifier {
      * @return type as string
      */
     public static String getIFCProfileDefType(ModelPopulation ifcModel, EntityInstance profileDef) {
-        // here IFC standard only allows IFCRECTANGLEPROFILEDEF, IFCTRAPEZIUMPROFILEDEF, IFCCIRCLEPROFILEDEF,
-        // IFCELLIPSEPROFILEDEF, IFCSHAPEPROFILEDEF as item
-
         ArrayList<EntityInstance> rectanglePD = new ArrayList<>(ifcModel.getInstancesOfType(ProfileDefRepresentationTypeItems.IfcRectangleProfileDef.name()));
 
         if (rectanglePD.contains(profileDef)) return ProfileDefRepresentationTypeItems.IfcRectangleProfileDef.name();
@@ -263,15 +241,13 @@ public class IfcObjectIdentifier {
     }
 
     /**
-     * Method gets type of IFCBOOLEANOPERAND
+     * Method gets type of IfcBooleanOperand
      *
      * @param ifcModel ifc model
      * @param entity   to get type of
-     * @return type of IFCBOOLEANOPERAND
+     * @return type of IfcBooleanOperand
      */
     public static String getIfcBooleanOperandType(ModelPopulation ifcModel, EntityInstance entity) {
-        // allowed types
-
         ArrayList<EntityInstance> extrudedAreas = new ArrayList<>(ifcModel.getInstancesOfType(IfcBooleanOperandType.IfcExtrudedAreaSolid.name()));
         if (extrudedAreas.contains(entity)) return IfcBooleanOperandType.IfcExtrudedAreaSolid.name();
 
@@ -331,15 +307,13 @@ public class IfcObjectIdentifier {
     }
 
     /**
-     * Method gets type of IFCBOUNDEDCURVE
+     * Method gets type of IfcBoundedCurve
      *
      * @param ifcModel ifc model
      * @param entity   to get type of
-     * @return type of IFCBOUNDEDCURVE
+     * @return type of IfcBoundedCurve
      */
     public static String getIfcCurveType(ModelPopulation ifcModel, EntityInstance entity) {
-        // here IFCCOMPOSITECURVE, IFCPOLYLINE, IFCTRIMMEDCURVE, IFCBSPLINECURVE allowed
-
         ArrayList<EntityInstance> compositeCurves = new ArrayList<>(ifcModel.getInstancesOfType(CurveRepresentationTypeItems.IfcCompositeCurve.name()));
         if (compositeCurves.contains(entity)) return CurveRepresentationTypeItems.IfcCompositeCurve.name();
 
@@ -378,11 +352,11 @@ public class IfcObjectIdentifier {
     }
 
     /**
-     * Method gets type of IFCSPATIALSTRUCTUREELEMENT
+     * Method gets type of IfcSpatialStructureElement
      *
      * @param ifcModel ifc model
      * @param entity   to get type of
-     * @return type of IFCSPATIALSTRUCTUREELEMENT
+     * @return type of IfcSpatialStructureElement
      */
     public static String getSpatialStructureElementType(ModelPopulation ifcModel, EntityInstance entity) {
         ArrayList<EntityInstance> buildings = new ArrayList<>(ifcModel.getInstancesOfType(IfcSpatialStructureElementTypes.IfcBuilding.name()));
@@ -402,11 +376,11 @@ public class IfcObjectIdentifier {
     }
 
     /**
-     * Checks if entity is part of IFCRELVOIDSELEMENT, if yes than returns IFCRELVOIDSELEMENT, else null
+     * Checks if entity is part of IfcRelVoidsElement, if yes than returns IfcRelVoidsElement, else null
      *
      * @param ifcModel ifc model
-     * @param entity   to get IFCRELVOIDSELEMENT for
-     * @return if entity part of an IFCRELVOIDSELEMENT the EntityInstance if IFCRELVOIDSELEMENT, else null
+     * @param entity   to get IfcRelVoidsElement for
+     * @return if entity part of an IfcRelVoidsElement the EntityInstance if IfcRelVoidsElement, else null
      */
     public static EntityInstance getRelVoidsElementOfEntity(ModelPopulation ifcModel, EntityInstance entity) {
         ArrayList<EntityInstance> relVoidsElements = new ArrayList<>(ifcModel.getInstancesOfType(BIMObject.IfcRelVoidsElement.name()));
@@ -418,11 +392,11 @@ public class IfcObjectIdentifier {
     }
 
     /**
-     * Checks if entity is of type IFCPOLYLINE
+     * Checks if entity is of type IfcPolyline
      *
      * @param ifcModel ifc model
      * @param entity   to check type of
-     * @return true if IFCPOLYLINE, else false
+     * @return true if IfcPolyline, else false
      */
     public static boolean isIfcPolyline(ModelPopulation ifcModel, EntityInstance entity) {
         ArrayList<EntityInstance> polylines = new ArrayList<>(ifcModel.getInstancesOfType(CurveRepresentationTypeItems.IfcPolyline.name()));
@@ -430,11 +404,11 @@ public class IfcObjectIdentifier {
     }
 
     /**
-     * Checks if entity is of type IFCCOMPOSITECURVE
+     * Checks if entity is of type IfcCompositeCurve
      *
      * @param ifcModel ifc model
      * @param entity   to check type of
-     * @return true if IFCCOMPOSITECURVE, else false
+     * @return true if IfcCompositeCurve, else false
      */
     public static boolean isIfcCompositeCurve(ModelPopulation ifcModel, EntityInstance entity) {
         ArrayList<EntityInstance> cCurves = new ArrayList<>(ifcModel.getInstancesOfType(CurveRepresentationTypeItems.IfcCompositeCurve.name()));
@@ -442,11 +416,11 @@ public class IfcObjectIdentifier {
     }
 
     /**
-     * Checks if entity is of type IFCTRIMMEDCURVE
+     * Checks if entity is of type IfcTrimmedCurve
      *
      * @param ifcModel ifc model
      * @param entity   to check type of
-     * @return true if IFCTRIMMEDCURVE, else false
+     * @return true if IfcTrimmedCurve, else false
      */
     public static boolean isIfcTrimmedCurve(ModelPopulation ifcModel, EntityInstance entity) {
         ArrayList<EntityInstance> tCurves = new ArrayList<>(ifcModel.getInstancesOfType(CurveRepresentationTypeItems.IfcTrimmedCurve.name()));
@@ -454,11 +428,11 @@ public class IfcObjectIdentifier {
     }
 
     /**
-     * Checks if entity is of type IFCCIRCLE
+     * Checks if entity is of type IfcCircle
      *
      * @param ifcModel ifc model
      * @param entity   to check type of
-     * @return true if IFCCIRCLE, else false
+     * @return true if IfcCircle, else false
      */
     public static boolean isIfcCircle(ModelPopulation ifcModel, EntityInstance entity) {
         ArrayList<EntityInstance> cCurves = new ArrayList<>(ifcModel.getInstancesOfType(CurveRepresentationTypeItems.IfcCircle.name()));
@@ -466,11 +440,11 @@ public class IfcObjectIdentifier {
     }
 
     /**
-     * Checks if entity is of type IFCAXIS2PLACEMENT3D
+     * Checks if entity is of type IfcAxis2Placement3D
      *
      * @param ifcModel ifc model
      * @param entity   to check type of
-     * @return true if IFCAXIS2PLACEMENT3D, else false
+     * @return true if IfcAxis2Placement3D, else false
      */
     public static boolean isIfcAxis2Placement3D(ModelPopulation ifcModel, EntityInstance entity) {
         ArrayList<EntityInstance> axis2placement3Ds = new ArrayList<>(ifcModel.getInstancesOfType(Axis2PlacementRepresentationTypeItems.IfcAxis2Placement3D.name()));
@@ -478,11 +452,11 @@ public class IfcObjectIdentifier {
     }
 
     /**
-     * Checks if entity is of type IFCOPENINGELEMENT
+     * Checks if entity is of type IfcOpeningElement
      *
      * @param ifcModel ifc model
      * @param entity   to check type of
-     * @return true if IFCOPENINGELEMENT, else false
+     * @return true if IfcOpeningElement, else false
      */
     public static boolean isIfcOpeningElement(ModelPopulation ifcModel, EntityInstance entity) {
         ArrayList<EntityInstance> openingElement = new ArrayList<>(ifcModel.getInstancesOfType(IfcRelVoidsElementTypes.IfcOpeningElement.name()));
@@ -490,11 +464,11 @@ public class IfcObjectIdentifier {
     }
 
     /**
-     * Checks if entity is of type IFCSLAB
+     * Checks if entity is of type IfcSlab
      *
      * @param ifcModel ifc model
      * @param entity   to check type of
-     * @return true if IFCSLAB, else false
+     * @return true if IfcSlab, else false
      */
     public static boolean isIfcSlab(ModelPopulation ifcModel, EntityInstance entity) {
         ArrayList<EntityInstance> slabElements = new ArrayList<>(ifcModel.getInstancesOfType(BIMObject.IfcSlab.name()));
@@ -502,11 +476,11 @@ public class IfcObjectIdentifier {
     }
 
     /**
-     * Checks if entity is of type IFCDOOR
+     * Checks if entity is of type IfcDoor
      *
      * @param ifcModel ifc model
      * @param entity   to check type of
-     * @return true if IFCDOOR, else false
+     * @return true if IfcDoor, else false
      */
     public static boolean isIfcDoor(ModelPopulation ifcModel, EntityInstance entity) {
         ArrayList<EntityInstance> doorElements = new ArrayList<>(ifcModel.getInstancesOfType(BIMObject.IfcDoor.name()));
@@ -514,11 +488,11 @@ public class IfcObjectIdentifier {
     }
 
     /**
-     * Checks if entity is of type IFCWINDOW
+     * Checks if entity is of type IfcWindow
      *
      * @param ifcModel ifc model
      * @param entity   to check type of
-     * @return true if IFCWINDOW, else false
+     * @return true if IfcWindow, else false
      */
     public static boolean isIfcWindow(ModelPopulation ifcModel, EntityInstance entity) {
         ArrayList<EntityInstance> windowElements = new ArrayList<>(ifcModel.getInstancesOfType(BIMObject.IfcWindow.name()));
@@ -532,7 +506,7 @@ public class IfcObjectIdentifier {
     /**
      * Removes unnecessary chars from representation attribute string
      *
-     * @param attribute representation attribute (REPRESENTATIONIDENTIFIER, REPRESENTATIONTYPE)
+     * @param attribute representation attribute (RepresentationIdentifier, RepresentationType)
      * @return prepared string
      */
     private static String prepareRepresentationAttribute(String attribute) {

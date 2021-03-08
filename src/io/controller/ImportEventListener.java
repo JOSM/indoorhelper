@@ -18,7 +18,7 @@ public interface ImportEventListener {
     void onBIMImport(String filepath);
 
     /**
-     * Will be called after finishing parsing
+     * Will be called after parsing finished
      *
      * @param ds Parsed data kept in DataSet
      */

@@ -23,6 +23,7 @@ public class ParserGeoMath {
      * @return latlon of cartesian point
      */
     public static LatLon cartesianToGeodetic(Vector3D cartesianPoint, Vector3D cartesianOrigin, LatLon latLonOfCartesianOrigin, IfcUnitCatalog.LengthUnit cartesianUnit) {
+        // TODO improve the way of transformation - clean up this method
         double originCartX = cartesianOrigin.getX();
         double originCartY = cartesianOrigin.getY();
         double originLat = Math.toRadians(latLonOfCartesianOrigin.lat());

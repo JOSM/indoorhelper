@@ -2,19 +2,22 @@
 package io.parser.data.ifc;
 
 /**
+ * Class classify ifc object types.
+ * Notice: Enum elements are not defined uppercase to use them as strings
+ *
  * @author rebsc
  */
 public class IfcRepresentationCatalog {
 
     /**
-     * RepresentationIdentifier of IFCSHAPEREPRESENTATION
+     * RepresentationIdentifier of IfcShapeRepresentations
      */
     public enum RepresentationIdentifier {
         Annotation, Axis, Box, Body, Clearance, CoG, FootPrint, Lighting, Profile, Reference, Surface
     }
 
     /**
-     * RepresentationType of IFCSHAPEREPRESENTATION
+     * RepresentationType of IfcShapeRepresentations
      */
     public enum RepresentationType {
         AdvancedBrep, AdvancedSweptSolid, Annotation2D, Brep, CSG, Clipping, SurfaceModel, Point, PointCloud, Curve, Curve2D,
@@ -24,42 +27,42 @@ public class IfcRepresentationCatalog {
     }
 
     /**
-     * Allowed IFCSHAPEREPRESENTATION.Items types for IFCSHAPEREPRESENTATION.RepresentationType ADVANCEDBREP
+     * Permitted IfcShapeRepresentation.Items types for IfcShapeRepresentation.RepresentationType AdvancedBrep
      */
     public enum AdvancedBrepRepresentationTypeItems {
         IfcAdvancedBrep, IfcFacetedBrep
     }
 
     /**
-     * Allowed IFCSHAPEREPRESENTATION.Items types for IFCSHAPEREPRESENTATION.RepresentationTypes ADVANCEDWEPTSOLID
+     * Permitted IfcShapeRepresentation.Items types for IfcShapeRepresentation.RepresentationTypes AdvancedSweptSolid
      */
     public enum AdvancedSweptSolidRepresentationTypeItems {
         IfcSweptDiskSolid, IfcSweptDiskSolidPolygonal
     }
 
     /**
-     * Allowed IFCSHAPEREPRESENTATION.Items types for IFCSHAPEREPRESENTATION.RepresentationType BREP
+     * Permitted IfcShapeRepresentation.Items types for IfcShapeRepresentation.RepresentationType Brep
      */
     public enum BrepRepresentationTypeItems {
         IfcFacetedBrep
     }
 
     /**
-     * Allowed IFCSHAPEREPRESENTATION.Items types for IFCSHAPEREPRESENTATION.RepresentationType CSG
+     * Permitted IfcShapeRepresentation.Items types for IfcShapeRepresentation.RepresentationType CSG
      */
     public enum CSGRepresentationTypeItems {
         IfcCsgSolid, IfcBooleanResult, IfcPrimitive3D
     }
 
     /**
-     * Allowed IFCSHAPEREPRESENTATION.Items types for IFCSHAPEREPRESENTATION.RepresentationTypes CLIPPING
+     * Permitted IfcShapeRepresentation.Items types for IfcShapeRepresentation.RepresentationTypes Clipping
      */
     public enum ClippingRepresentationTypeItems {
         IfcBooleanClippingResult
     }
 
     /**
-     * Allowed IFCSHAPEREPRESENTATION.Items types for IFCSHAPEREPRESENTATION.RepresentationType CURVE.
+     * Permitted IfcShapeRepresentation.Items types for IfcShapeRepresentation.RepresentationType Curve.
      * Includes supertypes
      */
     public enum CurveRepresentationTypeItems {
@@ -67,50 +70,50 @@ public class IfcRepresentationCatalog {
         IfcConic, IfcCircle, IfcEllipse, IfcLine, IfcOffsetCurve2D, IfcOffsetCurve3D, IfcIndexedPolyCurve
     }
 
-    public enum MappedRepresentatiobTypeItems {
+    public enum MappedRepresentationTypeItems {
         IfcMappedItem
     }
 
     /**
-     * Allowed IFCSHAPEREPRESENTATION.Items types for IFCSHAPEREPRESENTATION.RepresentationTypes TESSELATION
+     * Permitted IfcShapeRepresentation.Items types for IfcShapeRepresentation.RepresentationTypes Tesselation
      */
     public enum TessellationRepresentationTypeItems {
         IfcTessellatedFaceSet
     }
 
     /**
-     * Allowed IFCSHAPEREPRESENTATION.Items types for IFCSHAPEREPRESENTATION.RepresentationTypes SURFACEMODEL
+     * Permitted IfcShapeRepresentation.Items types for IfcShapeRepresentation.RepresentationTypes SurfaceModel
      */
     public enum SurfaceModelRepresentationTypeItems {
         IfcTessellatedItem, IfcShellBasedSurfaceModel, IfcFaceBasedSurfaceModel, IfcFacetedBrep
     }
 
     /**
-     * Allowed IFCSHAPEREPRESENTATION.Items types for IFCSHAPEREPRESENTATION.RepresentationTypes SWEPTSOLID
+     * Permitted IfcShapeRepresentation.Items types for IfcShapeRepresentation.RepresentationTypes SweptSolid
      */
     public enum SweptSolidRepresentationTypeItems {
         IfcExtrudedAreaSolid, IfcRevolvedAreaSolid
     }
 
     /**
-     * Allowed IFCSHAPEREPRESENTATION.Items types for IFCSHAPEREPRESENTATION.RepresentationTypes BOUNDINGBOX
+     * Permitted IfcShapeRepresentation.Items types for IfcShapeRepresentation.RepresentationTypes BoundingBox
      */
     public enum BoundingBoxRepresentationTypeItems {
         IfcBoundingBox
     }
 
 
-    // Items of IFC representation subtypes
+    // Ifc representation subtypes
 
     /**
-     * Allowed IFCSHAPEREPRESENTATION.Items types for IFCREPRESENTATIONITEM IFCLOOP
+     * Permitted IfcShapeRepresentation.Items types for IfcShapeRepresentation IfcLoop
      */
     public enum LoopSubRepresentationTypeItems {
         IfcEdgeLoop, IfcPolyLoop, IfcVertexLoop
     }
 
     /**
-     * Allowed IFCSHAPEREPRESENTATION.Items types for IFCREPRESENTATIONITEM IFCPROFILEDEF
+     * Permitted IfcShapeRepresentation.Items types for IfcShapeRepresentation IfcProfileDef
      */
     public enum ProfileDefRepresentationTypeItems {
         IfcRectangleProfileDef, IfcTrapeziumProfileDef, IfcCircleProfileDef, IfcEllipseProfileDef,

@@ -160,9 +160,9 @@ public class BIMtoOSMParser {
     }
 
     /**
-     * Method parses data from IFC file into OSM data
+     * Method parses data from ifc file into OSM data
      *
-     * @param filepath of IFC file
+     * @param filepath of ifc file
      */
     public boolean parse(String filepath) {
         if (!loadFile(filepath)) return false;
@@ -256,10 +256,10 @@ public class BIMtoOSMParser {
     }
 
     /**
-     * Read the FILE_SCHEMA flag from IFC file and return used schema
+     * Read the FILE_SCHEMA flag from ifc file and return used schema
      *
      * @param ifcFile (if necessary) optimized IFC file
-     * @return Used IFC file schema as string
+     * @return Used ifc file schema as string
      */
     private String chooseSchemaFile(File ifcFile) {
         String schema = "";
@@ -291,7 +291,7 @@ public class BIMtoOSMParser {
     }
 
     /**
-     * Checks if IFCSITE element exists in data
+     * Checks if IfcSite element exists in data
      *
      * @param data to check
      * @return true if exists, else false
@@ -398,7 +398,7 @@ public class BIMtoOSMParser {
                     // get type of relatingStructure
                     if (!relatingStructureType.equals(IfcSpatialStructureElementTypes.IfcBuildingStorey.name()))
                         return 0;
-                    // if of type IFCBUILDINGSTOREY
+                    // if of type IfcBuildingStorey
                     double storeyElevation = prepareDoubleString((String) relatingStructure.getAttributeValueBN("Elevation"));
 
                     // get assigned level tag to Elevation entity
@@ -492,15 +492,15 @@ public class BIMtoOSMParser {
     /**
      * Method calculates the latlon coordinates of building origin corner
      *
-     * @param ifcSite IFCSITE entity
+     * @param ifcSite IfcSite entity
      * @return latlon coordinates of building corner
      */
     @SuppressWarnings("unchecked")
     private LatLon getLatLonBuildingOrigin(EntityInstance ifcSite) {
         Vector3D ifcSiteOffset = null;
         if (ifcSite.getAttributeValueBNasEntityInstance("Representation") != null) {
-            // get the offset between IFCSITE geodetic coordinates and building origin coordinate
-            // handle IFCSITE offset if IFCBOUNDINGBOX representation
+            // get the offset between IfcSite geodetic coordinates and building origin coordinate
+            // handle IfcSite offset if IfcBoundingBox representation
             List<IfcRepresentation> repObjectIdentities = BIMtoOSMUtility.getIfcRepresentations(ifcSite);
             if (repObjectIdentities == null) return null;
 
@@ -515,7 +515,7 @@ public class BIMtoOSMParser {
             }
         }
 
-        // get RefLatitude and RefLongitude of IFCSITE
+        // get RefLatitude and RefLongitude of IfcSite
         List<String> refLat;
         List<String> refLon;
         try {
@@ -656,7 +656,7 @@ public class BIMtoOSMParser {
     /**
      * Shows error dialog is file loading failed
      *
-     * @param filepath of IFC file
+     * @param filepath of ifc file
      * @param msg      Error message
      * @param logInfo  log info to console
      */

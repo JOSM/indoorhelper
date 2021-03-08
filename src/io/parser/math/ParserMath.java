@@ -7,13 +7,12 @@ package io.parser.math;
  * @author rebsc
  */
 public class ParserMath {
-    
+
     /**
-     * Creates rotation matrix about x-axis from rotAngle
-     * https://en.wikipedia.org/wiki/Rotation_matrix
+     * Creates x-axis rotation matrix with given angle
      *
      * @param rotAngle in rad
-     * @return rotation matrix about x-axis
+     * @return x-axis rotation matrix
      */
     public static Matrix3D getRotationMatrixX(double rotAngle) {
         return new Matrix3D(
@@ -23,11 +22,10 @@ public class ParserMath {
     }
 
     /**
-     * Creates rotation matrix about y-axis from rotAngle
-     * https://en.wikipedia.org/wiki/Rotation_matrix
+     * Creates y-axis rotation matrix with given angle
      *
      * @param rotAngle in rad
-     * @return rotation matrix about y-axis
+     * @return y-axis rotation matrix
      */
     public static Matrix3D getRotationMatrixY(double rotAngle) {
         return new Matrix3D(
@@ -37,11 +35,10 @@ public class ParserMath {
     }
 
     /**
-     * Creates rotation matrix about z-axis from rotAngle
-     * https://en.wikipedia.org/wiki/Rotation_matrix
+     * Creates z-axis rotation matrix with given angle
      *
      * @param rotAngle in rad
-     * @return rotation matrix about z-axis
+     * @return z-axis rotation matrix
      */
     public static Matrix3D getRotationMatrixZ(double rotAngle) {
         return new Matrix3D(

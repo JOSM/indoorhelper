@@ -37,8 +37,7 @@ import static java.awt.GridBagConstraints.EAST;
 import static org.openstreetmap.josm.tools.I18n.tr;
 
 /**
- * Import data controller class which provides the communication between the
- * ImportDataModel and the import views.
+ * Import data controller class handles communication between {@link ImportDataModel} and import views.
  *
  * @author rebsc
  */
@@ -78,7 +77,7 @@ public class ImportDataController implements ImportEventListener {
     }
 
     /**
-     * Method handles parsing of import data.
+     * Method handles parsing of import data
      *
      * @param filepath Full path of import file
      */

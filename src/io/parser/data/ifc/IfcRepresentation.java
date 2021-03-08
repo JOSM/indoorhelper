@@ -6,7 +6,7 @@ import io.parser.data.ifc.IfcRepresentationCatalog.RepresentationType;
 import nl.tue.buildingsmart.express.population.EntityInstance;
 
 /**
- * Class representing identifier and type of IFCREPRESENTATION
+ * Class holding identifier and types of IfcRepresentation
  *
  * @author rebsc
  */
@@ -73,6 +73,5 @@ public class IfcRepresentation {
     public void setRootEntity(EntityInstance rootEntity) {
         this.rootEntity = rootEntity;
     }
-
 
 }

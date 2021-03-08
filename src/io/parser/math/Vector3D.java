@@ -2,7 +2,7 @@
 package io.parser.math;
 
 /**
- * Class keeping/handling data of 3D vector
+ * Class representing 3D vector
  *
  * @author rebsc
  */

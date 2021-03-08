@@ -8,7 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
 /**
- * Class holding methods to pre-optimize IFC files before loading them
+ * Class providing methods to optimize IFC files before loading them
  *
  * @author rebsc
  */

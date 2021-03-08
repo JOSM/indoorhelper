@@ -11,9 +11,9 @@ import java.util.List;
  */
 public class BIMtoOSMCatalog {
     /**
-     * Returns all BIM tags representing a wall.
+     * Returns all BIM tags representing a wall
      *
-     * @return List of BIMObjects representing a wall.
+     * @return List of {@link BIMObject}s representing a wall
      */
     public static List<String> getWallTags() {
         ArrayList<String> wallTags = new ArrayList<>();
@@ -24,9 +24,9 @@ public class BIMtoOSMCatalog {
     }
 
     /**
-     * Returns all BIM tags representing an area.
+     * Returns all BIM tags representing an area
      *
-     * @return List of BIMObjects representing an area.
+     * @return List of {@link BIMObject}s representing an area
      */
     public static List<String> getAreaTags() {
         ArrayList<String> areaTags = new ArrayList<>();
@@ -37,9 +37,9 @@ public class BIMtoOSMCatalog {
     }
 
     /**
-     * Returns all BIM tags representing a column.
+     * Returns all BIM tags representing a column
      *
-     * @return List of BIMObjects representing a column.
+     * @return List of {@link BIMObject}s representing a column
      */
     public static List<String> getColumnTags() {
         ArrayList<String> colTags = new ArrayList<>();
@@ -48,9 +48,9 @@ public class BIMtoOSMCatalog {
     }
 
     /**
-     * Returns all BIM tags representing a door.
+     * Returns all BIM tags representing a door
      *
-     * @return List of BIMObjects representing a door.
+     * @return List of {@link BIMObject}s representing a door
      */
     public static List<String> getDoorTags() {
         ArrayList<String> doorTags = new ArrayList<>();
@@ -60,9 +60,9 @@ public class BIMtoOSMCatalog {
     }
 
     /**
-     * Returns all BIM tags representing a stair.
+     * Returns all BIM tags representing a window
      *
-     * @return List of BIMObjects representing a stair.
+     * @return List of {@link BIMObject}s representing a window
      */
     public static List<String> getWindowTags() {
         ArrayList<String> stairTags = new ArrayList<>();
@@ -71,9 +71,9 @@ public class BIMtoOSMCatalog {
     }
 
     /**
-     * Returns all BIM tags representing a stair.
+     * Returns all BIM tags representing a stair
      *
-     * @return List of BIMObjects representing a stair.
+     * @return List of {@link BIMObject}s representing a stair
      */
     public static List<String> getStairTags() {
         ArrayList<String> stairTags = new ArrayList<>();
@@ -82,9 +82,9 @@ public class BIMtoOSMCatalog {
     }
 
     /**
-     * Returns all BIM tags representing a RelVoidsElement.
+     * Returns all BIM tags representing a RelVoidsElement
      *
-     * @return List of BIMObjects representing a RelVoidsElement.
+     * @return List of {@link BIMObject}s representing a RelVoidsElement
      */
     public static List<String> getRelVoidsElementTags() {
         ArrayList<String> relVoidsTags = new ArrayList<>();
@@ -93,9 +93,9 @@ public class BIMtoOSMCatalog {
     }
 
     /**
-     * Get IFCSITE tag
+     * Get IfcSite tag
      *
-     * @return List of IFCSITE tags
+     * @return List of IfcSite tags
      */
     public static List<String> getIFCSITETags() {
         ArrayList<String> ifcSiteTags = new ArrayList<>();
@@ -104,7 +104,7 @@ public class BIMtoOSMCatalog {
     }
 
     /**
-     * Relevant BIM objects.
+     * Relevant BIM objects
      *
      * @author rebsc
      */

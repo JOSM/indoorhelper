@@ -2,7 +2,7 @@
 package io.parser.math;
 
 /**
- * Class keeping/handling data of 3D matrix
+ * Class prividng 3D matrix
  *
  * @author rebsc
  */
@@ -146,7 +146,7 @@ public class Matrix3D {
     }
 
     /**
-     * Set values of this matrix to values from param matrix
+     * Sets values of this matrix to values from param matrix
      *
      * @param matrix to get values from
      */

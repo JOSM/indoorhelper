@@ -19,7 +19,7 @@ import java.util.List;
 import static io.parser.utils.ParserUtility.stringVectorToVector3D;
 
 /**
- * Class helps parsing BIM data with providing methods to extract OSM relevant data.
+ * Class providing useful methods to parse BIM data to OSM data
  *
  * @author rebsc
  */
@@ -42,7 +42,7 @@ public class BIMtoOSMUtility {
     public static BIMDataCollection extractMajorBIMData(ModelPopulation ifcModel) {
         BIMDataCollection bimData = new BIMDataCollection();
 
-        // get the root element IFCSITE
+        // get the root element IfcSite
         List<EntityInstance> ifcSiteObjects = new ArrayList<>();
         BIMtoOSMCatalog.getIFCSITETags().forEach(tag -> ifcSiteObjects.addAll(ifcModel.getInstancesOfType(tag)));
 
@@ -157,7 +157,7 @@ public class BIMtoOSMUtility {
     }
 
     /**
-     * Method resolves placement of Ifc object and safes the result in {@link BIMObject3D}
+     * Method resolves placement of Ifc object and keeps the result in {@link BIMObject3D}
      *
      * @param objectPlacementEntity of {@link BIMObject3D}
      * @param object                to resolve placement of
@@ -167,7 +167,7 @@ public class BIMtoOSMUtility {
         if (object == null) return null;
         if (objectPlacementEntity == null) return object;
 
-        // get objects IFCRELATIVEPLACEMENT entity
+        // get objects IfcRelativePlacement entity
         EntityInstance relativePlacement = objectPlacementEntity.getAttributeValueBNasEntityInstance("RelativePlacement");
 
         // get rotation of this entity
@@ -178,7 +178,7 @@ public class BIMtoOSMUtility {
         Vector3D translation = getTranslationFromRelativePlacement(relativePlacement);
         if (translation == null) return object;
 
-        // check if this entity has placement parent (PLACEMENTRELTO)
+        // check if this entity has placement parent (PlacementRelTo)
         if (objectPlacementEntity.getAttributeValueBNasEntityInstance("PlacementRelTo") != null) {
             EntityInstance placementRelTo = objectPlacementEntity.getAttributeValueBNasEntityInstance("PlacementRelTo");
             resolveObjectPlacement(placementRelTo, object);
@@ -250,7 +250,7 @@ public class BIMtoOSMUtility {
     }
 
     /**
-     * Method gets local shape representation of IFC object
+     * Method gets local shape representation of ifc object
      *
      * @param ifcModel ifcModel
      * @param object   BIM object
@@ -276,8 +276,8 @@ public class BIMtoOSMUtility {
     }
 
     /**
-     * Checks the IFCSHAPEREPRESENTATION objects for object with IFCSHAPEREPRESENTATION.REPRESENTATIONIDENTIFIER = "identifier" and
-     * returns it
+     * Checks the IFCSHAPEREPRESENTATION objects for object with
+     * IFCSHAPEREPRESENTATION.REPRESENTATIONIDENTIFIER = "identifier" and returns it
      *
      * @param repObjectIdentities IfcShapeRepresentation objects
      * @param identifier          RepresentationIdentifier
@@ -298,10 +298,10 @@ public class BIMtoOSMUtility {
      */
     @SuppressWarnings("unchecked")
     private static Matrix3D getObjectRotationMatrix(EntityInstance object) {
-        // get objects IFCLOCALPLACEMENT entity
+        // get objects IfcLocalPlacement entity
         EntityInstance objectIFCLP = object.getAttributeValueBNasEntityInstance("ObjectPlacement");
 
-        // get all RELATIVEPLACEMENTs to root
+        // get all RelativePlacements to root
         ArrayList<EntityInstance> objectRP = getRelativePlacementsToRoot(objectIFCLP, new ArrayList<>());
 
         double rotAngleX = 0.0;    // in rad
@@ -309,8 +309,9 @@ public class BIMtoOSMUtility {
         Vector3D parentXVector = null;
         Vector3D parentZVector = null;
 
+        // TODO use one rotation matrix instead of each for each axis
         for (EntityInstance relativeObject : objectRP) {
-            // get REFDIRECTION (x axis vector)
+            // get RefDirection (x axis vector)
             List<String> xDirectionRatios;
             List<String> zDirectionRatios;
             try {
@@ -359,20 +360,21 @@ public class BIMtoOSMUtility {
     }
 
     /**
-     * Method recursive walks thru IFC file and collects the RELATIVEPLACEMENT EntityInstances from start entity to root entity
+     * Method runs recursively through ifc file and collects RelativePlacement EntityInstances from
+     * start to root entity
      *
-     * @param entity                   you want to collect the RELATIVEPLACEMENT from
+     * @param entity                   you want to collect the RelativePlacement for
      * @param relativePlacementsToRoot empty list at beginning, needed for recursive iteration
-     * @return List with EntityInstances of RELATIVEPLACEMENTs
+     * @return List with EntityInstances of RelativePlacement
      */
     private static ArrayList<EntityInstance> getRelativePlacementsToRoot(EntityInstance entity, ArrayList<EntityInstance> relativePlacementsToRoot) {
         if (entity == null) return relativePlacementsToRoot;
 
-        // get objects IFCRELATIVEPLACEMENT entity
+        // get objects IfcRelativePlacement entity
         EntityInstance relativePlacement = entity.getAttributeValueBNasEntityInstance("RelativePlacement");
         relativePlacementsToRoot.add(relativePlacement);
 
-        // get id of placement relative to this (PLACEMENTRELTO)
+        // get id of placement relative to this (PlacementRelTo)
         EntityInstance placementRelTo = entity.getAttributeValueBNasEntityInstance("PlacementRelTo");
         getRelativePlacementsToRoot(placementRelTo, relativePlacementsToRoot);
 
@@ -380,23 +382,23 @@ public class BIMtoOSMUtility {
     }
 
     /**
-     * Identifies the type of an IFCREPRESENTATION object.
+     * Identifies the type of an IfcRepresentation object.
      *
-     * @param object object to get the IFCPRODUCTDEFINITIONSHAPE.REPRESENTATIONS from which will be identified
+     * @param object object to get the IfcProductDefinitionShape.Representations from which will be identified
      * @return List of IFCShapeRepresentationIdentity holding an IFC representation object and it's identifier
      */
     public static List<IfcRepresentation> getIfcRepresentations(EntityInstance object) {
         ArrayList<IfcRepresentation> repObjectIdentities = new ArrayList<>();
 
-        // get IFCPRODUCTDEFINITIONSHAPE of object
+        // get IfcProductDefinitionShape of object
         EntityInstance objectIFCPDS = object.getAttributeValueBNasEntityInstance("Representation");
-        // get all IFCSHAPEREPRESENTATIONS of IFCOBJECT
+        // get all IfcShapeRepresentation of object
         ArrayList<EntityInstance> objectRepresentations =
                 objectIFCPDS.getAttributeValueBNasEntityInstanceList("Representations");
 
         // identify each object
         for (EntityInstance repObject : objectRepresentations) {
-            //identify IFCSHAPEREPRESENTATION type
+            //identify IfcShapeRepresentation type
             IfcRepresentation repIdentity = IfcObjectIdentifier.identifyShapeRepresentation(repObject);
             repIdentity.setRootEntity(object);
             if (!repIdentity.isFilled()) return null;

@@ -44,7 +44,7 @@ public class ParserUtility {
     }
 
     /**
-     * Parses string of double value from IFC file into proper double
+     * Parses string of double value from ifc file into double
      *
      * @param doubleString String of coordinate
      * @return double representing double
@@ -63,7 +63,7 @@ public class ParserUtility {
     }
 
     /**
-     * Get level list of data set
+     * Get list of levels included in dataset
      *
      * @param ds data set
      * @return Level list as {@link ArrayList <Integer>}
@@ -93,7 +93,7 @@ public class ParserUtility {
     }
 
     /**
-     * Get level tag of node. Search in node tags and in tags of ways including the node
+     * Get level tag of node.
      * @param node to get level tag
      * @return level tag or null
      */

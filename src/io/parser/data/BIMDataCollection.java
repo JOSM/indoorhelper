@@ -18,7 +18,7 @@ public class BIMDataCollection {
     private List<EntityInstance> doorObjects;
     private List<EntityInstance> stairObjects;
     private List<EntityInstance> windowObjects;
-    private List<EntityInstance> relVoidsElements;    // IFCRELVOIDSELEMENT
+    private List<EntityInstance> relVoidsElements;    // IfcRelVoidsElement
 
     public EntityInstance getIfcSite() {
         return ifcSite;

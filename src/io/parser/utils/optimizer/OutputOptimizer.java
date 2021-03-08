@@ -12,7 +12,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Class optimizing OSM data to avoid unnecessary nodes/ways in data set
+ * Class providing methods to optimize OSM data files to avoid unnecessary nodes/ways in data set
  *
  * @author rebsc
  */

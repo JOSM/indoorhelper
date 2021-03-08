@@ -13,7 +13,6 @@ import org.openstreetmap.josm.gui.layer.OsmDataLayer;
 public class ImportDataRenderer {
 
     public static void renderDataOnNewLayer(DataSet ds, String layerName) {
-        // create new layer with data
         OsmDataLayer importLayer = new OsmDataLayer(ds, layerName, null);
         MainApplication.getLayerManager().addLayer(importLayer);
         MainApplication.getLayerManager().setActiveLayer(importLayer);
