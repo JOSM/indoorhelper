@@ -224,7 +224,7 @@ public class IndoorHelperController {
     /**
      * General listener for LevelSelectorView window
      */
-    class ToolSelectorWindowSListener extends WindowAdapter {
+    class ToolSelectorWindowListener extends WindowAdapter {
 
         @Override
         public void windowClosed(WindowEvent e) {
@@ -297,7 +297,7 @@ public class IndoorHelperController {
         if (selectorView != null) {
             selectorView.setOkButtonListener(toolLevelOkButtonListener);
             selectorView.setCancelButtonListener(toolLevelCancelButtonListener);
-            selectorView.setSelectorWindowListener(new ToolSelectorWindowSListener());
+            selectorView.setSelectorWindowListener(new ToolSelectorWindowListener());
         }
     }
 
