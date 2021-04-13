@@ -1,5 +1,5 @@
 // License: AGPL. For details, see LICENSE file.
-package io.parser.utils.optimizer;
+package io.parser.optimizer;
 
 import io.parser.math.ParserGeoMath;
 import io.parser.utils.ParserUtility;
@@ -25,7 +25,6 @@ public class OutputOptimizer {
      * @param ds     to optimize
      */
     public static void optimize(Configuration config, DataSet ds) {
-        // if merge close nodes enabled
         if (config.MERGE_CLOSE_NODES) {
             int preCount = ds.getNodes().size() + ds.getWays().size();
 
@@ -57,7 +56,7 @@ public class OutputOptimizer {
             for (Node candidate : target.mergeCandidates) {
                 Node dsCandidate = (Node) ds.getPrimitiveById(candidate.getPrimitiveId());
                 if (dsCandidate == null) {
-                    //TODO Improve the merge to avoid this!
+                    //TODO Improve the merge to avoid this case!
                     Logging.info(String.format("%s-OutputOptimizerReport: Merge candidate is NULL, this should not happen!",
                             OutputOptimizer.class.getName()));
                     continue;
@@ -90,6 +89,8 @@ public class OutputOptimizer {
      * @return Set of merges
      */
     private static ArrayList<Merge> findMerges(DataSet ds, double mergeDistance, int level) {
+        //TODO find merges by using clustering algorithm
+
         ArrayList<Merge> merges = new ArrayList<>();
         ArrayList<Node> nodes = new ArrayList<>(ds.getNodes());
 

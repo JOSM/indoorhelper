@@ -1,4 +1,4 @@
-package io.parser.utils.optimizer;
+package io.parser.optimizer;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.junit.Test;

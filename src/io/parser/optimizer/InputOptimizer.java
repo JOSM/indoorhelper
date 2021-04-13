@@ -1,5 +1,5 @@
 // License: AGPL. For details, see LICENSE file.
-package io.parser.utils.optimizer;
+package io.parser.optimizer;
 
 import org.openstreetmap.josm.tools.Logging;
 
