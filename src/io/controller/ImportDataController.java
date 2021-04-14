@@ -44,15 +44,17 @@ import static org.openstreetmap.josm.tools.I18n.tr;
 public class ImportDataController implements ImportEventListener {
 
     private final ImportDataModel model;
-    private JFrame progressFrame;
     private String importedFilepath;
     private final String pluginDir = Preferences.main().getPluginsDirectory().toString();
+
+    private JFrame progressFrame;
+    private JProgressBar progressBar;
+    private JPanel infoPanel;
 
     public ImportDataController() {
         model = new ImportDataModel();
         JosmAction importBIMAction = new ImportBIMDataAction(this);
         MainMenu.add(MainApplication.getMenu().fileMenu, importBIMAction, false, 21);
-        initProgressProcess();
 
         // add log file handler
         try {
@@ -84,6 +86,7 @@ public class ImportDataController implements ImportEventListener {
     private void importBIMData(String filepath) {
         addInfoLabel();
         importedFilepath = filepath;
+        initProgressProcess();
         progressFrame.setVisible(true);
         new Thread(() -> {
             new BIMtoOSMParser(this, pluginDir + "/indoorhelper/").parse(importedFilepath);
@@ -102,11 +105,17 @@ public class ImportDataController implements ImportEventListener {
         ImportDataRenderer.renderDataOnNewLayer(ds, layerName);
     }
 
+    @Override
+    public void onProcessStatusChanged(String statusMsg) {
+        progressBar.setString(statusMsg);
+    }
+
     /**
      * Initializes progress frame and progress bar used while loading file
      */
     private void initProgressProcess() {
-        JProgressBar progressBar = new JProgressBar(0, 100);
+        progressBar = new JProgressBar(0, 100);
+        progressBar.setName("progressBar");
         progressBar.setIndeterminate(true);
         progressBar.setStringPainted(true);
         progressBar.setString("loading file");
@@ -122,7 +131,11 @@ public class ImportDataController implements ImportEventListener {
      * Shows info panel at top
      */
     private void addInfoLabel() {
-        JPanel infoPanel = new JPanel();
+        MapFrame map = MainApplication.getMap();
+        if(map == null) return;
+        if(infoPanel != null) return;
+
+        infoPanel = new JPanel();
         Font font = infoPanel.getFont().deriveFont(Font.PLAIN, 14.0f);
         JMultilineLabel iLabel = new JMultilineLabel(
                 tr("BIM importer is in beta version! \n You can help to improve the BIM import by reporting bugs or other issues. " +
@@ -149,8 +162,7 @@ public class ImportDataController implements ImportEventListener {
             }
         });
         infoPanel.add(closeButton, GBC.std(3, 1).span(1, 2).anchor(EAST));
-        MapFrame map = MainApplication.getMap();
-        if (map != null) map.addTopPanel(infoPanel);
+        map.addTopPanel(infoPanel);
     }
 
     /**

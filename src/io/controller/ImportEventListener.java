@@ -23,4 +23,12 @@ public interface ImportEventListener {
      * @param ds Parsed data kept in DataSet
      */
     void onDataParsed(DataSet ds);
+
+    /**
+     * Will be called on parsing status changed to update
+     * progress bar
+     *
+     * @param statusMsg new progress bar info
+     */
+    void onProcessStatusChanged(String statusMsg);
 }

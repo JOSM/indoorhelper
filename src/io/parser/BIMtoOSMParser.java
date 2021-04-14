@@ -86,12 +86,17 @@ public class BIMtoOSMParser {
      * @param pluginDirectory of indoorHelper plugin
      */
     public BIMtoOSMParser(ImportEventListener listener, String pluginDirectory) {
+        if (listener == null) {
+            throw new IllegalArgumentException("invalid argument value of listener: null");
+        }
         importListener = listener;
+
         if (pluginDirectory == null) {
             resourcePathDir = Preferences.main().getPluginsDirectory().toString() + "/indoorhelper/resources";
         } else {
             resourcePathDir = pluginDirectory + "/resources/";
         }
+
         ifcSchemaFilePath = resourcePathDir + IFC2X3_TC1_SCHEMA;
         tagCatalog = new TagCatalog();
         lengthUnit = IfcUnitCatalog.LengthUnit.M;
@@ -171,7 +176,8 @@ public class BIMtoOSMParser {
         BIMDataCollection rawFilteredData = BIMtoOSMUtility.extractMajorBIMData(ifcModel);
 
         if (!checkForIFCSITE(rawFilteredData)) {
-            showParsingErrorView(filepath, "Could not import IFC file.\nIFC file does not contain IFCSITE element.", true);
+            showParsingErrorView(filepath, "Could not import IFC file.\nIFC " +
+                    "file does not contain IFCSITE element.", true);
             return false;
         }
 
@@ -186,6 +192,7 @@ public class BIMtoOSMParser {
         // pack parsed data into osm format
         DataSet packedOSMData = packIntoOSMData(preparedData);
         if (optimizeOutput) {
+            importListener.onProcessStatusChanged("Optimizing data");
             OutputOptimizer.optimize(optimizeOutputConfig, packedOSMData);
         }
 
@@ -194,9 +201,8 @@ public class BIMtoOSMParser {
         }
 
         // trigger rendering
-        if (importListener != null) {
-            importListener.onDataParsed(packedOSMData);
-        }
+        importListener.onDataParsed(packedOSMData);
+
         Logging.info(this.getClass().getName() + ": " + filepath + " parsed successfully");
         return true;
     }
