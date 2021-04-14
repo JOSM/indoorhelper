@@ -192,7 +192,7 @@ public class BIMtoOSMParser {
         // pack parsed data into osm format
         DataSet packedOSMData = packIntoOSMData(preparedData);
         if (optimizeOutput) {
-            importListener.onProcessStatusChanged("Optimizing data");
+            importListener.onProcessStatusChanged("optimizing data");
             OutputOptimizer.optimize(optimizeOutputConfig, packedOSMData);
         }
 
