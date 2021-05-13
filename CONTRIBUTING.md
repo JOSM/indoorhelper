@@ -22,5 +22,5 @@ You're welcome to do some refactoring, bug fixing or to improve the plugin funct
 * Write meaningful commit messages
 
 ## License
-All contributions to this repository are licensed under the [GPLv3](LICENSE).
+All contributions to this repository are licensed under the [AGPLv3](LICENSE).
 
