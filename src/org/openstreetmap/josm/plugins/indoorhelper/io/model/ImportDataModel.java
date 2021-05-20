@@ -5,8 +5,6 @@ import org.openstreetmap.josm.data.osm.DataSet;
 
 /**
  * Class holding imported data
- *
- * @author rebsc
  */
 public class ImportDataModel {
 
@@ -16,7 +14,7 @@ public class ImportDataModel {
         ds = data;
     }
 
-    public DataSet getData(){
+    public DataSet getData() {
         return ds;
     }
 

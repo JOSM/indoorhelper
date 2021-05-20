@@ -38,8 +38,6 @@ import static org.openstreetmap.josm.tools.I18n.tr;
 
 /**
  * Import data controller class handles communication between {@link ImportDataModel} and import views.
- *
- * @author rebsc
  */
 public class ImportDataController implements ImportEventListener {
 
@@ -132,8 +130,8 @@ public class ImportDataController implements ImportEventListener {
      */
     private void addInfoLabel() {
         MapFrame map = MainApplication.getMap();
-        if(map == null) return;
-        if(infoPanel != null) return;
+        if (map == null) return;
+        if (infoPanel != null) return;
 
         infoPanel = new JPanel();
         Font font = infoPanel.getFont().deriveFont(Font.PLAIN, 14.0f);

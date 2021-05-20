@@ -2,9 +2,7 @@
 package org.openstreetmap.josm.plugins.indoorhelper.io.parser.math;
 
 /**
- * Class prividng 3D matrix
- *
- * @author rebsc
+ * Class provides 3D matrix
  */
 public class Matrix3D {
 

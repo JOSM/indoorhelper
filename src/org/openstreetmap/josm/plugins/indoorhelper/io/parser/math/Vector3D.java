@@ -3,8 +3,6 @@ package org.openstreetmap.josm.plugins.indoorhelper.io.parser.math;
 
 /**
  * Class representing 3D vector
- *
- * @author rebsc
  */
 public class Vector3D {
     private double x;

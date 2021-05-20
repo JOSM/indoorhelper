@@ -13,10 +13,7 @@ import static org.openstreetmap.josm.tools.I18n.tr;
 
 /**
  * Menu entry action for BIM import function.
- *
- * @author rebsc
  */
-@SuppressWarnings("serial")
 public class ImportBIMDataAction extends JosmAction {
 
     private ImportEventListener importListener;

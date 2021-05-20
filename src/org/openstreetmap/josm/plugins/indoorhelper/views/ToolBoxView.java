@@ -22,9 +22,7 @@ import static org.openstreetmap.josm.tools.I18n.tr;
  * This is the main toolbox of the indoorhelper plug-in.
  *
  * @author egru
- * @author rebsc
  */
-@SuppressWarnings("serial")
 public class ToolBoxView extends ToggleDialog {
     private JPanel dialogPanel;
     private JPanel contentPanel;
@@ -345,7 +343,7 @@ public class ToolBoxView extends ToggleDialog {
         this.preset3.setEnabled(enabled);
         this.preset4.setEnabled(enabled);
 
-        if (enabled == false) {
+        if (!enabled) {
             resetUiElements();
         }
     }
@@ -390,7 +388,7 @@ public class ToolBoxView extends ToggleDialog {
         this.multiOuterButton.setEnabled(enabled);
         this.multiInnerButton.setEnabled(enabled);
 
-        if (enabled == false) resetUiElements();
+        if (!enabled) resetUiElements();
     }
 
     /**
@@ -443,7 +441,7 @@ public class ToolBoxView extends ToggleDialog {
      * @author rebsc
      */
     public void setLevelLabel(String levelTag) {
-        if (getLevelCheckBoxStatus() == false) {
+        if (!getLevelCheckBoxStatus()) {
             if (!levelTag.equals("")) {
                 this.levelLabel.setText(tr("Working level: {0}", levelTag));
             } else {

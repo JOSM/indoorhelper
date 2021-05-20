@@ -7,9 +7,7 @@ import org.openstreetmap.josm.plugins.indoorhelper.io.parser.data.ifc.IfcReprese
 import org.openstreetmap.josm.plugins.indoorhelper.io.model.BIMtoOSMCatalog;
 import org.openstreetmap.josm.plugins.indoorhelper.io.parser.data.BIMDataCollection;
 import org.openstreetmap.josm.plugins.indoorhelper.io.parser.data.BIMObject3D;
-import org.openstreetmap.josm.plugins.indoorhelper.io.parser.math.Matrix3D;
-import org.openstreetmap.josm.plugins.indoorhelper.io.parser.math.ParserMath;
-import org.openstreetmap.josm.plugins.indoorhelper.io.parser.math.Vector3D;
+import org.openstreetmap.josm.plugins.indoorhelper.io.parser.math.*;
 import nl.tue.buildingsmart.express.population.EntityInstance;
 import nl.tue.buildingsmart.express.population.ModelPopulation;
 
@@ -20,8 +18,6 @@ import static org.openstreetmap.josm.plugins.indoorhelper.io.parser.utils.Parser
 
 /**
  * Class providing useful methods to parse BIM data to OSM data
- *
- * @author rebsc
  */
 public class BIMtoOSMUtility {
 
@@ -127,9 +123,9 @@ public class BIMtoOSMUtility {
     /**
      * Transform BIM object for further operations. Extracts OSM relevant information and puts it into {@link BIMObject3D}
      *
-     * @param ifcModel   ifcModel
-     * @param solution   geometry solution type
-     * @param objectType relating BIMtoOSMCatalog.BIMObject
+     * @param ifcModel     ifcModel
+     * @param solution     geometry solution type
+     * @param objectType   relating BIMtoOSMCatalog.BIMObject
      * @param objectEntity BIM object of objectType
      * @return Transformed BIM object
      */
@@ -276,8 +272,8 @@ public class BIMtoOSMUtility {
     }
 
     /**
-     * Checks the IFCSHAPEREPRESENTATION objects for object with
-     * IFCSHAPEREPRESENTATION.REPRESENTATIONIDENTIFIER = "identifier" and returns it
+     * Checks the IfcShapeRepresentation objects for object with
+     * IfcShapeRepresentation.RepresentationIdentifier = "identifier" and returns it
      *
      * @param repObjectIdentities IfcShapeRepresentation objects
      * @param identifier          RepresentationIdentifier

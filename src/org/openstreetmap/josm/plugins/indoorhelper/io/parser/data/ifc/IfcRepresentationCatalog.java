@@ -4,8 +4,6 @@ package org.openstreetmap.josm.plugins.indoorhelper.io.parser.data.ifc;
 /**
  * Class classify ifc object types.
  * Notice: Enum elements are not defined uppercase to use them as strings
- *
- * @author rebsc
  */
 public class IfcRepresentationCatalog {
 

@@ -45,8 +45,6 @@ import static org.openstreetmap.josm.tools.I18n.tr;
 
 /**
  * Parser for BIM data. Extracts major BIM elements and transforms coordinates into OSM convenient format
- *
- * @author rebsc
  */
 public class BIMtoOSMParser {
 

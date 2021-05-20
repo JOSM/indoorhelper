@@ -13,8 +13,6 @@ import java.util.List;
 
 /**
  * Parser utility methods
- *
- * @author rebsc
  */
 public class ParserUtility {
 
@@ -94,15 +92,16 @@ public class ParserUtility {
 
     /**
      * Get level tag of node.
+     *
      * @param node to get level tag
      * @return level tag or null
      */
-    public static Number getLevelTag(Node node){
-        if(node == null)    return null;
-        if(node.get("level") != null){
+    public static Number getLevelTag(Node node) {
+        if (node == null) return null;
+        if (node.get("level") != null) {
             return Integer.parseInt(node.get("level"));
         }
-        if(!node.getParentWays().isEmpty()){
+        if (!node.getParentWays().isEmpty()) {
             return Integer.parseInt(node.getParentWays().get(0).get("level"));
         }
         return null;
@@ -110,13 +109,14 @@ public class ParserUtility {
 
     /**
      * Checks if both nodes are part of the same way
+     *
      * @param node1 to check
      * @param node2 to check
      * @return true if both nodes are part of the same way, else false
      */
-    public static boolean nodesPartOfSameWay(Node node1, Node node2){
+    public static boolean nodesPartOfSameWay(Node node1, Node node2) {
         for (Way way : node1.getParentWays()) {
-            if(way.containsNode(node2)) return true;
+            if (way.containsNode(node2)) return true;
         }
         return false;
     }

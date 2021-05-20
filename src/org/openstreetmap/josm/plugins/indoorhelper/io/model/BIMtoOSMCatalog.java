@@ -6,8 +6,6 @@ import java.util.List;
 
 /**
  * Class holding information of BIM to OSM translation schema
- *
- * @author rebsc
  */
 public class BIMtoOSMCatalog {
     /**

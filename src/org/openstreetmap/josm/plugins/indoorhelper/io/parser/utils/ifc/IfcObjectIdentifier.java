@@ -12,8 +12,6 @@ import java.util.ArrayList;
 
 /**
  * Class to identify the type on an IfcShapeRepresentation object
- *
- * @author rebsc
  */
 public class IfcObjectIdentifier {
 

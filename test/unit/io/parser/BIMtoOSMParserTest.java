@@ -12,8 +12,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests of {@link BIMtoOSMParser} class.
- *
- * @author rebsc
  */
 @Ignore("Causes unexpected error in Jenkins build")
 @Disabled("Causes unexpected error in Jenkins build\n")

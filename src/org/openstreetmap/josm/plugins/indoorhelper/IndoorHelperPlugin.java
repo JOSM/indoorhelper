@@ -22,7 +22,6 @@ import java.io.*;
  * This is the main class for the indoorhelper plug-in.
  *
  * @author egru
- * @author rebsc
  */
 public class IndoorHelperPlugin extends Plugin implements PaintableInvalidationListener, ActiveLayerChangeListener {
 
@@ -79,7 +78,7 @@ public class IndoorHelperPlugin extends Plugin implements PaintableInvalidationL
 
             String valDirPath = Config.getDirs().getUserDataDirectory(true) + sep + "styles";
             File valDir = new File(valDirPath);
-            if(!valDir.mkdirs()){
+            if (!valDir.mkdirs()) {
                 return;
             }
             outPath = valDir.getAbsolutePath() + sep + resourceName;

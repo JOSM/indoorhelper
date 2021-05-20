@@ -31,7 +31,6 @@ import static org.openstreetmap.josm.tools.I18n.tr;
  * IndoorHelperModel and the different views.
  *
  * @author egru
- * @author rebsc
  */
 public class IndoorHelperController {
 
@@ -52,10 +51,8 @@ public class IndoorHelperController {
      * After that it checks the tagged data.
      *
      * @author egru
-     * @author rebsc
      */
     private final ActionListener toolApplyButtonListener = e -> {
-
         IndoorObject indoorObject = toolboxView.getSelectedObject();
 
         // collecting all tags
@@ -225,7 +222,6 @@ public class IndoorHelperController {
      * General listener for LevelSelectorView window
      */
     class ToolSelectorWindowListener extends WindowAdapter {
-
         @Override
         public void windowClosed(WindowEvent e) {
             selectorView = null;
@@ -241,7 +237,6 @@ public class IndoorHelperController {
      * Constructor for the {@link IndoorHelperController} which initiates model and views.
      */
     public IndoorHelperController() {
-
         toolboxView = new ToolBoxView();
 
         // set preference if no value ist set already
@@ -305,13 +300,11 @@ public class IndoorHelperController {
      * Shortcut for spacebar
      */
     private class SpaceAction extends AbstractAction {
-
         private static final long serialVersionUID = 1L;
 
         @Override
         public void actionPerformed(ActionEvent e) {
             if (outerHelp) {
-
                 // Create new relation and add the currently drawn object to it
                 model.addRelation("outer");
                 MainApplication.getMap().selectSelectTool(false);
@@ -320,7 +313,6 @@ public class IndoorHelperController {
                 // Clear currently selection
                 MainApplication.getLayerManager().getEditDataSet().clearSelection();
             } else if (innerHelp) {
-
                 // Save new drawn relation for adding
                 innerRelation = MainApplication.getLayerManager().getEditDataSet().getAllSelected();
                 MainApplication.getMap().selectSelectTool(false);
@@ -328,7 +320,6 @@ public class IndoorHelperController {
                 // Clear currently selection
                 MainApplication.getLayerManager().getEditDataSet().clearSelection();
             } else if (levelHelp) {
-
                 List<Tag> tags = new ArrayList<>();
                 tags.add(new Tag("level", levelNum));
 
@@ -346,7 +337,6 @@ public class IndoorHelperController {
      * Shortcut for enter
      */
     private class EnterAction extends AbstractAction {
-
         private static final long serialVersionUID = 1L;
 
         @Override

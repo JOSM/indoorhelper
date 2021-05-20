@@ -5,8 +5,6 @@ import org.openstreetmap.josm.data.osm.DataSet;
 
 /**
  * Listener handles import actions.
- *
- * @author rebsc
  */
 public interface ImportEventListener {
 

@@ -10,7 +10,6 @@ import javax.swing.*;
  *
  * @author egru
  */
-@SuppressWarnings("serial")
 class PresetButton extends JButton {
 
     private IndoorObject indoorObject;

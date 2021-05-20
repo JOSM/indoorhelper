@@ -12,7 +12,6 @@ import java.util.ListIterator;
  * Counter for the calls of specific indoor objects, to track which items were used most frequently.
  *
  * @author egru
- * @author rebsc
  */
 public class PresetCounter {
 

@@ -20,7 +20,6 @@ import static org.openstreetmap.josm.tools.I18n.tr;
  * the functions to handle the plug-in
  *
  * @author egru
- * @author rebsc
  */
 public class IndoorHelperModel {
 
@@ -53,7 +52,6 @@ public class IndoorHelperModel {
      *
      * @param object   the object which defines the tag-set you want to add
      * @param userTags the tags which are given by the user input
-     * @author rebsc
      */
     public void addTagsToOSM(IndoorObject object, List<Tag> userTags) {
         if (!MainApplication.getLayerManager().getEditDataSet().selectionEmpty() &&
@@ -121,7 +119,6 @@ public class IndoorHelperModel {
      * Method which adds a list of tag-sets to the currently selected OSM data. Tags directly to ways and/or nodes.
      *
      * @param userTags the tags which are given by the user input
-     * @author rebsc
      */
     public void addTagsToOSM(List<Tag> userTags) {
 
@@ -142,7 +139,6 @@ public class IndoorHelperModel {
      * Method which adds the relation to OSM data. Also adds the selected tag-set to relation object.
      *
      * @param role the Multipolygon Role as String
-     * @author rebsc
      */
     public void addRelation(String role) {
         Relation newRelation = new Relation();
@@ -165,7 +161,6 @@ public class IndoorHelperModel {
      *
      * @param role          The Multipolygon Role as String
      * @param innerRelation inner relation
-     * @author rebsc
      */
     public void editRelation(String role, Collection<OsmPrimitive> innerRelation) {
 
@@ -211,7 +206,6 @@ public class IndoorHelperModel {
      * @param ds        actual working dataset
      * @param relations collection of relations in the dataset
      * @return relation of currently selected dataset
-     * @author rebsc
      */
     private Relation getRelationFromDataSet(DataSet ds, Collection<Relation> relations) {
         for (Relation r : relations) {
@@ -233,7 +227,6 @@ public class IndoorHelperModel {
      * @param ds        active dataset
      * @param relations collection of relations in the dataset
      * @return role of currently selected relation member if any
-     * @author rebsc
      */
     private String getRole(DataSet ds, Collection<Relation> relations) {
 
@@ -257,7 +250,6 @@ public class IndoorHelperModel {
      * @param ds        active dataset
      * @param relations relations
      * @return true if selected object is a relation
-     * @author rebsc
      */
     private boolean isRelationMember(DataSet ds, Collection<Relation> relations) {
         for (Relation r : relations) {

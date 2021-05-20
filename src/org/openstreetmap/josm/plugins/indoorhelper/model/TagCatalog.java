@@ -87,7 +87,6 @@ public final class TagCatalog {
      * {@link Enum} class for an easier access of elements in the {@link TagCatalog}
      *
      * @author egru
-     * @author rebsc
      */
     public enum IndoorObject {
         CONCRETE_WALL, GLASS_WALL, ROOM, TOILET_MALE, TOILET_FEMALE, ELEVATOR, DOOR_PRIVATE, DOOR_PUBLIC, ENTRANCE,

@@ -15,8 +15,6 @@ import static org.openstreetmap.josm.tools.I18n.tr;
 
 /**
  * This is the level selector toolbox of the indoorhelper plug-in.
- *
- * @author rebsc
  */
 public class LevelSelectorView extends JFrame {
 

@@ -15,8 +15,6 @@ import static org.openstreetmap.josm.plugins.indoorhelper.io.parser.utils.Parser
 
 /**
  * Class providing methods to extract OSM data from BIM data
- *
- * @author rebsc
  */
 public class IfcGeometryExtractor {
 

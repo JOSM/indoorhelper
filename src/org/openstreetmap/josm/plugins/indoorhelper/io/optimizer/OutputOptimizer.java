@@ -13,8 +13,6 @@ import java.util.List;
 
 /**
  * Class providing methods to optimize OSM data files to avoid unnecessary nodes/ways in data set
- *
- * @author rebsc
  */
 public class OutputOptimizer {
 

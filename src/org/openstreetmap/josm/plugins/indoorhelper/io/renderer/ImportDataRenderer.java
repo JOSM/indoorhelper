@@ -7,8 +7,6 @@ import org.openstreetmap.josm.gui.layer.OsmDataLayer;
 
 /**
  * Class handles rendering of imported data
- *
- * @author rebsc
  */
 public class ImportDataRenderer {
 

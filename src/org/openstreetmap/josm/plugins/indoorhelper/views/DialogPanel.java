@@ -13,7 +13,6 @@ import java.awt.event.FocusListener;
 
 import static org.openstreetmap.josm.tools.I18n.tr;
 
-@SuppressWarnings("serial")
 public class DialogPanel extends JPanel {
     private JPanel contentPanel;
     private JToggleButton powerButton;

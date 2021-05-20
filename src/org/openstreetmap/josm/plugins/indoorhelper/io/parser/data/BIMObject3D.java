@@ -12,8 +12,6 @@ import java.util.List;
 
 /**
  * Class holding OSM relevant data of 3D BIM object
- *
- * @author rebsc
  */
 public class BIMObject3D {
 

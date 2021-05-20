@@ -9,8 +9,6 @@ import java.util.Scanner;
 
 /**
  * Class providing methods to optimize IFC files before loading them
- *
- * @author rebsc
  */
 public class InputOptimizer {
 

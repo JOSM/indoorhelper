@@ -7,8 +7,6 @@ import org.openstreetmap.josm.data.coor.LatLon;
 
 /**
  * Class providing math functions for geodetic operations
- *
- * @author rebsc
  */
 public class ParserGeoMath {
 
@@ -62,6 +60,7 @@ public class ParserGeoMath {
 
     /**
      * Method calculates distance between latlon in meter
+     *
      * @param lat1 first point latitude
      * @param lon1 first point longitude
      * @param lat2 second point latitude
@@ -73,9 +72,9 @@ public class ParserGeoMath {
         double dLon = Math.toRadians(lon2 - lon1);
         double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
                 Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
-                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+                        Math.sin(dLon / 2) * Math.sin(dLon / 2);
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        return (OsmMercator.EARTH_RADIUS * c)*1e3;
+        return (OsmMercator.EARTH_RADIUS * c) * 1e3;
     }
 
 }

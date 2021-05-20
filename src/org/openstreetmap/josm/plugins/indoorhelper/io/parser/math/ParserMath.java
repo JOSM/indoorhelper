@@ -3,8 +3,6 @@ package org.openstreetmap.josm.plugins.indoorhelper.io.parser.math;
 
 /**
  * Class providing transformation and rotation methods
- *
- * @author rebsc
  */
 public class ParserMath {
 

@@ -7,8 +7,6 @@ import java.util.List;
 
 /**
  * Data structure holding specific BIM data elements.
- *
- * @author rebsc
  */
 public class BIMDataCollection {
     private EntityInstance ifcSite;    // root of data set

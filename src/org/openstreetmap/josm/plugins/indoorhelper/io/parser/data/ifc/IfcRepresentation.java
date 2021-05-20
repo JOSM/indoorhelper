@@ -6,8 +6,6 @@ import nl.tue.buildingsmart.express.population.EntityInstance;
 
 /**
  * Class holding identifier and types of IfcRepresentation
- *
- * @author rebsc
  */
 public class IfcRepresentation {
     // IFC attributes
