@@ -1,6 +1,7 @@
 // License: AGPL. For details, see LICENSE file.
 package io.parser;
 
+import org.openstreetmap.josm.plugins.indoorhelper.io.parser.BIMtoOSMParser;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.jupiter.api.Disabled;

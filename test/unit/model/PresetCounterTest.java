@@ -1,7 +1,8 @@
 // License: AGPL. For details, see LICENSE file.
 package model;
 
-import model.TagCatalog.IndoorObject;
+import org.openstreetmap.josm.plugins.indoorhelper.model.PresetCounter;
+import org.openstreetmap.josm.plugins.indoorhelper.model.TagCatalog.IndoorObject;
 import org.junit.Test;
 
 import java.util.ArrayList;

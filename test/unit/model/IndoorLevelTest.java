@@ -1,6 +1,7 @@
 // License: AGPL. For details, see LICENSE file.
 package model;
 
+import org.openstreetmap.josm.plugins.indoorhelper.model.IndoorLevel;
 import org.junit.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;

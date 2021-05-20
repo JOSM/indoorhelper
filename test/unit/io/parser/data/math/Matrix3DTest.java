@@ -1,8 +1,9 @@
 package io.parser.data.math;
 
 //import org.junit.jupiter.api.Test;
-import io.parser.math.Matrix3D;
-import io.parser.math.Vector3D;
+
+import org.openstreetmap.josm.plugins.indoorhelper.io.parser.math.Matrix3D;
+import org.openstreetmap.josm.plugins.indoorhelper.io.parser.math.Vector3D;
 import org.junit.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

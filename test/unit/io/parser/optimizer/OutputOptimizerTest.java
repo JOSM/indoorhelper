@@ -1,6 +1,7 @@
 package io.parser.optimizer;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.openstreetmap.josm.plugins.indoorhelper.io.optimizer.OutputOptimizer;
 import org.junit.Test;
 import org.junit.jupiter.api.Disabled;
 import org.openstreetmap.josm.data.coor.LatLon;
