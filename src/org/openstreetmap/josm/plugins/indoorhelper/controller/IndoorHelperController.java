@@ -164,22 +164,34 @@ public class IndoorHelperController {
     /**
      * Listener for preset button 1.
      */
-    private final ActionListener preset1Listener = e -> model.addTagsToOSM(toolboxView.getPreset1());
+    private final ActionListener preset1Listener = e -> {
+        model.addTagsToOSM(toolboxView.getPreset1());
+        refreshPresets();
+    };
 
     /**
      * Listener for preset button 2.
      */
-    private final ActionListener preset2Listener = e -> model.addTagsToOSM(toolboxView.getPreset2());
+    private final ActionListener preset2Listener = e -> {
+        model.addTagsToOSM(toolboxView.getPreset2());
+        refreshPresets();
+    };
 
     /**
      * Listener for preset button 3.
      */
-    private final ActionListener preset3Listener = e -> model.addTagsToOSM(toolboxView.getPreset3());
+    private final ActionListener preset3Listener = e -> {
+        model.addTagsToOSM(toolboxView.getPreset3());
+        refreshPresets();
+    };
 
     /**
      * Listener for preset button 4.
      */
-    private final ActionListener preset4Listener = e -> model.addTagsToOSM(toolboxView.getPreset4());
+    private final ActionListener preset4Listener = e -> {
+        model.addTagsToOSM(toolboxView.getPreset4());
+        refreshPresets();
+    };
 
     /**
      * Updates the preset button from the current ranking.
