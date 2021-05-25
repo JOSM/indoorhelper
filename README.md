@@ -17,7 +17,7 @@
 Want to contribute to this repository? Have a look at the [contribution guidelines](CONTRIBUTING.md)!
 
 ## Installation
-If you want to use the plugin or even work on the source code, have a look at [INSTALL.md](INSTALL.md) for installation instructions.
+If you want to use the plugin or work with the source code, have a look at [INSTALL.md](INSTALL.md) for installation instructions.
 
 ## Third-Party Libraries
 
