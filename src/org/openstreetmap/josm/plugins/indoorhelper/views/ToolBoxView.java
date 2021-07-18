@@ -1,22 +1,32 @@
 // License: AGPL. For details, see LICENSE file.
 package org.openstreetmap.josm.plugins.indoorhelper.views;
 
-import org.openstreetmap.josm.plugins.indoorhelper.model.TagCatalog;
-import org.openstreetmap.josm.plugins.indoorhelper.model.TagCatalog.IndoorObject;
-import org.openstreetmap.josm.gui.dialogs.ToggleDialog;
-import org.openstreetmap.josm.gui.widgets.DisableShortcutsOnFocusGainedTextField;
-import org.openstreetmap.josm.gui.widgets.JosmComboBox;
+import static org.openstreetmap.josm.tools.I18n.tr;
 
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.ItemListener;
 import java.util.List;
 
-import static org.openstreetmap.josm.tools.I18n.tr;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSeparator;
+import javax.swing.border.EmptyBorder;
+
+import org.openstreetmap.josm.data.Version;
+import org.openstreetmap.josm.gui.dialogs.ToggleDialog;
+import org.openstreetmap.josm.gui.widgets.DisableShortcutsOnFocusGainedTextField;
+import org.openstreetmap.josm.gui.widgets.JosmComboBox;
+import org.openstreetmap.josm.plugins.indoorhelper.model.TagCatalog;
+import org.openstreetmap.josm.plugins.indoorhelper.model.TagCatalog.IndoorObject;
 
 /**
  * This is the main toolbox of the indoorhelper plug-in.
@@ -90,10 +100,6 @@ public class ToolBoxView extends ToggleDialog {
         addLevelButton = new JButton();
         helpButton = new JButton();
 
-        //======== this ========
-        //Container contentPane = this.get;
-        //contentPane.setLayout(new BorderLayout());
-
         //======== dialogPane ========
 
         dialogPanel.setBorder(new EmptyBorder(12, 12, 12, 12));
@@ -126,6 +132,7 @@ public class ToolBoxView extends ToggleDialog {
         contentPanel.add(helpButton, new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0,
                 GridBagConstraints.CENTER, GridBagConstraints.BOTH,
                 new Insets(0, 0, 5, 0), 0, 0));
+        helpButton.setVisible(Version.getInstance().getVersion() < 18_066);
 
         //---- levelNameLabel ----
         levelNameLabel.setText(tr("Level name"));
@@ -331,12 +338,10 @@ public class ToolBoxView extends ToggleDialog {
         this.levelNameField.setEnabled(enabled);
         this.nameField.setEnabled(enabled);
         this.refField.setEnabled(enabled);
-        this.levelNameField.setEnabled(enabled);
         this.repeatOnField.setEnabled(enabled);
         this.multiOuterButton.setEnabled(enabled);
         this.multiInnerButton.setEnabled(enabled);
         this.multiCheckBox.setEnabled(enabled);
-        this.helpButton.setEnabled(enabled);
         this.addLevelButton.setEnabled(enabled);
         this.preset1.setEnabled(enabled);
         this.preset2.setEnabled(enabled);
@@ -356,7 +361,6 @@ public class ToolBoxView extends ToggleDialog {
     public void setNRUiElementsEnabled(boolean enabled) {
         this.nameField.setEnabled(enabled);
         this.refField.setEnabled(enabled);
-
     }
 
     /**
@@ -376,7 +380,6 @@ public class ToolBoxView extends ToggleDialog {
     public void setLVLUiElementsEnabled(boolean enabled) {
         this.levelNameField.setEnabled(enabled);
         this.addLevelButton.setEnabled(enabled);
-
     }
 
     /**
@@ -437,8 +440,8 @@ public class ToolBoxView extends ToggleDialog {
     /**
      * Setter for the current level value tag {@link #levelLabel}.
      *
-     * @param levelTag level value as String
      * @author rebsc
+     * @param levelTag level value as String
      */
     public void setLevelLabel(String levelTag) {
         if (!getLevelCheckBoxStatus()) {
@@ -478,7 +481,6 @@ public class ToolBoxView extends ToggleDialog {
     public String getRepeatOnText() {
         return this.repeatOnField.getText();
     }
-
 
     /**
      * Clears the text boxes and sets an empty String.
@@ -526,7 +528,6 @@ public class ToolBoxView extends ToggleDialog {
     public void setAddLevelButtonListener(ActionListener l) {
         this.addLevelButton.addActionListener(l);
     }
-
 
     /**
      * Set the listener for {@link #objectBox}.

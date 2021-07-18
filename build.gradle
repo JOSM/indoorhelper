@@ -3,15 +3,15 @@ import com.github.spotbugs.snom.SpotBugsTask
 plugins {
   id "java"
   id "eclipse"
-  id("com.github.spotbugs") version "4.2.0"
-  id "org.openstreetmap.josm" version "0.7.0"
+  id("com.github.spotbugs") version "4.7.2"
+  id "org.openstreetmap.josm" version "0.7.1"
 }
 
 sourceCompatibility = 1.8
 
 def versions = [
-  junit: "5.6.2",
-  spotbugs: "4.2.0"
+  junit: "5.7.2",
+  spotbugs: "4.3.0"
 ]
 
 repositories {
@@ -24,8 +24,8 @@ dependencies {
   testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${versions.junit}")
   testImplementation("org.junit.vintage:junit-vintage-engine:${versions.junit}")
   testImplementation("org.openstreetmap.josm:josm-unittest:"){changing=true}
-  testImplementation("com.github.tomakehurst:wiremock-jre8:2.26.3")
-  testImplementation("org.awaitility:awaitility:4.0.2")
+  testImplementation("com.github.tomakehurst:wiremock-jre8:2.29.1")
+  testImplementation("org.awaitility:awaitility:4.1.0")
   testImplementation("com.github.spotbugs:spotbugs-annotations:${versions["spotbugs"]}")
   compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
   compile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.25'
