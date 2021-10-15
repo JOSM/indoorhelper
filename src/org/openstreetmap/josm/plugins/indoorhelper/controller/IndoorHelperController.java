@@ -445,7 +445,8 @@ public class IndoorHelperController {
         Map<String, String> indoorMapPaint = new HashMap<>();
         indoorMapPaint.put("title", tr("Indoor"));
         indoorMapPaint.put("active", Boolean.toString(enabled));
-        indoorMapPaint.put("url", Config.getDirs().getUserDataDirectory(true) + sep + "styles" + sep + "sit.mapcss");
+        indoorMapPaint.put("url", Preferences.main().getPluginsDirectory().toString() + sep
+                + "indoorhelper" + sep + "resources" + sep + "sit.mapcss");
         styleMapsNew.add(indoorMapPaint);
         Config.getPref().putListOfMaps("mappaint.style.entries", styleMapsNew);
         updateSettings();

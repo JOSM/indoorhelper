@@ -65,7 +65,7 @@ public class ImportDataController implements ImportEventListener {
 
         // export resource files used by BuildingSMARTLibrary from jar to file system
         try {
-            exportPluginResource();
+            exportBIMResource();
         } catch (Exception e) {
             Logging.info(e.getMessage());
         }
@@ -164,14 +164,14 @@ public class ImportDataController implements ImportEventListener {
     }
 
     /**
-     * Export resources embedded in jar into file system
+     * Export BIM resources embedded in jar into file system
      *
      * @throws Exception IOException
      */
-    private void exportPluginResource() throws Exception {
+    private void exportBIMResource() throws Exception {
         File jarFile = new File(Preferences.main().getPluginsDirectory().toURI().getPath() + "/indoorhelper.jar");
         if (jarFile.isFile()) {
-            Logging.info("Copying resource files from jar to file system");
+            Logging.info("Copying BIM resource files from jar to file system");
             try (JarFile jar = new JarFile(jarFile)) {
                 ZipEntry ze1 = jar.getEntry("resources/IFC2X3_TC1.exp");
                 ZipEntry ze2 = jar.getEntry("resources/IFC4.exp");

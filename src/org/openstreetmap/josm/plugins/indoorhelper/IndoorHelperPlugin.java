@@ -1,8 +1,7 @@
 // License: AGPL. For details, see LICENSE file.
 package org.openstreetmap.josm.plugins.indoorhelper;
 
-import org.openstreetmap.josm.plugins.indoorhelper.controller.IndoorHelperController;
-import org.openstreetmap.josm.plugins.indoorhelper.io.controller.ImportDataController;
+import org.openstreetmap.josm.data.Preferences;
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.MapFrame;
 import org.openstreetmap.josm.gui.autofilter.AutoFilter;
@@ -14,9 +13,17 @@ import org.openstreetmap.josm.gui.layer.MapViewPaintable.PaintableInvalidationLi
 import org.openstreetmap.josm.gui.layer.OsmDataLayer;
 import org.openstreetmap.josm.plugins.Plugin;
 import org.openstreetmap.josm.plugins.PluginInformation;
-import org.openstreetmap.josm.spi.preferences.Config;
+import org.openstreetmap.josm.plugins.indoorhelper.controller.IndoorHelperController;
+import org.openstreetmap.josm.plugins.indoorhelper.io.controller.ImportDataController;
+import org.openstreetmap.josm.tools.Logging;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.jar.JarFile;
+import java.util.zip.ZipEntry;
 
 /**
  * This is the main class for the indoorhelper plug-in.
@@ -28,7 +35,7 @@ public class IndoorHelperPlugin extends Plugin implements PaintableInvalidationL
     private IndoorHelperController indoorController;    // controller for indoor helper panel
     private ImportDataController importController = null;        // controller for import function
 
-    String sep = System.getProperty("file.separator");
+    private final String pluginDir = Preferences.main().getPluginsDirectory().toString();
 
     /**
      * Constructor for the plug-in.
@@ -40,10 +47,11 @@ public class IndoorHelperPlugin extends Plugin implements PaintableInvalidationL
      */
     public IndoorHelperPlugin(PluginInformation info) throws IOException {
         super(info);
-        exportStyleFile("sit.mapcss");
-        exportStyleFile("entrance_door_icon.png");
-        exportStyleFile("entrance_icon.png");
-        exportStyleFile("elevator_icon.png");
+        try {
+            exportStyleFiles();
+        } catch (Exception e) {
+            Logging.info(e.getMessage());
+        }
         MainApplication.getLayerManager().addAndFireActiveLayerChangeListener(this);
     }
 
@@ -61,32 +69,30 @@ public class IndoorHelperPlugin extends Plugin implements PaintableInvalidationL
     }
 
     /**
-     * Exports the mapCSS file to the preferences directory.
+     * Exports the mapCSS files to the resources directory.
      *
-     * @param resourceName resource name
      * @throws IOException if any I/O error occurs
      */
-    private void exportStyleFile(String resourceName) throws IOException {
-        try (InputStream stream = IndoorHelperPlugin.class.getResourceAsStream("/data/" + resourceName)) {
-            if (stream == null) {
-                throw new IOException("Cannot get resource \"" + resourceName + "\" from Jar file.");
-            }
-
-            String outPath;
-            int readBytes;
-            byte[] buffer = new byte[4096];
-
-            String valDirPath = Config.getDirs().getUserDataDirectory(true) + sep + "styles";
-            File valDir = new File(valDirPath);
-            if (!valDir.mkdirs()) {
-                return;
-            }
-            outPath = valDir.getAbsolutePath() + sep + resourceName;
-
-            try (OutputStream resStreamOut = new FileOutputStream(outPath)) {
-                while ((readBytes = stream.read(buffer)) > 0) {
-                    resStreamOut.write(buffer, 0, readBytes);
+    private void exportStyleFiles() throws IOException {
+        File jarFile = new File(Preferences.main().getPluginsDirectory().toURI().getPath() + "/indoorhelper.jar");
+        if (jarFile.isFile()) {
+            Logging.info("Copying style resource files from jar to file system");
+            try (JarFile jar = new JarFile(jarFile)) {
+                ZipEntry mapcss = jar.getEntry("data/sit.mapcss");
+                ZipEntry entranceDoor = jar.getEntry("data/entrance_door_icon.png");
+                ZipEntry entrance = jar.getEntry("data/entrance_icon.png");
+                ZipEntry elevator = jar.getEntry("data/elevator_icon.png");
+                InputStream inputStreamMapcss = jar.getInputStream(mapcss);
+                InputStream inputStreamEntranceDoor = jar.getInputStream(entranceDoor);
+                InputStream inputStreamEntrance = jar.getInputStream(entrance);
+                InputStream inputStreamElevator = jar.getInputStream(elevator);
+                if (!new File(pluginDir + "/indoorhelper/resources").mkdirs()) {
+                    return;
                 }
+                Files.copy(inputStreamMapcss, Paths.get(pluginDir + "/indoorhelper/resources/sit.mapcss"));
+                Files.copy(inputStreamEntranceDoor, Paths.get(pluginDir + "/indoorhelper/resources/entrance_door_icon.png"));
+                Files.copy(inputStreamEntrance, Paths.get(pluginDir + "/indoorhelper/resources/entrance_icon.png"));
+                Files.copy(inputStreamElevator, Paths.get(pluginDir + "/indoorhelper/resources/elevator_icon.png"));
             }
         }
     }
