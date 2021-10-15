@@ -49,6 +49,8 @@ public class ImportDataController implements ImportEventListener {
     private JProgressBar progressBar;
     private JPanel infoPanel;
 
+    private final String[] BIMResources = {"IFC2X3_TC1.exp", "IFC4.exp"};
+
     public ImportDataController() {
         model = new ImportDataModel();
         JosmAction importBIMAction = new ImportBIMDataAction(this);
@@ -173,17 +175,18 @@ public class ImportDataController implements ImportEventListener {
         if (jarFile.isFile()) {
             Logging.info("Copying BIM resource files from jar to file system");
             try (JarFile jar = new JarFile(jarFile)) {
-                ZipEntry ze1 = jar.getEntry("resources/IFC2X3_TC1.exp");
-                ZipEntry ze2 = jar.getEntry("resources/IFC4.exp");
-                InputStream is1 = jar.getInputStream(ze1);
-                InputStream is2 = jar.getInputStream(ze2);
-                if (!new File(pluginDir + "/indoorhelper/resources").mkdirs()) {
-                    return;
+                for (String filename : BIMResources) {
+                    ZipEntry zip = jar.getEntry("resources/" + filename);
+                    InputStream is = jar.getInputStream(zip);
+                    if (Files.notExists(Paths.get(pluginDir + "/indoorhelper/resources/"))) {
+                        if (!new File(pluginDir + "/indoorhelper/resources").mkdirs()) {
+                            return;
+                        }
+                    }
+                    Files.copy(is, Paths.get(pluginDir + "/indoorhelper/resources/" + filename));
+                    is.close();
                 }
-                Files.copy(is1, Paths.get(pluginDir + "/indoorhelper/resources/IFC2X3_TC1.exp"));
-                Files.copy(is2, Paths.get(pluginDir + "/indoorhelper/resources/IFC4.exp"));
             }
         }
     }
-
 }

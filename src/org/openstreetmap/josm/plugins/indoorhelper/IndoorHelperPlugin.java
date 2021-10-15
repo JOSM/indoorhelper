@@ -36,6 +36,7 @@ public class IndoorHelperPlugin extends Plugin implements PaintableInvalidationL
     private ImportDataController importController = null;        // controller for import function
 
     private final String pluginDir = Preferences.main().getPluginsDirectory().toString();
+    private final String[] styleFiles = {"sit.mapcss", "entrance_door_icon.png", "entrance_icon.png", "elevator_icon.png"};
 
     /**
      * Constructor for the plug-in.
@@ -78,21 +79,17 @@ public class IndoorHelperPlugin extends Plugin implements PaintableInvalidationL
         if (jarFile.isFile()) {
             Logging.info("Copying style resource files from jar to file system");
             try (JarFile jar = new JarFile(jarFile)) {
-                ZipEntry mapcss = jar.getEntry("data/sit.mapcss");
-                ZipEntry entranceDoor = jar.getEntry("data/entrance_door_icon.png");
-                ZipEntry entrance = jar.getEntry("data/entrance_icon.png");
-                ZipEntry elevator = jar.getEntry("data/elevator_icon.png");
-                InputStream inputStreamMapcss = jar.getInputStream(mapcss);
-                InputStream inputStreamEntranceDoor = jar.getInputStream(entranceDoor);
-                InputStream inputStreamEntrance = jar.getInputStream(entrance);
-                InputStream inputStreamElevator = jar.getInputStream(elevator);
-                if (!new File(pluginDir + "/indoorhelper/resources").mkdirs()) {
-                    return;
+                for (String filename : styleFiles) {
+                    ZipEntry zip = jar.getEntry("data/" + filename);
+                    InputStream is = jar.getInputStream(zip);
+                    if (Files.notExists(Paths.get(pluginDir + "/indoorhelper/resources/"))) {
+                        if (!new File(pluginDir + "/indoorhelper/resources").mkdirs()) {
+                            return;
+                        }
+                    }
+                    Files.copy(is, Paths.get(pluginDir + "/indoorhelper/resources/" + filename));
+                    is.close();
                 }
-                Files.copy(inputStreamMapcss, Paths.get(pluginDir + "/indoorhelper/resources/sit.mapcss"));
-                Files.copy(inputStreamEntranceDoor, Paths.get(pluginDir + "/indoorhelper/resources/entrance_door_icon.png"));
-                Files.copy(inputStreamEntrance, Paths.get(pluginDir + "/indoorhelper/resources/entrance_icon.png"));
-                Files.copy(inputStreamElevator, Paths.get(pluginDir + "/indoorhelper/resources/elevator_icon.png"));
             }
         }
     }
