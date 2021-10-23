@@ -1,10 +1,6 @@
 // License: AGPL. For details, see LICENSE file.
 package org.openstreetmap.josm.plugins.indoorhelper.io.controller;
 
-import org.openstreetmap.josm.plugins.indoorhelper.io.actions.ImportBIMDataAction;
-import org.openstreetmap.josm.plugins.indoorhelper.io.model.ImportDataModel;
-import org.openstreetmap.josm.plugins.indoorhelper.io.parser.BIMtoOSMParser;
-import org.openstreetmap.josm.plugins.indoorhelper.io.renderer.ImportDataRenderer;
 import org.openstreetmap.josm.actions.JosmAction;
 import org.openstreetmap.josm.data.Preferences;
 import org.openstreetmap.josm.data.osm.DataSet;
@@ -13,6 +9,8 @@ import org.openstreetmap.josm.gui.MainMenu;
 import org.openstreetmap.josm.gui.MapFrame;
 import org.openstreetmap.josm.gui.widgets.JMultilineLabel;
 import org.openstreetmap.josm.gui.widgets.UrlLabel;
+import org.openstreetmap.josm.plugins.indoorhelper.io.actions.ImportBIMDataAction;
+import org.openstreetmap.josm.plugins.indoorhelper.io.renderer.ImportDataRenderer;
 import org.openstreetmap.josm.spi.preferences.Config;
 import org.openstreetmap.josm.tools.GBC;
 import org.openstreetmap.josm.tools.ImageProvider;
@@ -37,11 +35,10 @@ import static java.awt.GridBagConstraints.EAST;
 import static org.openstreetmap.josm.tools.I18n.tr;
 
 /**
- * Import data controller class handles communication between {@link ImportDataModel} and import views.
+ * Import data controller handles import actions
  */
 public class ImportDataController implements ImportEventListener {
 
-    private final ImportDataModel model;
     private String importedFilepath;
     private final String pluginDir = Preferences.main().getPluginsDirectory().toString();
 
@@ -52,7 +49,6 @@ public class ImportDataController implements ImportEventListener {
     private final String[] BIMResources = {"IFC2X3_TC1.exp", "IFC4.exp"};
 
     public ImportDataController() {
-        model = new ImportDataModel();
         JosmAction importBIMAction = new ImportBIMDataAction(this);
         MainMenu.add(MainApplication.getMenu().fileMenu, importBIMAction, false, 21);
 
@@ -66,6 +62,7 @@ public class ImportDataController implements ImportEventListener {
         }
 
         // export resource files used by BuildingSMARTLibrary from jar to file system
+        // TODO should be done by BIMtoOSM lib
         try {
             exportBIMResource();
         } catch (Exception e) {
@@ -89,14 +86,15 @@ public class ImportDataController implements ImportEventListener {
         initProgressProcess();
         progressFrame.setVisible(true);
         new Thread(() -> {
-            new BIMtoOSMParser(this, pluginDir + "/indoorhelper/").parse(importedFilepath);
+            // TODO replace bei BIMtoOSM lib
+            //new BIMtoOSMParser(this, pluginDir + "/indoorhelper/").parse(importedFilepath);
             progressFrame.setVisible(false);
         }).start();
     }
 
     @Override
+    // TODO replace DataSet class by data set class form BIMtoOSM
     public void onDataParsed(DataSet ds) {
-        model.setImportData(ds);
         String layerName = String.format("BIMObject%2d", MainApplication.getLayerManager().getLayers().size());
         if (importedFilepath != null) {
             String[] parts = importedFilepath.split(File.separator.equals("\\") ? "\\\\" : "/");

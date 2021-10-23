@@ -16,7 +16,7 @@ import static org.openstreetmap.josm.tools.I18n.tr;
  */
 public class ImportBIMDataAction extends JosmAction {
 
-    private ImportEventListener importListener;
+    private final ImportEventListener importListener;
 
     public ImportBIMDataAction(ImportEventListener listener) {
         super(tr("Import BIM File"), "dialogs/bim_small", null, null, false);
