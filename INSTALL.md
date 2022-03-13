@@ -21,9 +21,14 @@ For developing two IDEs are recommended: [IntelliJ IDEA](https://www.jetbrains.c
  1. Download IntelliJ IDEA
  2. Open IntelliJ and import the indoorhelper plugin: File → Open → `path/to/indoorhelper_folder`
  3. You may need to set the current SDK: File → Project Strucuture → Project → Project SDK
- 4. You may need to set `indoorhelper/src` as source folder and `indoorhelper/test` as test folder or include some dependencies paths. This settings can be found under File → Project Strucuture → Modules
- 5. Build the plugin using gradle (thanks to [floschers gradle-josm-plugin](https://gitlab.com/floscher/gradle-josm-plugin/-/tree/master)!): Open the gradle toolbar under View → Tool Windows → gradle. Now you see already defined configurations. Use Tasks → build → build to build the plugin. Use Tasks → josm → runJosm to run the plugin with a clean JOSM instance. For more information see [ gradle-josm-plugin README.md](https://gitlab.com/floscher/gradle-josm-plugin/-/blob/master/README.md)
+ 4. You may need to set `indoorhelper/src` as source folder and `indoorhelper/test` as test folder. This settings can be found under File → Project Strucuture → Modules (see also [jetbrains#adding_content_root](https://www.jetbrains.com/help/idea/content-roots.html#adding_content_root))
+ 5. After editing the src or test folder (in step 3.) you may need to add the dependencies to this modules again. In Project Structure... → Modules ...select the module and select tab Dependencies → + → Library ...add missing libraries
+ 6. Build the plugin using gradle (thanks to [floschers gradle-josm-plugin](https://gitlab.com/floscher/gradle-josm-plugin/-/tree/master)!): Open the gradle toolbar under View → Tool Windows → gradle. Now you see already defined configurations. Use Tasks → build → build to build the plugin. Use Tasks → josm → runJosm to run the plugin with a clean JOSM instance. For more information see [ gradle-josm-plugin README.md](https://gitlab.com/floscher/gradle-josm-plugin/-/blob/master/README.md)
 
+**Troubleshooting IntelliJ IDEA**
+* Check if correct SDK is set (see above 3.)
+* Check if folder `src` is set to src directory and if folder `test` is set to test directory (see above 4.)
+* Check if all dependencies are added properly (see above 5.)
 
 **Setup with [Eclipse](https://www.eclipse.org/downloads/):**
 
