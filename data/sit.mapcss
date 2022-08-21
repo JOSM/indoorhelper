@@ -1,6 +1,7 @@
 /* building shells and walls */
 
-way[indoor=wall][material=concrete]
+way[indoor=wall][material=concrete],
+area[indoor=wall][material=concrete]
 {
 	width:		1;	
 	color:		#000000;	
@@ -10,7 +11,8 @@ way[indoor=wall][material=concrete]
 	z-index:	5;
 }
 
-way[indoor=wall][material=glass]
+way[indoor=wall][material=glass],
+area[indoor=wall][material=glass]
 {
 	width:		1;	
 	color:		#000000;
@@ -34,7 +36,8 @@ way[window=glass]
 
 
 node|z21-[door],
-way|z21-[door]
+way|z21-[door],
+area|z21-[door]
 {
 	icon-image:	"entrance_door_icon.png";
 	icon-width:	30;
@@ -42,7 +45,8 @@ way|z21-[door]
 	z-index: 	 4;
 }
 
-way[door]
+way[door],
+area[door]
 {
 	fill-color: 	#7d530b;
 	fill-opacity: 	1.0;
@@ -53,7 +57,8 @@ way[door]
 
 /*entrance*/
 
-way[entrance]
+way[entrance],
+area[entrance]
 {
 	fill-color: 	#525252;
 	fill-opacity: 	1.0;
@@ -63,7 +68,8 @@ way[entrance]
 
 
 node|z20-[entrance],
-way|z20-[entrance]
+way|z20-[entrance],
+area|z20-[entrance]
 {
 	icon-image:	"entrance_icon.png";
 	icon-width:	30;
@@ -74,7 +80,8 @@ way|z20-[entrance]
 
 /* highways */
 
-way[highway=steps]
+way[highway=steps],
+area[highway=steps]
 {
 	width: 		1;
 	color: 		#000000;
@@ -86,7 +93,8 @@ way[highway=steps]
 	z-index:	2;
 }
 
-way[highway=elevator]
+way[highway=elevator],
+area[highway=elevator]
 {
 	width: 		1;
 	color: 		#000000;
@@ -98,7 +106,8 @@ way[highway=elevator]
 	z-index:	2;
 }
 
-way|z20-[highway=elevator]
+way|z20-[highway=elevator],
+area|z20-[highway=elevator]
 {
 	icon-image:	"elevator_icon.png";
 	icon-width:	30;
@@ -127,7 +136,7 @@ way[highway=parking]
 	z-index:	3;
 }
 
-way[area=parkinglot]
+area[area=parkinglot]
 {
 	width: 		1;
 	color: 		#000000;
@@ -140,7 +149,7 @@ way[area=parkinglot]
 }
 
 /* rooms */
-way[indoor=room]
+area[indoor=room]
 {
 	width:		1;
 	color:		#a49f9f;
@@ -150,7 +159,7 @@ way[indoor=room]
 	z-index:	1;
 }
 
-way|z19-20[ref]
+area|z19-20[ref]
 {
 	text:		ref;
 	text-position:  center;
@@ -159,7 +168,7 @@ way|z19-20[ref]
 
 	z-index:	3;
 }
-way|z21-[ref][!name]
+area|z21-[ref][!name]
 {
 	text:		ref;
 	text-position:  center;
@@ -169,7 +178,7 @@ way|z21-[ref][!name]
 	z-index:	3;
 }
 
-way|z21-[name]
+area|z21-[name]
 {
 	text:		name;
 	text-position:  center;
@@ -181,7 +190,7 @@ way|z21-[name]
 
 /* corridor */
 
-way[indoor=corridor]
+area[indoor=corridor]
 {
 	width:		1;
 	color:		#a49f9f;
@@ -194,7 +203,7 @@ way[indoor=corridor]
 
 
 /* areas */
-way|z18-[indoor=area]
+area|z18-[indoor=area]
 {
 	fill-color: 	#FFDAB9;
 	fill-opacity: 	1.0;
@@ -202,7 +211,7 @@ way|z18-[indoor=area]
 	z-index:	1;
 }
 
-way[indoor=area][landuse=ground]
+area[indoor=area][landuse=ground]
 {
 	width:		1;
 	color:		#a49f9f;
@@ -213,7 +222,7 @@ way[indoor=area][landuse=ground]
 	z-index:	1;
 }
 
-way[indoor=area][landuse=x]
+area[indoor=area][landuse=x]
 {
 	width:		1;
 	color:		#000000;
@@ -224,7 +233,7 @@ way[indoor=area][landuse=x]
 	z-index:	2;
 }
 
-way[indoor=area][landuse=loading]
+area[indoor=area][landuse=loading]
 {
 	width:		1;
 	color:		#000000;
@@ -235,7 +244,7 @@ way[indoor=area][landuse=loading]
 	z-index:	2;
 }
 
-way[indoor=area][landuse=rack]
+area[indoor=area][landuse=rack]
 {
 	width:		1;
 	color:		#000000;
@@ -246,7 +255,7 @@ way[indoor=area][landuse=rack]
 	z-index:	2;
 }
 
-way[indoor=area][landuse=machine]
+area[indoor=area][landuse=machine]
 {
 	width:		1;
 	color:		#000000;
@@ -257,7 +266,7 @@ way[indoor=area][landuse=machine]
 	z-index:	2;
 }
 
-way[indoor=area][landuse=workspace]
+area[indoor=area][landuse=workspace]
 {
 	width:		1;
 	color:		#000000;
@@ -268,7 +277,7 @@ way[indoor=area][landuse=workspace]
 	z-index:	2;
 }
 
-way[indoor=area][landuse=workfield]
+area[indoor=area][landuse=workfield]
 {
 	width:		1;
 	color:		#FFFFFF;
@@ -280,7 +289,7 @@ way[indoor=area][landuse=workfield]
 	z-index:	3;
 }
 
-way[indoor=area][landuse=storage]
+area[indoor=area][landuse=storage]
 {
 	width:		1;
 	color:		#FFFFFF;
@@ -292,7 +301,7 @@ way[indoor=area][landuse=storage]
 	z-index:	2;
 }
 
-way[indoor=area][leisure=pitch]
+area[indoor=area][leisure=pitch]
 {
 	width:		1;
 	color:		#000000;
@@ -302,7 +311,7 @@ way[indoor=area][leisure=pitch]
 	z-index:	1;
 }
 
-way|z19-[name][use=sports]
+area|z19-[name][use=sports]
 {
 	text:		name;
 	font-size: 	12;
