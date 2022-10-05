@@ -375,6 +375,14 @@ public class IndoorHelperController {
      * @param key specific key to unset hidden objects which contains it
      */
     public void unsetSpecificKeyFilter(String key) {
+        try{
+            // check if key is integer, no support for float values right now
+            Integer.parseInt(workingLevel);
+        }catch(Exception e){
+            System.out.println("No support of -unsetSpecificKeyFilter- for float values right now.");
+            return;
+        }
+
         DataSet editDataSet = OsmDataManager.getInstance().getEditDataSet();
         if (editDataSet != null) {
             ArrayList<OsmPrimitive> primitiveCollection = new ArrayList<>(editDataSet.allPrimitives());
@@ -385,6 +393,8 @@ public class IndoorHelperController {
                     primitivesToDisable.add(primitive);
                 }
             }
+
+            // TODO check if we really need to perform this on a new thread
             new Thread(() -> primitivesToDisable.forEach(primitive -> {
                 if (IndoorLevel.isPartOfWorkingLevel(primitive.get(key), level)) {
                     primitive.unsetDisabledState();
