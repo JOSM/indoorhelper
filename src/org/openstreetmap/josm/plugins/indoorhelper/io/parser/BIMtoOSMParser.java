@@ -463,21 +463,17 @@ public class BIMtoOSMParser {
     private void transformToGeodetic(LatLon llBuildingOrigin, ArrayList<BIMObject3D> preparedBIMData) {
         if (llBuildingOrigin != null) {
             // get building rotation matrix
-            Vector3D projectNorth = getProjectNorth();
             Vector3D trueNorth = getTrueNorth();
             Matrix3D rotationMatrix = null;
-            if (projectNorth != null && trueNorth != null) {
-                double rotationAngle = trueNorth.angleBetween(projectNorth);
+            if (trueNorth != null) {
+                double rotationAngle = new Vector3D(0,1,0).angleBetween(trueNorth);
                 rotationMatrix = ParserMath.getRotationMatrixZ(rotationAngle);
             }
-
-            if (rotationMatrix == null) return;
-
             for (BIMObject3D object : preparedBIMData) {
                 ArrayList<LatLon> transformedCoordinates = new ArrayList<>();
                 for (Vector3D point : object.getCartesianGeometryCoordinates()) {
                     // rotate point
-                    rotationMatrix.transform(point);
+                    if(rotationMatrix != null) rotationMatrix.transform(point);
                     // transform point
                     LatLon llPoint = ParserGeoMath.cartesianToGeodetic(point, new Vector3D(0.0, 0.0, 0.0), llBuildingOrigin, lengthUnit);
                     transformedCoordinates.add(llPoint);
