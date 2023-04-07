@@ -491,24 +491,6 @@ public class BIMtoOSMParser {
      */
     @SuppressWarnings("unchecked")
     private LatLon getLatLonBuildingOrigin(EntityInstance ifcSite) {
-        Vector3D ifcSiteOffset = null;
-        if (ifcSite.getAttributeValueBNasEntityInstance("Representation") != null) {
-            // get the offset between IfcSite geodetic coordinates and building origin coordinate
-            // handle IfcSite offset if IfcBoundingBox representation
-            List<IfcRepresentation> repObjectIdentities = BIMtoOSMUtility.getIfcRepresentations(ifcSite);
-            if (repObjectIdentities == null) return null;
-
-            IfcRepresentation boxRepresentation =
-                    BIMtoOSMUtility.getIfcRepresentation(repObjectIdentities, RepresentationIdentifier.Box);
-            if (boxRepresentation != null) {
-                // get offset
-                EntityInstance bb = boxRepresentation.getEntity();
-                EntityInstance bbItem = bb.getAttributeValueBNasEntityInstanceList("Items").get(0);
-                EntityInstance cartesianCorner = bbItem.getAttributeValueBNasEntityInstance("Corner");
-                ifcSiteOffset = IfcGeometryExtractor.ifcCoordinatesToVector3D(cartesianCorner);
-            }
-        }
-
         // get RefLatitude and RefLongitude of IfcSite
         List<String> refLat;
         List<String> refLon;
@@ -534,10 +516,7 @@ public class BIMtoOSMParser {
                 prepareDoubleString(refLon.get(2)),
                 refLon.size()>3 ? prepareDoubleString(refLon.get(3)) : Double.NaN
         );
-        // if offset, calculate building origin without offset
-        if (ifcSiteOffset != null && ifcSiteOffset.getX() != 0.0 && ifcSiteOffset.getY() != 0.0) {
-            return ParserGeoMath.cartesianToGeodetic(new Vector3D(0.0, 0.0, 0.0), ifcSiteOffset, new LatLon(lat, lon), lengthUnit);
-        }
+        // TODO: determine site offset, if not zero, calculate WCS LatLon from site LatLon
 
         return new LatLon(lat, lon);
     }
