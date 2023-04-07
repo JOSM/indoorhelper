@@ -462,7 +462,6 @@ public class BIMtoOSMParser {
      */
     private void transformToGeodetic(LatLon llBuildingOrigin, ArrayList<BIMObject3D> preparedBIMData) {
         if (llBuildingOrigin != null) {
-
             // get building rotation matrix
             Vector3D projectNorth = getProjectNorth();
             Vector3D trueNorth = getTrueNorth();
@@ -530,12 +529,15 @@ public class BIMtoOSMParser {
         double lat = ParserGeoMath.degreeMinutesSecondsToLatLon(
                 prepareDoubleString(refLat.get(0)),
                 prepareDoubleString(refLat.get(1)),
-                prepareDoubleString(refLat.get(2)));
+                prepareDoubleString(refLat.get(2)),
+                refLat.size()>3 ? prepareDoubleString(refLat.get(3)) : Double.NaN
+            );
         double lon = ParserGeoMath.degreeMinutesSecondsToLatLon(
                 prepareDoubleString(refLon.get(0)),
                 prepareDoubleString(refLon.get(1)),
-                prepareDoubleString(refLon.get(2)));
-
+                prepareDoubleString(refLon.get(2)),
+                refLon.size()>3 ? prepareDoubleString(refLon.get(3)) : Double.NaN
+        );
         // if offset, calculate building origin without offset
         if (ifcSiteOffset != null && ifcSiteOffset.getX() != 0.0 && ifcSiteOffset.getY() != 0.0) {
             return ParserGeoMath.cartesianToGeodetic(new Vector3D(0.0, 0.0, 0.0), ifcSiteOffset, new LatLon(lat, lon), lengthUnit);
