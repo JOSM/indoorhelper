@@ -517,6 +517,7 @@ public class BIMtoOSMParser {
                 refLon.size()>3 ? prepareDoubleString(refLon.get(3)) : Double.NaN
         );
         // TODO: determine site offset, if not zero, calculate WCS LatLon from site LatLon
+        // actually, site offset should be handled in engineering CS, not in geodetic CS (matrix in transformToGeodetic)
 
         return new LatLon(lat, lon);
     }
