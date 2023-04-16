@@ -2,7 +2,7 @@
 package org.openstreetmap.josm.plugins.indoorhelper.controller;
 
 import org.openstreetmap.josm.plugins.indoorhelper.model.IndoorHelperModel;
-import org.openstreetmap.josm.plugins.indoorhelper.model.IndoorLevel;
+import org.openstreetmap.josm.plugins.indoorhelper.model.LevelRangeVerifier;
 import org.openstreetmap.josm.plugins.indoorhelper.model.TagCatalog.IndoorObject;
 import org.openstreetmap.josm.plugins.indoorhelper.views.LevelSelectorView;
 import org.openstreetmap.josm.plugins.indoorhelper.views.ToolBoxView;
@@ -396,7 +396,7 @@ public class IndoorHelperController {
 
             // TODO check if we really need to perform this on a new thread
             new Thread(() -> primitivesToDisable.forEach(primitive -> {
-                if (IndoorLevel.isPartOfWorkingLevel(primitive.get(key), level)) {
+                if (LevelRangeVerifier.isPartOfWorkingLevel(primitive.get(key), level)) {
                     primitive.unsetDisabledState();
                 }
             })).start();
