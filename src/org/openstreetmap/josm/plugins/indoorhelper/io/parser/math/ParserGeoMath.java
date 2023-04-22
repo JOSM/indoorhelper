@@ -54,8 +54,8 @@ public class ParserGeoMath {
         return new LatLon(Math.toDegrees(pointLat), Math.toDegrees(pointLon));
     }
 
-    public static double degreeMinutesSecondsToLatLon(double degrees, double minutes, double seconds) {
-        return degrees + (minutes / 60.0) + (seconds / 3600.0);
+    public static double degreeMinutesSecondsToLatLon(double degrees, double minutes, double seconds, double v) {
+        return degrees + (minutes / 60.0) + (seconds / 3600.0) + (Double.isNaN(v) ? 0 : v/3600000000.);
     }
 
     /**

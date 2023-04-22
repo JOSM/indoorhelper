@@ -462,23 +462,18 @@ public class BIMtoOSMParser {
      */
     private void transformToGeodetic(LatLon llBuildingOrigin, ArrayList<BIMObject3D> preparedBIMData) {
         if (llBuildingOrigin != null) {
-
             // get building rotation matrix
-            Vector3D projectNorth = getProjectNorth();
             Vector3D trueNorth = getTrueNorth();
             Matrix3D rotationMatrix = null;
-            if (projectNorth != null && trueNorth != null) {
-                double rotationAngle = trueNorth.angleBetween(projectNorth);
+            if (trueNorth != null) {
+                double rotationAngle = new Vector3D(0,1,0).angleBetween(trueNorth);
                 rotationMatrix = ParserMath.getRotationMatrixZ(rotationAngle);
             }
-
-            if (rotationMatrix == null) return;
-
             for (BIMObject3D object : preparedBIMData) {
                 ArrayList<LatLon> transformedCoordinates = new ArrayList<>();
                 for (Vector3D point : object.getCartesianGeometryCoordinates()) {
                     // rotate point
-                    rotationMatrix.transform(point);
+                    if(rotationMatrix != null) rotationMatrix.transform(point);
                     // transform point
                     LatLon llPoint = ParserGeoMath.cartesianToGeodetic(point, new Vector3D(0.0, 0.0, 0.0), llBuildingOrigin, lengthUnit);
                     transformedCoordinates.add(llPoint);
@@ -496,24 +491,6 @@ public class BIMtoOSMParser {
      */
     @SuppressWarnings("unchecked")
     private LatLon getLatLonBuildingOrigin(EntityInstance ifcSite) {
-        Vector3D ifcSiteOffset = null;
-        if (ifcSite.getAttributeValueBNasEntityInstance("Representation") != null) {
-            // get the offset between IfcSite geodetic coordinates and building origin coordinate
-            // handle IfcSite offset if IfcBoundingBox representation
-            List<IfcRepresentation> repObjectIdentities = BIMtoOSMUtility.getIfcRepresentations(ifcSite);
-            if (repObjectIdentities == null) return null;
-
-            IfcRepresentation boxRepresentation =
-                    BIMtoOSMUtility.getIfcRepresentation(repObjectIdentities, RepresentationIdentifier.Box);
-            if (boxRepresentation != null) {
-                // get offset
-                EntityInstance bb = boxRepresentation.getEntity();
-                EntityInstance bbItem = bb.getAttributeValueBNasEntityInstanceList("Items").get(0);
-                EntityInstance cartesianCorner = bbItem.getAttributeValueBNasEntityInstance("Corner");
-                ifcSiteOffset = IfcGeometryExtractor.ifcCoordinatesToVector3D(cartesianCorner);
-            }
-        }
-
         // get RefLatitude and RefLongitude of IfcSite
         List<String> refLat;
         List<String> refLon;
@@ -530,16 +507,17 @@ public class BIMtoOSMParser {
         double lat = ParserGeoMath.degreeMinutesSecondsToLatLon(
                 prepareDoubleString(refLat.get(0)),
                 prepareDoubleString(refLat.get(1)),
-                prepareDoubleString(refLat.get(2)));
+                prepareDoubleString(refLat.get(2)),
+                refLat.size()>3 ? prepareDoubleString(refLat.get(3)) : Double.NaN
+            );
         double lon = ParserGeoMath.degreeMinutesSecondsToLatLon(
                 prepareDoubleString(refLon.get(0)),
                 prepareDoubleString(refLon.get(1)),
-                prepareDoubleString(refLon.get(2)));
-
-        // if offset, calculate building origin without offset
-        if (ifcSiteOffset != null && ifcSiteOffset.getX() != 0.0 && ifcSiteOffset.getY() != 0.0) {
-            return ParserGeoMath.cartesianToGeodetic(new Vector3D(0.0, 0.0, 0.0), ifcSiteOffset, new LatLon(lat, lon), lengthUnit);
-        }
+                prepareDoubleString(refLon.get(2)),
+                refLon.size()>3 ? prepareDoubleString(refLon.get(3)) : Double.NaN
+        );
+        // TODO: determine site offset, if not zero, calculate WCS LatLon from site LatLon
+        // actually, site offset should be handled in engineering CS, not in geodetic CS (matrix in transformToGeodetic)
 
         return new LatLon(lat, lon);
     }
