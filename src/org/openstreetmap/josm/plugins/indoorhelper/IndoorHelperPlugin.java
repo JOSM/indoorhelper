@@ -108,7 +108,7 @@ public class IndoorHelperPlugin extends Plugin implements PaintableInvalidationL
         if (currentAutoFilter != null) {
             if (indoorController != null) {
                 indoorController.setWorkingLevel(currentAutoFilter.getLabel());
-                indoorController.unsetSpecificKeyFilter("repeat_on");
+                indoorController.updateRepeatOnKeyFilter();
             }
         } else if (indoorController != null) {
             indoorController.setWorkingLevel("");

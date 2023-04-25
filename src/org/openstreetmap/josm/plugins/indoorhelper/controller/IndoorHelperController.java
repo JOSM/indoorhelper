@@ -368,15 +368,11 @@ public class IndoorHelperController {
     }
 
     /**
-     * Function which unsets the disabled state of currently hidden and/or disabled objects which have a
-     * specific tag (key). Just unsets the disabled state if object has a tag-value which is part of the
-     * current working level.
-     *
-     * @param key specific key to unset hidden objects which contains it
+     * Updates visibility of objects tagged by repeat_on key using the active working level.
      */
-    public void unsetSpecificKeyFilter(String key) {
+    public void updateRepeatOnKeyFilter() {
+        String key = "repeat_on";
         try{
-            // check if key is integer, no support for float values right now
             Integer.parseInt(workingLevel);
         }catch(Exception e){
             System.out.println("No support of -unsetSpecificKeyFilter- for float values right now.");
