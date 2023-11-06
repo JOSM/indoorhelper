@@ -1,22 +1,22 @@
 // License: AGPL. For details, see LICENSE file.
 package model;
 
-import org.openstreetmap.josm.plugins.indoorhelper.model.LevelRangeVerifier;
-import org.junit.Test;
-
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.Test;
+import org.openstreetmap.josm.plugins.indoorhelper.model.LevelRangeVerifier;
 
 /**
  * Unit tests of {@link LevelRangeVerifier} class.
  */
-public class LevelRangeVerifierTest {
+class LevelRangeVerifierTest {
 
     /**
      * Test case for {@link LevelRangeVerifier#isPartOfWorkingLevel(String, int)} method.
      */
     @Test
-    public void testIsPartOfWorkingLevel() {
+    void testIsPartOfWorkingLevel() {
         assertTrue(LevelRangeVerifier.isPartOfWorkingLevel("-3--1", -3));
         assertTrue(LevelRangeVerifier.isPartOfWorkingLevel("-3--1", -2));
         assertTrue(LevelRangeVerifier.isPartOfWorkingLevel("-3--1", -1));

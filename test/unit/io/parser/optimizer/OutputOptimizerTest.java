@@ -1,29 +1,30 @@
 package io.parser.optimizer;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.openstreetmap.josm.plugins.indoorhelper.io.optimizer.OutputOptimizer;
-import org.junit.Test;
-import org.junit.jupiter.api.Disabled;
-import org.openstreetmap.josm.data.coor.LatLon;
-import org.openstreetmap.josm.data.osm.Node;
-import org.openstreetmap.josm.testutils.DatasetFactory;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.openstreetmap.josm.data.coor.LatLon;
+import org.openstreetmap.josm.data.osm.Node;
+import org.openstreetmap.josm.plugins.indoorhelper.io.optimizer.OutputOptimizer;
+import org.openstreetmap.josm.testutils.DatasetFactory;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 @Disabled("Causes java.lang.SecurityException: class \"org.openstreetmap.josm.tools.MemoryManagerTest\"'s " +
         "signer information does not match signer information of other classes in the same package\n")
-public class OutputOptimizerTest {
+class OutputOptimizerTest {
 
     /**
      * Setup test.
      */
 //    @Rule
-//    public JOSMTestRules test = new JOSMTestRules().preferences();
+//    JOSMTestRules test = new JOSMTestRules().preferences();
     @SuppressFBWarnings(value = "URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD")
 
-    public ArrayList<LatLon> testNodes1 = new ArrayList<LatLon>() {
+    ArrayList<LatLon> testNodes1 = new ArrayList<LatLon>() {
         {
             add(new LatLon(50.81400880917, 12.9240191164));
             add(new LatLon(50.81410474868, 12.92479892858));
@@ -44,7 +45,7 @@ public class OutputOptimizerTest {
      * Test case for {@link OutputOptimizer#optimize} method.
      */
     @Test
-    public void testOptimize() {
+    void testOptimize() {
 //        ArrayList<Node> nodes = llsToNodes(testNodes1);
 //        ArrayList<Way> ways = new ArrayList<>();
 //        Pair<ArrayList<Node>, ArrayList<Way>> testData = new Pair<>(nodes, ways);

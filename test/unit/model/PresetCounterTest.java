@@ -1,25 +1,25 @@
 // License: AGPL. For details, see LICENSE file.
 package model;
 
-import org.openstreetmap.josm.plugins.indoorhelper.model.PresetCounter;
-import org.openstreetmap.josm.plugins.indoorhelper.model.TagCatalog.IndoorObject;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.jupiter.api.Test;
+import org.openstreetmap.josm.plugins.indoorhelper.model.PresetCounter;
+import org.openstreetmap.josm.plugins.indoorhelper.model.TagCatalog.IndoorObject;
 
 /**
  * Unit tests of {@link PresetCounter} class.
  */
-public class PresetCounterTest {
+class PresetCounterTest {
 
     /**
      * Test case for testing the ranking functionality.
      */
     @Test
-    public void testRanking() {
+    void testRanking() {
         // input preparation
         PresetCounter counter = new PresetCounter();
 

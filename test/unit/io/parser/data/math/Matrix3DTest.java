@@ -2,16 +2,16 @@ package io.parser.data.math;
 
 //import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
 import org.openstreetmap.josm.plugins.indoorhelper.io.parser.math.Matrix3D;
 import org.openstreetmap.josm.plugins.indoorhelper.io.parser.math.Vector3D;
-import org.junit.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit tests of {@link Matrix3D} class.
  */
-public class Matrix3DTest {
+class Matrix3DTest {
     /**
      * Setup test
      */
@@ -35,7 +35,7 @@ public class Matrix3DTest {
     Vector3D matrix1TransformedPoint1 = new Vector3D(86.0, 105.8, 125.123);
 
     @Test
-    public void testTransform() {
+    void testTransform() {
         Vector3D v = new Vector3D(vector1);
         matrix1.transform(v);
         assertEquals(v.getX(), matrix1TransformedPoint1.getX(), 0.005);
@@ -44,7 +44,7 @@ public class Matrix3DTest {
     }
 
     @Test
-    public void testMultiply() {
+    void testMultiply() {
         Matrix3D m = new Matrix3D(matrix1);
         m.multiply(10.0);
         assertEquals(m.getM00(), matrix1.getM00() * 10.0, 0.005);
@@ -75,25 +75,25 @@ public class Matrix3DTest {
     }
 
     @Test
-    public void testInvert() {
+    void testInvert() {
         Matrix3D m = new Matrix3D(matrix3);
         m.invert();
 
-        assertEquals(m.getM00(), -(1.0 / 3.0), 0.005);
-        assertEquals(m.getM01(), 0.0, 0.005);
-        assertEquals(m.getM02(), (2.0 / 3.0), 0.005);
+        assertEquals(-(1.0 / 3.0), m.getM00(), 0.005);
+        assertEquals(0.0, m.getM01(), 0.005);
+        assertEquals((2.0 / 3.0), m.getM02(), 0.005);
 
-        assertEquals(m.getM10(), (2.0 / 3.0), 0.005);
-        assertEquals(m.getM11(), 0.0, 0.005);
-        assertEquals(m.getM12(), -(1.0 / 3.0), 0.005);
+        assertEquals((2.0 / 3.0), m.getM10(), 0.005);
+        assertEquals(0.0, m.getM11(), 0.005);
+        assertEquals(-(1.0 / 3.0), m.getM12(), 0.005);
 
-        assertEquals(m.getM20(), -2.0, 0.005);
-        assertEquals(m.getM21(), 1.0, 0.005);
-        assertEquals(m.getM22(), 0.0, 0.005);
+        assertEquals(-2.0, m.getM20(), 0.005);
+        assertEquals(1.0, m.getM21(), 0.005);
+        assertEquals(0.0, m.getM22(), 0.005);
     }
 
     @Test
-    public void testDet() {
-        assertEquals(matrix3.det(), 3.0);
+    void testDet() {
+        assertEquals(3.0, matrix3.det());
     }
 }

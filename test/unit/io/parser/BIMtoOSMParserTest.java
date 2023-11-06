@@ -1,27 +1,25 @@
 // License: AGPL. For details, see LICENSE file.
 package io.parser;
 
-import org.openstreetmap.josm.plugins.indoorhelper.io.parser.BIMtoOSMParser;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.jupiter.api.Disabled;
-import org.openstreetmap.josm.TestUtils;
-
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.openstreetmap.josm.TestUtils;
+import org.openstreetmap.josm.plugins.indoorhelper.io.parser.BIMtoOSMParser;
 
 /**
  * Unit tests of {@link BIMtoOSMParser} class.
  */
-@Ignore("Causes unexpected error in Jenkins build")
 @Disabled("Causes unexpected error in Jenkins build\n")
-public class BIMtoOSMParserTest {
+class BIMtoOSMParserTest {
 
     /**
      * Setup test.
      */
 //    @Rule
-//    public JOSMTestRules test = new JOSMTestRules().preferences();
+//    JOSMTestRules test = new JOSMTestRules().preferences();
 
     String pluginDir = System.getProperty("user.dir");
     String resourcePathDir = TestUtils.getTestDataRoot();
@@ -30,7 +28,7 @@ public class BIMtoOSMParserTest {
      * Test case for {@link BIMtoOSMParser#parse} method.
      */
     @Test
-    public void testParse() {
+    void testParse() {
         // IFC2X3
         assertParseTrue("test1_IFC2X3_TC1.ifc");
         assertParseTrue("test2_IFC2X3_TC1.ifc");
