@@ -19,6 +19,18 @@ public final class TagCatalog {
         List<Tag> tagList = new ArrayList<>();
 
         switch (o) {
+            case LIBRARY:
+                tagList.add(new Tag("indoor", "room"));
+                tagList.add(new Tag("amenity", "library"));
+                return tagList;
+            case TERMINAL:
+                tagList.add(new Tag("information", "terminal"));
+                tagList.add(new Tag("tourism", "information"));
+                return tagList;
+            case CAFE:
+                tagList.add(new Tag("indoor", "room"));
+                tagList.add(new Tag("amenity", "cafe"));
+                return tagList;
             case CONCRETE_WALL:
                 tagList.add(new Tag("indoor", "wall"));
                 tagList.add(new Tag("material", "concrete"));
@@ -66,7 +78,10 @@ public final class TagCatalog {
             case STEPS:
                 tagList.add(new Tag("highway", "steps"));
                 return tagList;
-            case CORRIDOR:
+            case WALL:
+                tagList.add(new Tag("indoor", "wall"));
+                return tagList;
+                case CORRIDOR:
                 tagList.add(new Tag("indoor", "corridor"));
                 return tagList;
             case BENCH:
@@ -89,7 +104,8 @@ public final class TagCatalog {
      * @author egru
      */
     public enum IndoorObject {
-        CONCRETE_WALL, GLASS_WALL, ROOM, TOILET_MALE, TOILET_FEMALE, ELEVATOR, DOOR_PRIVATE, DOOR_PUBLIC, ENTRANCE,
-        ENTRANCE_EXIT_ONLY, ACCESS_PRIVATE, ACCESS_PUBLIC, STEPS, CORRIDOR, BENCH, AREA, NONE
+        ROOM, CORRIDOR, AREA, LIBRARY, TERMINAL, CAFE, TOILET_MALE, TOILET_FEMALE,
+        DOOR_PRIVATE, DOOR_PUBLIC, ENTRANCE, ENTRANCE_EXIT_ONLY, ACCESS_PRIVATE, ACCESS_PUBLIC,
+        STEPS, ELEVATOR, WALL, CONCRETE_WALL, GLASS_WALL, BENCH, NONE
     }
 }
