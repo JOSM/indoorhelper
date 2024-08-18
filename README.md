@@ -22,8 +22,3 @@ If you want to use the plugin or work with the source code, have a look at [INST
 ## Third-Party Libraries
 
 * https://github.com/opensourceBIM/BuildingSMARTLibrary
-
-## Authors
-
-* Created by Erik Gruschka
-* Maintainer: Rebecca Schmidt (rebeccasmdt@gmail.com)
