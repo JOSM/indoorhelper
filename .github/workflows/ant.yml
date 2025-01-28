@@ -35,7 +35,7 @@ jobs:
           last_tag=$(git describe --tags --abbrev=0 --always)
           release_needed="false"
           for file in $(git diff ${last_tag}..HEAD --name-only); do
-            if [[ $file = "src/main"* ]]; then
+            if [[ $file = "src/"* ]] || [[ $file = "data/"* ]] || [[ $file = "lib/"* ]] || [[ $file = "resources/"* ]] || [[ $file = "images/"* ]]; then
               release_needed="true"
               break
             fi
