@@ -1,15 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<project  name="indoorhelper" default="dist" basedir=".">	
-	<!-- edit the properties of this plugin in the file `gradle.properties` -->
-	<property file="${basedir}/gradle.properties"/>
-
-	<property name="josm" location="../../core/dist/josm-custom.jar"/>
-	<property name="plugin.dist.dir" value="../../dist"/>
-	
-    <!-- ** include targets that all plugins have in common ** -->
-    <import file="../build-common.xml"/>
-
-    <target name="pre-compile" depends="fetch_dependencies">
-        <!-- include fetch_dependencies task -->
-    </target>
+<project name="indoorhelper" default="dist" basedir=".">
+  <!-- enter the *lowest* JOSM version this plugin is currently compatible with -->
+  <property name="plugin.main.version" value="19044"/>
+  <!-- Configure these properties (replace "..." accordingly).
+         See https://josm.openstreetmap.de/wiki/DevelopersGuide/DevelopingPlugins
+    -->
+  <property name="plugin.author" value="Erik Gruschka, Rebecca Schmidt"/>
+  <property name="plugin.class" value="org.openstreetmap.josm.plugins.indoorhelper.IndoorHelperPlugin"/>
+  <property name="plugin.description" value="Gives assistance for the mapping process of indoor OSM building data. Includes a validator and a mappaint style for indoor-data."/>
+  <property name="plugin.icon" value="images/dialogs/indoorhelper.png"/>
+  <property name="plugin.link" value="https://wiki.openstreetmap.org/wiki/JOSM/Plugins/indoorhelper"/>
+  <property name="plugin.early" value="true"/>
+  <!--<property name="plugin.requires" value="..."/>-->
+  <property name="plugin.stage" value="50"/>
+  <!-- edit the properties of this plugin in the file `gradle.properties` -->
+  <property name="de_plugin.description" value="Plug-In zur Hilfe bei der Erstellung von Innenraumdaten. Beinhaltet einen Validator f黵 die erstellten Daten und einen Renderstil um diese 黚ersichtlich darzustellen."/>
+  <!-- ** include targets that all plugins have in common ** -->
+  <import file="../build-common.xml"/>
+  <target name="pre-compile" depends="fetch_dependencies">
+    <!-- include fetch_dependencies task -->
+  </target>
 </project>

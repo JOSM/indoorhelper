@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.openstreetmap.josm.plugins</groupId>
+    <artifactId>plugin-root</artifactId>
+    <version>SNAPSHOT</version>
+  </parent>
+  <artifactId>validations_testing</artifactId>
+  <url>${plugin.link}</url>
+  <developers>
+    <developer>
+      <name>Erik Gruschka</name>
+    </developer>
+    <developer>
+      <name>Rebecca Schmidt</name>
+    </developer>
+  </developers>
+  <properties>
+    <plugin.src.dir>${project.basedir}/src/main/java</plugin.src.dir>
+    <plugin.resources.dir>${project.basedir}/src/main/resources</plugin.resources.dir>
+    <plugin.main.version>19044</plugin.main.version>
+    <plugin.author>Erik Gruschka, Rebecca Schmidt</plugin.author>
+    <plugin.class>org.openstreetmap.josm.plugins.indoorhelper.IndoorHelperPlugin</plugin.class>
+    <plugin.description>Gives assistance for the mapping process of indoor OSM building data. Includes a validator and a mappaint style for indoor-data.</plugin.description>
+    <plugin.description.de>Plug-In zur Hilfe bei der Erstellung von Innenraumdaten. Beinhaltet einen Validator f&#x9EF5; die erstellten Daten und einen Renderstil um diese &#x9EDA;ersichtlich darzustellen.</plugin.description.de>
+    <plugin.link>https://wiki.openstreetmap.org/wiki/JOSM/Plugins/indoorhelper</plugin.link>
+    <plugin.icon>images/dialogs/indoorhelper.png</plugin.icon>
+    <plugin.canloadatruntime>true</plugin.canloadatruntime>
+    <plugin.stage>50</plugin.stage>
+  </properties>
+  <build>
+    <dependencies>
+      <dependency>
+        <groupId>org.opensourcebim</groupId>
+        <artifactId>BuildingSMARTLibrary</artifactId>
+        <version>1.0.9</version>
+        <scope>compile</scope>
+      </dependency>
+    </dependencies>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifestEntries>
+              <Plugin-Link>${plugin.link}</Plugin-Link>
+              <Plugin-Canloadatruntime>${plugin.canloadatruntime}</Plugin-Canloadatruntime>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
