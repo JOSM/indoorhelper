@@ -6,7 +6,7 @@
     <artifactId>plugin-root</artifactId>
     <version>SNAPSHOT</version>
   </parent>
-  <artifactId>validations_testing</artifactId>
+  <artifactId>indoorhelper</artifactId>
   <url>${plugin.link}</url>
   <developers>
     <developer>
@@ -17,8 +17,6 @@
     </developer>
   </developers>
   <properties>
-    <plugin.src.dir>${project.basedir}/src/main/java</plugin.src.dir>
-    <plugin.resources.dir>${project.basedir}/src/main/resources</plugin.resources.dir>
     <plugin.main.version>19044</plugin.main.version>
     <plugin.author>Erik Gruschka, Rebecca Schmidt</plugin.author>
     <plugin.class>org.openstreetmap.josm.plugins.indoorhelper.IndoorHelperPlugin</plugin.class>
@@ -29,15 +27,63 @@
     <plugin.canloadatruntime>true</plugin.canloadatruntime>
     <plugin.stage>50</plugin.stage>
   </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.opensourcebim</groupId>
+      <artifactId>BuildingSMARTLibrary</artifactId>
+      <version>1.0.9</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.wiremock</groupId>
+      <artifactId>wiremock</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.platform</groupId>
+      <artifactId>junit-platform-launcher</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.platform</groupId>
+      <artifactId>junit-platform-suite</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.vintage</groupId>
+      <artifactId>junit-vintage-engine</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-params</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-engine</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-migrationsupport</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jmockit</groupId>
+      <artifactId>jmockit</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.awaitility</groupId>
+      <artifactId>awaitility</artifactId>
+    </dependency>
+  </dependencies>
   <build>
-    <dependencies>
-      <dependency>
-        <groupId>org.opensourcebim</groupId>
-        <artifactId>BuildingSMARTLibrary</artifactId>
-        <version>1.0.9</version>
-        <scope>compile</scope>
-      </dependency>
-    </dependencies>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
