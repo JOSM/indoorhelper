@@ -64,7 +64,7 @@ public class ParserUtility {
      * Get list of levels included in dataset
      *
      * @param ds data set
-     * @return Level list as {@link ArrayList<Integer>}
+     * @return Level list as {@link ArrayList}{@code <Integer>}}
      */
     public static ArrayList<Integer> getLevelList(DataSet ds) {
         ArrayList<Integer> l = new ArrayList<>();
