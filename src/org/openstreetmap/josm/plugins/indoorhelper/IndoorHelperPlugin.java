@@ -22,7 +22,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.Objects;
 import java.util.jar.JarFile;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 
 /**
@@ -104,10 +107,14 @@ public class IndoorHelperPlugin extends Plugin implements PaintableInvalidationL
 
     @Override
     public void paintableInvalidated(PaintableInvalidationEvent event) {
-        AutoFilter currentAutoFilter = AutoFilterManager.getInstance().getCurrentAutoFilter();
-        if (currentAutoFilter != null) {
+        List<AutoFilter> currentAutoFilters = AutoFilterManager.getInstance().getCurrentAutoFilters();
+        if (currentAutoFilters != null && !currentAutoFilters.isEmpty()) {
             if (indoorController != null) {
-                indoorController.setWorkingLevel(currentAutoFilter.getLabel());
+                String combinedLabels = currentAutoFilters.stream()
+                    .map(AutoFilter::getLabel)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.joining(", "));
+                indoorController.setWorkingLevel(combinedLabels);
                 indoorController.updateRepeatOnKeyFilter();
             }
         } else if (indoorController != null) {

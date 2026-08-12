@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project name="indoorhelper" default="dist" basedir=".">
   <!-- enter the *lowest* JOSM version this plugin is currently compatible with -->
-  <property name="plugin.main.version" value="19044"/>
+  <property name="plugin.main.version" value="19592"/>
   <!-- Configure these properties (replace "..." accordingly).
          See https://josm.openstreetmap.de/wiki/DevelopersGuide/DevelopingPlugins
     -->
@@ -14,7 +14,7 @@
   <!--<property name="plugin.requires" value="..."/>-->
   <property name="plugin.stage" value="50"/>
   <!-- edit the properties of this plugin in the file `gradle.properties` -->
-  <property name="de_plugin.description" value="Plug-In zur Hilfe bei der Erstellung von Innenraumdaten. Beinhaltet einen Validator f黵 die erstellten Daten und einen Renderstil um diese 黚ersichtlich darzustellen."/>
+  <property name="de_plugin.description" value="Plug-In zur Hilfe bei der Erstellung von Innenraumdaten. Beinhaltet einen Validator für die erstellten Daten und einen Renderstil um diese übersichtlich darzustellen."/>
   <!-- ** include targets that all plugins have in common ** -->
   <import file="../build-common.xml"/>
   <target name="pre-compile" depends="fetch_dependencies">

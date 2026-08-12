@@ -17,11 +17,11 @@
     </developer>
   </developers>
   <properties>
-    <plugin.main.version>19044</plugin.main.version>
+    <plugin.main.version>19592</plugin.main.version>
     <plugin.author>Erik Gruschka, Rebecca Schmidt</plugin.author>
     <plugin.class>org.openstreetmap.josm.plugins.indoorhelper.IndoorHelperPlugin</plugin.class>
     <plugin.description>Gives assistance for the mapping process of indoor OSM building data. Includes a validator and a mappaint style for indoor-data.</plugin.description>
-    <plugin.description.de>Plug-In zur Hilfe bei der Erstellung von Innenraumdaten. Beinhaltet einen Validator f&#x9EF5; die erstellten Daten und einen Renderstil um diese &#x9EDA;ersichtlich darzustellen.</plugin.description.de>
+    <plugin.description.de>Plug-In zur Hilfe bei der Erstellung von Innenraumdaten. Beinhaltet einen Validator für die erstellten Daten und einen Renderstil um diese übersichtlich darzustellen.</plugin.description.de>
     <plugin.link>https://wiki.openstreetmap.org/wiki/JOSM/Plugins/indoorhelper</plugin.link>
     <plugin.icon>images/dialogs/indoorhelper.png</plugin.icon>
     <plugin.canloadatruntime>true</plugin.canloadatruntime>
