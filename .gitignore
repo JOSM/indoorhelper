@@ -4,3 +4,5 @@
 /javadoc/
 /lib/
 .idea/
+dependency-reduced-pom.xml
+target/
